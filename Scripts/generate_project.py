@@ -92,7 +92,7 @@ def target_settings(name: str) -> dict:
         "GENERATE_INFOPLIST_FILE": "YES",
         "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
         "MARKETING_VERSION": "0.1.0",
-        "PRODUCT_BUNDLE_IDENTIFIER": f"com.recollect.{name}",
+        "PRODUCT_BUNDLE_IDENTIFIER": f"com.harryhutchins.recollectdemo.{name}",
         "PRODUCT_NAME": "$(TARGET_NAME)",
         "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
         "SUPPORTS_MACCATALYST": "NO",

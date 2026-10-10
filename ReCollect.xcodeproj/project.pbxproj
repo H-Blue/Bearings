@@ -75,7 +75,7 @@
 				GENERATE_INFOPLIST_FILE = "YES";
 				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
 				MARKETING_VERSION = "0.1.0";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harryhutchins.recollectdemo.ReCollectTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = "NO";
@@ -154,7 +154,7 @@
 				GENERATE_INFOPLIST_FILE = "YES";
 				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
 				MARKETING_VERSION = "0.1.0";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollect";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harryhutchins.recollectdemo.ReCollect";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = "NO";
@@ -354,7 +354,7 @@
 				GENERATE_INFOPLIST_FILE = "YES";
 				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
 				MARKETING_VERSION = "0.1.0";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harryhutchins.recollectdemo.ReCollectUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = "NO";
@@ -444,7 +444,7 @@
 				GENERATE_INFOPLIST_FILE = "YES";
 				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
 				MARKETING_VERSION = "0.1.0";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollect";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harryhutchins.recollectdemo.ReCollect";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = "NO";
@@ -699,7 +699,7 @@
 				GENERATE_INFOPLIST_FILE = "YES";
 				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
 				MARKETING_VERSION = "0.1.0";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harryhutchins.recollectdemo.ReCollectUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = "NO";
@@ -723,7 +723,7 @@
 				GENERATE_INFOPLIST_FILE = "YES";
 				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
 				MARKETING_VERSION = "0.1.0";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.harryhutchins.recollectdemo.ReCollectTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = "NO";
