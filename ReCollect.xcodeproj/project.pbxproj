@@ -1,0 +1,855 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+
+	};
+	objectVersion = 56;
+	objects = {
+		040974C1864DC349DE94646E = {
+			isa = "PBXBuildFile";
+			fileRef = "2AF336C91C902B619D6FDB22";
+		};
+		0436E01BE008F0C465CEF4B3 = {
+			isa = "PBXContainerItemProxy";
+			containerPortal = "48CC3D9CB6E90ABD2D4A1C50";
+			proxyType = 1;
+			remoteGlobalIDString = "E0DE895892D1A16302431EAF";
+			remoteInfo = "ReCollect";
+		};
+		0733FB871440E3D9AAD4F31A = {
+			isa = "PBXBuildFile";
+			fileRef = "A1F2DCE6A9EC62E6DE949648";
+		};
+		08631B20564E0F13FC15A804 = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = "NO";
+				CLANG_ENABLE_MODULES = "YES";
+				CLANG_ENABLE_OBJC_ARC = "YES";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = "YES";
+				CLANG_WARN_OBJC_ROOT_CLASS = "YES_ERROR";
+				ENABLE_STRICT_OBJC_MSGSEND = "YES";
+				GCC_C_LANGUAGE_STANDARD = "gnu17";
+				GCC_NO_COMMON_BLOCKS = "YES";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = "YES";
+				GCC_WARN_ABOUT_RETURN_TYPE = "YES_ERROR";
+				GCC_WARN_UNDECLARED_SELECTOR = "YES";
+				GCC_WARN_UNINITIALIZED_AUTOS = "YES_AGGRESSIVE";
+				GCC_WARN_UNUSED_FUNCTION = "YES";
+				GCC_WARN_UNUSED_VARIABLE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				SDKROOT = "iphoneos";
+				SWIFT_VERSION = "5.0";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				SWIFT_COMPILATION_MODE = "wholemodule";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = "YES";
+			};
+			name = "Release";
+		};
+		08E913A4114B94044568E3A2 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalDay.swift";
+			sourceTree = "<group>";
+		};
+		0BA37903FF64A6F5E15EA34E = {
+			isa = "PBXBuildFile";
+			fileRef = "3B242D74DBBD48E540939994";
+		};
+		0DC8C776F372B52079A41F2E = {
+			isa = "PBXGroup";
+			children = (
+				"A1F2DCE6A9EC62E6DE949648",
+				"B09F42797A35074C98050B0B",
+			);
+			path = "Editor";
+			sourceTree = "<group>";
+		};
+		108CC836BC39A3266441C5DE = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				MARKETING_VERSION = "0.1.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = "NO";
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = "NO";
+				SWIFT_VERSION = "5.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReCollect.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ReCollect";
+			};
+			name = "Release";
+		};
+		10ACC04A89FED0B1F22C3F0D = {
+			isa = "PBXGroup";
+			children = (
+				"AD72FD891E2E9B21EF028740",
+				"5CF679CCD806D9A242645CB3",
+				"2C1608DE2D6F447B1A46548D",
+				"8B5DDF76036D380574358900",
+				"F1A55F62CE96728C7403F59E",
+			);
+			path = "ReCollectTests";
+			sourceTree = "<group>";
+		};
+		1437FCBFEDB65CDEDC1A0965 = {
+			isa = "PBXGroup";
+			children = (
+				"3B242D74DBBD48E540939994",
+				"4932CCF8DDD7871187459807",
+			);
+			path = "Persistence";
+			sourceTree = "<group>";
+		};
+		186B69D5736EF1FA3774C468 = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = "NO";
+				CLANG_ENABLE_MODULES = "YES";
+				CLANG_ENABLE_OBJC_ARC = "YES";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = "YES";
+				CLANG_WARN_OBJC_ROOT_CLASS = "YES_ERROR";
+				ENABLE_STRICT_OBJC_MSGSEND = "YES";
+				GCC_C_LANGUAGE_STANDARD = "gnu17";
+				GCC_NO_COMMON_BLOCKS = "YES";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = "YES";
+				GCC_WARN_ABOUT_RETURN_TYPE = "YES_ERROR";
+				GCC_WARN_UNDECLARED_SELECTOR = "YES";
+				GCC_WARN_UNINITIALIZED_AUTOS = "YES_AGGRESSIVE";
+				GCC_WARN_UNUSED_FUNCTION = "YES";
+				GCC_WARN_UNUSED_VARIABLE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				SDKROOT = "iphoneos";
+				SWIFT_VERSION = "5.0";
+				DEBUG_INFORMATION_FORMAT = "dwarf";
+				ENABLE_TESTABILITY = "YES";
+				GCC_OPTIMIZATION_LEVEL = "0";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				ONLY_ACTIVE_ARCH = "YES";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = "Debug";
+		};
+		18E35996C14AF315F29F3D2C = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				MARKETING_VERSION = "0.1.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollect";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = "NO";
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = "NO";
+				SWIFT_VERSION = "5.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				ENABLE_PREVIEWS = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "ReCollect";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = "YES";
+				INFOPLIST_KEY_UILaunchScreen_Generation = "YES";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+			};
+			name = "Release";
+		};
+		192967B8D692C6816F838D75 = {
+			isa = "PBXFileReference";
+			explicitFileType = "wrapper.cfbundle";
+			includeInIndex = 0;
+			path = "ReCollectTests.xctest";
+			sourceTree = "BUILT_PRODUCTS_DIR";
+		};
+		1B553D42927137F6762369BB = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalMonth.swift";
+			sourceTree = "<group>";
+		};
+		1D34A0970352C3E277365EEE = {
+			isa = "PBXGroup";
+			children = (
+				"DBF9813E7112D9EA6FD936C1",
+				"C8DE13C4EBAA497A57B22E7B",
+				"75ECB38D7459B99F9877E015",
+				"70CB936923B97909163A0A43",
+				"1437FCBFEDB65CDEDC1A0965",
+				"739C20DA9E6EBBD4112A6F70",
+				"5DF2DD8F0051B897C7BA77BC",
+			);
+			path = "ReCollect";
+			sourceTree = "<group>";
+		};
+		20F18D8BD5A403CB786E2BD3 = {
+			isa = "XCConfigurationList";
+			buildConfigurations = (
+				"D7B746E7B11955949108A4FF",
+				"4DD28F25736C50B3EA9CFE7E",
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		225244DF00FCE3D3B52C2EDC = {
+			isa = "PBXBuildFile";
+			fileRef = "1B553D42927137F6762369BB";
+		};
+		24F585EDB9F3954F207574EF = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "DayView.swift";
+			sourceTree = "<group>";
+		};
+		25D5DBD9682CC019030AFD93 = {
+			isa = "PBXBuildFile";
+			fileRef = "31498E4CBEE6438FF4228B72";
+		};
+		2AF336C91C902B619D6FDB22 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalPeriod.swift";
+			sourceTree = "<group>";
+		};
+		2C1608DE2D6F447B1A46548D = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalFailureTests.swift";
+			sourceTree = "<group>";
+		};
+		30130A1EB5C9D02F0540D2EF = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalEntry.swift";
+			sourceTree = "<group>";
+		};
+		31498E4CBEE6438FF4228B72 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "ReCollectTheme.swift";
+			sourceTree = "<group>";
+		};
+		332689F552931A3BA3629937 = {
+			isa = "PBXFileReference";
+			explicitFileType = "wrapper.application";
+			includeInIndex = 0;
+			path = "ReCollect.app";
+			sourceTree = "BUILT_PRODUCTS_DIR";
+		};
+		3B242D74DBBD48E540939994 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalStore.swift";
+			sourceTree = "<group>";
+		};
+		3E615970DE22A639A140FF8A = {
+			isa = "PBXFrameworksBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		457EA0C7A68E603E2AB563FB = {
+			isa = "PBXBuildFile";
+			fileRef = "B09F42797A35074C98050B0B";
+		};
+		4837C1E2CF754CEB36DF60EA = {
+			isa = "PBXSourcesBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+				"73D2B7EF50CBF51EAA8A18BA",
+				"ECB8E55485E8154497152099",
+				"25D5DBD9682CC019030AFD93",
+				"F817A9F96BBC85F80F3D90F2",
+				"0733FB871440E3D9AAD4F31A",
+				"457EA0C7A68E603E2AB563FB",
+				"E75D55CDD11A1A5C1CF33E2B",
+				"E221A069DDD815AB054C6D45",
+				"B99D6707DD2732CEDF40E77A",
+				"225244DF00FCE3D3B52C2EDC",
+				"040974C1864DC349DE94646E",
+				"0BA37903FF64A6F5E15EA34E",
+				"6E063730F5FA6901AD61CB0D",
+				"C86B855B3BCCF98149AB2783",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		48C318E693AAFBB8767592C4 = {
+			isa = "PBXBuildFile";
+			fileRef = "8B5DDF76036D380574358900";
+		};
+		48CC3D9CB6E90ABD2D4A1C50 = {
+			isa = "PBXProject";
+			attributes = {
+				BuildIndependentTargetsInParallel = "YES";
+				LastUpgradeCheck = "1600";
+				TargetAttributes = {
+					E0DE895892D1A16302431EAF = {
+						CreatedOnToolsVersion = "16.0";
+					};
+					57004776FA053C632B786013 = {
+						CreatedOnToolsVersion = "16.0";
+						TestTargetID = "E0DE895892D1A16302431EAF";
+					};
+					E333E9EEC912D1CA5CE7AC54 = {
+						CreatedOnToolsVersion = "16.0";
+						TestTargetID = "E0DE895892D1A16302431EAF";
+					};
+				};
+			};
+			buildConfigurationList = "7D49FECC15E7CAB078DDC1B1";
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "en";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				"en",
+				"Base",
+			);
+			mainGroup = "9FF0CD9E3945FDC9ABC47FF5";
+			productRefGroup = "8B619C19A1F26BF2C001BFEE";
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				"E0DE895892D1A16302431EAF",
+				"57004776FA053C632B786013",
+				"E333E9EEC912D1CA5CE7AC54",
+			);
+		};
+		49065458BC47A8EBF4C3B227 = {
+			isa = "PBXBuildFile";
+			fileRef = "B075605380C9705326DDD8B3";
+		};
+		4932CCF8DDD7871187459807 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "PersistenceController.swift";
+			sourceTree = "<group>";
+		};
+		4DD28F25736C50B3EA9CFE7E = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				MARKETING_VERSION = "0.1.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = "NO";
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = "NO";
+				SWIFT_VERSION = "5.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				TEST_TARGET_NAME = "ReCollect";
+			};
+			name = "Release";
+		};
+		57004776FA053C632B786013 = {
+			isa = "PBXNativeTarget";
+			buildConfigurationList = "F814E3D43400B0100C68FEA6";
+			buildPhases = (
+				"B49918E3FD19D71C8D5A67A2",
+				"F03FCE786E529CBA8F0C8E4F",
+				"E4E40E038D495A836A580D24",
+			);
+			buildRules = (
+
+			);
+			dependencies = (
+				"72AF6CC8FF696CD0BDA95779",
+			);
+			name = "ReCollectTests";
+			productName = "ReCollectTests";
+			productReference = "192967B8D692C6816F838D75";
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5A37AB2BE345D6172C3A8495 = {
+			isa = "PBXFileReference";
+			explicitFileType = "wrapper.cfbundle";
+			includeInIndex = 0;
+			path = "ReCollectUITests.xctest";
+			sourceTree = "BUILT_PRODUCTS_DIR";
+		};
+		5CF679CCD806D9A242645CB3 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalEditorSessionTests.swift";
+			sourceTree = "<group>";
+		};
+		5DF2DD8F0051B897C7BA77BC = {
+			isa = "PBXGroup";
+			children = (
+				"60959ED7DA170FAF315AC656",
+			);
+			path = "Services";
+			sourceTree = "<group>";
+		};
+		6006DCBC8662C38DCF7BD486 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalFlowTests.swift";
+			sourceTree = "<group>";
+		};
+		60959ED7DA170FAF315AC656 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "LocalJournalRetrieving.swift";
+			sourceTree = "<group>";
+		};
+		650B7AA653E52762908B0B55 = {
+			isa = "PBXBuildFile";
+			fileRef = "2C1608DE2D6F447B1A46548D";
+		};
+		66AA908EC2BDC059C3C922B8 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "ReCollectApp.swift";
+			sourceTree = "<group>";
+		};
+		6E063730F5FA6901AD61CB0D = {
+			isa = "PBXBuildFile";
+			fileRef = "4932CCF8DDD7871187459807";
+		};
+		70A3FBC9ABE6E4E50FB2AA02 = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				MARKETING_VERSION = "0.1.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollect";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = "NO";
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = "NO";
+				SWIFT_VERSION = "5.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				ENABLE_PREVIEWS = "YES";
+				INFOPLIST_KEY_CFBundleDisplayName = "ReCollect";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = "YES";
+				INFOPLIST_KEY_UILaunchScreen_Generation = "YES";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SWIFT_EMIT_LOC_STRINGS = "YES";
+			};
+			name = "Debug";
+		};
+		70CB936923B97909163A0A43 = {
+			isa = "PBXGroup";
+			children = (
+				"08E913A4114B94044568E3A2",
+				"30130A1EB5C9D02F0540D2EF",
+				"1B553D42927137F6762369BB",
+				"2AF336C91C902B619D6FDB22",
+			);
+			path = "Models";
+			sourceTree = "<group>";
+		};
+		71C86592A0A83A9E98E60F38 = {
+			isa = "PBXResourcesBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+				"A743FCD9C84CFC044D28F8C4",
+				"49065458BC47A8EBF4C3B227",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71FC3A359DA46643146228B1 = {
+			isa = "PBXResourcesBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72AF6CC8FF696CD0BDA95779 = {
+			isa = "PBXTargetDependency";
+			target = "E0DE895892D1A16302431EAF";
+			targetProxy = "0436E01BE008F0C465CEF4B3";
+		};
+		739C20DA9E6EBBD4112A6F70 = {
+			isa = "PBXGroup";
+			children = (
+				"9E69F682DAD7CD00551B7B94",
+				"B075605380C9705326DDD8B3",
+			);
+			path = "Resources";
+			sourceTree = "<group>";
+		};
+		73D2B7EF50CBF51EAA8A18BA = {
+			isa = "PBXBuildFile";
+			fileRef = "66AA908EC2BDC059C3C922B8";
+		};
+		7548B953A83DA2DC50E43C53 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "ReCollectRootView.swift";
+			sourceTree = "<group>";
+		};
+		75ECB38D7459B99F9877E015 = {
+			isa = "PBXGroup";
+			children = (
+				"A7BDACCFE7463A66CFF6E4E5",
+				"0DC8C776F372B52079A41F2E",
+				"B667C5F3800941BD5A236C26",
+			);
+			path = "Features";
+			sourceTree = "<group>";
+		};
+		7D49FECC15E7CAB078DDC1B1 = {
+			isa = "XCConfigurationList";
+			buildConfigurations = (
+				"186B69D5736EF1FA3774C468",
+				"08631B20564E0F13FC15A804",
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		7E71A78C8B54C63DCFB4EB5C = {
+			isa = "PBXFrameworksBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B5DDF76036D380574358900 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalMonthTests.swift";
+			sourceTree = "<group>";
+		};
+		8B619C19A1F26BF2C001BFEE = {
+			isa = "PBXGroup";
+			children = (
+				"332689F552931A3BA3629937",
+				"192967B8D692C6816F838D75",
+				"5A37AB2BE345D6172C3A8495",
+			);
+			name = "Products";
+			sourceTree = "<group>";
+		};
+		93E146D7BFDA03C72A92C0CB = {
+			isa = "PBXContainerItemProxy";
+			containerPortal = "48CC3D9CB6E90ABD2D4A1C50";
+			proxyType = 1;
+			remoteGlobalIDString = "E0DE895892D1A16302431EAF";
+			remoteInfo = "ReCollect";
+		};
+		9AC07151664FBF27AD51E598 = {
+			isa = "PBXGroup";
+			children = (
+				"6006DCBC8662C38DCF7BD486",
+			);
+			path = "ReCollectUITests";
+			sourceTree = "<group>";
+		};
+		9E69F682DAD7CD00551B7B94 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "folder.assetcatalog";
+			path = "Assets.xcassets";
+			sourceTree = "<group>";
+		};
+		9FF0CD9E3945FDC9ABC47FF5 = {
+			isa = "PBXGroup";
+			children = (
+				"1D34A0970352C3E277365EEE",
+				"10ACC04A89FED0B1F22C3F0D",
+				"9AC07151664FBF27AD51E598",
+				"8B619C19A1F26BF2C001BFEE",
+			);
+			sourceTree = "<group>";
+		};
+		A1F2DCE6A9EC62E6DE949648 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalEditorSession.swift";
+			sourceTree = "<group>";
+		};
+		A743FCD9C84CFC044D28F8C4 = {
+			isa = "PBXBuildFile";
+			fileRef = "9E69F682DAD7CD00551B7B94";
+		};
+		A7BDACCFE7463A66CFF6E4E5 = {
+			isa = "PBXGroup";
+			children = (
+				"24F585EDB9F3954F207574EF",
+			);
+			path = "Day";
+			sourceTree = "<group>";
+		};
+		A9DC4BAF0C3E797CEBD892F8 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "TimelineView.swift";
+			sourceTree = "<group>";
+		};
+		AA3C8570C6D69ED85D890447 = {
+			isa = "PBXBuildFile";
+			fileRef = "AD72FD891E2E9B21EF028740";
+		};
+		AD72FD891E2E9B21EF028740 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalDayTests.swift";
+			sourceTree = "<group>";
+		};
+		B075605380C9705326DDD8B3 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "text.xml";
+			path = "PrivacyInfo.xcprivacy";
+			sourceTree = "<group>";
+		};
+		B09F42797A35074C98050B0B = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalEditorView.swift";
+			sourceTree = "<group>";
+		};
+		B49918E3FD19D71C8D5A67A2 = {
+			isa = "PBXSourcesBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+				"AA3C8570C6D69ED85D890447",
+				"F6A368543CA64D77CDA244D4",
+				"650B7AA653E52762908B0B55",
+				"48C318E693AAFBB8767592C4",
+				"FC194836B22DCDA0609BA19C",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B667C5F3800941BD5A236C26 = {
+			isa = "PBXGroup";
+			children = (
+				"A9DC4BAF0C3E797CEBD892F8",
+			);
+			path = "Timeline";
+			sourceTree = "<group>";
+		};
+		B99D6707DD2732CEDF40E77A = {
+			isa = "PBXBuildFile";
+			fileRef = "30130A1EB5C9D02F0540D2EF";
+		};
+		C1CFB6D7F565C197664D3A17 = {
+			isa = "XCConfigurationList";
+			buildConfigurations = (
+				"70A3FBC9ABE6E4E50FB2AA02",
+				"18E35996C14AF315F29F3D2C",
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		C4179AFE19901C35B735C630 = {
+			isa = "PBXBuildFile";
+			fileRef = "6006DCBC8662C38DCF7BD486";
+		};
+		C86B855B3BCCF98149AB2783 = {
+			isa = "PBXBuildFile";
+			fileRef = "60959ED7DA170FAF315AC656";
+		};
+		C8DE13C4EBAA497A57B22E7B = {
+			isa = "PBXGroup";
+			children = (
+				"31498E4CBEE6438FF4228B72",
+			);
+			path = "Design";
+			sourceTree = "<group>";
+		};
+		CE530E747CAF838F8E8696E4 = {
+			isa = "PBXTargetDependency";
+			target = "E0DE895892D1A16302431EAF";
+			targetProxy = "93E146D7BFDA03C72A92C0CB";
+		};
+		D7B746E7B11955949108A4FF = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				MARKETING_VERSION = "0.1.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = "NO";
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = "NO";
+				SWIFT_VERSION = "5.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				TEST_TARGET_NAME = "ReCollect";
+			};
+			name = "Debug";
+		};
+		D8D2F4AA6DADB846DF223811 = {
+			isa = "XCBuildConfiguration";
+			buildSettings = {
+				CODE_SIGN_STYLE = "Automatic";
+				CURRENT_PROJECT_VERSION = "1";
+				GENERATE_INFOPLIST_FILE = "YES";
+				IPHONEOS_DEPLOYMENT_TARGET = "17.0";
+				MARKETING_VERSION = "0.1.0";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.recollect.ReCollectTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = "NO";
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = "NO";
+				SWIFT_VERSION = "5.0";
+				TARGETED_DEVICE_FAMILY = "1";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReCollect.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ReCollect";
+			};
+			name = "Debug";
+		};
+		DBF9813E7112D9EA6FD936C1 = {
+			isa = "PBXGroup";
+			children = (
+				"66AA908EC2BDC059C3C922B8",
+				"7548B953A83DA2DC50E43C53",
+			);
+			path = "App";
+			sourceTree = "<group>";
+		};
+		E0512A67C8610C3A977592C1 = {
+			isa = "PBXSourcesBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+				"C4179AFE19901C35B735C630",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0DE895892D1A16302431EAF = {
+			isa = "PBXNativeTarget";
+			buildConfigurationList = "C1CFB6D7F565C197664D3A17";
+			buildPhases = (
+				"4837C1E2CF754CEB36DF60EA",
+				"3E615970DE22A639A140FF8A",
+				"71C86592A0A83A9E98E60F38",
+			);
+			buildRules = (
+
+			);
+			dependencies = (
+
+			);
+			name = "ReCollect";
+			productName = "ReCollect";
+			productReference = "332689F552931A3BA3629937";
+			productType = "com.apple.product-type.application";
+		};
+		E221A069DDD815AB054C6D45 = {
+			isa = "PBXBuildFile";
+			fileRef = "08E913A4114B94044568E3A2";
+		};
+		E333E9EEC912D1CA5CE7AC54 = {
+			isa = "PBXNativeTarget";
+			buildConfigurationList = "20F18D8BD5A403CB786E2BD3";
+			buildPhases = (
+				"E0512A67C8610C3A977592C1",
+				"7E71A78C8B54C63DCFB4EB5C",
+				"71FC3A359DA46643146228B1",
+			);
+			buildRules = (
+
+			);
+			dependencies = (
+				"CE530E747CAF838F8E8696E4",
+			);
+			name = "ReCollectUITests";
+			productName = "ReCollectUITests";
+			productReference = "5A37AB2BE345D6172C3A8495";
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		E4E40E038D495A836A580D24 = {
+			isa = "PBXResourcesBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E75D55CDD11A1A5C1CF33E2B = {
+			isa = "PBXBuildFile";
+			fileRef = "A9DC4BAF0C3E797CEBD892F8";
+		};
+		ECB8E55485E8154497152099 = {
+			isa = "PBXBuildFile";
+			fileRef = "7548B953A83DA2DC50E43C53";
+		};
+		F03FCE786E529CBA8F0C8E4F = {
+			isa = "PBXFrameworksBuildPhase";
+			buildActionMask = 2147483647;
+			files = (
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1A55F62CE96728C7403F59E = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "JournalStoreTests.swift";
+			sourceTree = "<group>";
+		};
+		F6A368543CA64D77CDA244D4 = {
+			isa = "PBXBuildFile";
+			fileRef = "5CF679CCD806D9A242645CB3";
+		};
+		F814E3D43400B0100C68FEA6 = {
+			isa = "XCConfigurationList";
+			buildConfigurations = (
+				"D8D2F4AA6DADB846DF223811",
+				"108CC836BC39A3266441C5DE",
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		F817A9F96BBC85F80F3D90F2 = {
+			isa = "PBXBuildFile";
+			fileRef = "24F585EDB9F3954F207574EF";
+		};
+		FC194836B22DCDA0609BA19C = {
+			isa = "PBXBuildFile";
+			fileRef = "F1A55F62CE96728C7403F59E";
+		};
+	};
+	rootObject = "48CC3D9CB6E90ABD2D4A1C50";
+}
