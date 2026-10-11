@@ -4,7 +4,7 @@ Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 
 
 ## Timeline Settings gear — October 11, 2026
 
-The timeline now exposes Settings through a 44-point light-gray gear at the top left. The existing navy journal shortcut remains at the top right. The swipe-to-reveal and rope-pull interaction and its accessibility action were removed; day views continue to omit Settings.
+The timeline now exposes Settings through a 44-point dark Ink gear at the top left. The existing navy journal shortcut remains at the top right. The swipe-to-reveal and rope-pull interaction and its accessibility action were removed; day views continue to omit Settings. The temporary light-gray native-control tint was reverted across app navigation, buttons, pickers, toggles, reflection, editor, safety and Settings screens so those controls again use the original dark Ink token.
 
 The focused native UI check passed on the Bearings iPhone 16 Pro simulator running iOS 26.5. It verifies that the gear is present, hittable and 44 points square on the left while the journal shortcut remains on the right; horizontal timeline movement does not open Settings; the removed handle is absent; tapping the gear opens Settings; dismissal returns to the timeline; and the day view has no Settings control. Harry's iPhone was unavailable to Xcode, so this change was not installed or visually checked on physical hardware. Maximum Dynamic Type and live assistive-technology behavior remain unverified.
 

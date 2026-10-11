@@ -330,7 +330,7 @@ final class JournalFlowTests: XCTestCase {
 
         settingsButton.tap()
         waitFor(app.otherElements["settings.screen"])
-        attachScreenshot(named: "Settings with light gray native control values")
+        attachScreenshot(named: "Settings with restored dark native controls")
         waitFor(app.buttons["settings.done"]).tap()
 
         waitFor(app.buttons["timeline.today"]).tap()

@@ -38,7 +38,7 @@ The transition scales the timeline around the tapped date, moves it upward, and 
 
 The owner requested a quieter timeline on October 11, 2026: remove Bearings and the slogan from this view, remove the bottom helper sentence, and center the horizontal timeline axis in the safe-area viewport. Horizontal thumb swipes in the blank area near the bottom move the dates using native scrolling. A small fountain-pen outline in opaque `#323575` replaces the visible Today label and opens today’s journal; it retains a 44-point hit target and the accessible name “Write today.” Month navigation, the date chooser, entry markers and reverse navigation remain available. Opening-screen branding remains part of the separate opening experience.
 
-Settings is now intentionally hidden from visible timeline and day controls. On the timeline, the first upward swipe reveals a rope-like handle at the bottom; pulling that handle upward opens Settings. Day views cannot open Settings, and horizontal timeline swipes remain reserved for date navigation. Native iOS control values use the light-gray Marker color while the custom timeline pen, linework and AI controls remain navy.
+Settings is available from the 44-point gear at the timeline's top left; the journal shortcut remains at the top right. Day views do not show Settings, and horizontal timeline swipes remain reserved for date navigation. Native iOS control values use the original dark Ink color while the custom timeline pen, linework and AI controls remain navy.
 
 ## Opening experience
 

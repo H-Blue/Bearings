@@ -58,7 +58,7 @@ struct TimelineView: View {
                 Button(action: onSettings) {
                     Image(systemName: "gearshape")
                         .font(.system(size: 21, weight: .regular))
-                        .foregroundStyle(BearingsTheme.systemControl)
+                        .foregroundStyle(BearingsTheme.ink)
                         .frame(width: 44, height: 44)
                         .contentShape(Rectangle())
                 }

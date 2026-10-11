@@ -124,7 +124,7 @@ private struct TrustedContactEditorView: View {
                 Button("Remove", role: .destructive, action: remove)
             } message: { Text("This removes the contact from Bearings.") }
         }
-        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.systemControl)
+        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.ink)
     }
 
     private func save() {
