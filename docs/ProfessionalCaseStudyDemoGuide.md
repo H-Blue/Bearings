@@ -1,6 +1,6 @@
 # Professional case study demo: loading and presentation
 
-The copy-ready source is [`ProfessionalCaseStudyJournal.md`](ProfessionalCaseStudyJournal.md). The machine-readable equivalent is [`fixtures/ProfessionalCaseStudyJournal.json`](fixtures/ProfessionalCaseStudyJournal.json). Both contain the same 14 fictional entries, one for each day from September 21 through October 4, 2026.
+The copy-ready source is [`ProfessionalCaseStudyJournal.md`](ProfessionalCaseStudyJournal.md). The machine-readable equivalent is [`fixtures/ProfessionalCaseStudyJournal.json`](fixtures/ProfessionalCaseStudyJournal.json). Both contain the same 14 fictional entries from September 28 through October 10, 2026. October 10 has a midday entry and the final evening review.
 
 ## Installed demo path
 
@@ -14,7 +14,7 @@ The seeder intentionally does nothing when the selected store already contains e
 
 If the phone cannot be connected or the demo build cannot be installed, enter the paragraphs from the copy-ready document through the normal editor. Set the journal day and time shown in each heading, save, and confirm each entry appears before continuing. Manual entry preserves the civil journal dates but uses the actual paste/save time as creation metadata.
 
-For a staged presentation, load entries 01–07 and capture the first weekly reflection before adding entries 08–14. The automatic seeder loads both weeks at once, which is better for a complete browsing demo. Bearings computes reflections from the requested civil week, so week one remains separate even when week two is already present.
+For a staged presentation, load entries 01–07 and capture the September 28–October 4 reflection before adding entries 08–14. October 11 is intentionally empty; select that day and request **This week** to review the October 5–11 period, whose writing ends on October 10. The automatic seeder loads both weeks at once, which is better for a complete browsing demo. Bearings computes reflections from the requested civil week, so week one remains separate even when week two is already present.
 
 ## Honest presenter label
 
