@@ -1,6 +1,6 @@
 # Bearings development progress
 
-Milestones: native journaling foundation, owner-directed Bearings rename/app icon, and blue app linework, October 10, 2026.
+Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, and GitHub setup, October 10, 2026.
 
 ## Implemented
 
@@ -25,7 +25,7 @@ Debug compilation and all 24 data/editor tests passed, including repeated real r
 
 ## Documentation synchronization
 
-The original foundation product, architecture, references, decisions, tests and progress were synchronized to [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204) under the existing Bearings Notion home. Saved content and parent hierarchy were fetched and verified; all six sections matched the final local documentation after native formatting normalization. No external GitHub repository has been created or pushed.
+The original foundation product, architecture, references, decisions, tests and progress were synchronized to [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204) under the existing Bearings Notion home. Saved content and parent hierarchy were fetched and verified; all six sections matched the final local documentation after native formatting normalization. At that milestone, no external GitHub repository had been created or pushed; the later GitHub setup is recorded below.
 
 ## Bearings rename and app icon
 
@@ -33,7 +33,7 @@ The owner explicitly renamed ReCollect to **Bearings** and requested the compass
 
 The owner supplied and explicitly accepted `appIcon.png` for the app icon. Its artwork is preserved without recoloring or redrawing and resized only to 1024 × 1024 at `Bearings/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png`; the root source remains untouched. The original flush-background, circular-compass and simplified-topographic-map request specified `#C8AB89` / `#323575` as design targets. Exact two-color enforcement is not claimed for the accepted image. The supplied-icon decision retained the approved paper/ink/marker palette; the subsequent blue-linework instruction is recorded below.
 
-The renamed app passed all 24 data/editor tests, two focused UI tests covering saved edits/relaunch and Reduce Motion navigation, and an unsigned generic iOS Release build. The simulator Home Screen shows Bearings with the accepted compass icon. The local branch is now `codex/bearings-foundation`; original signing configuration and journal identities are preserved. Exact checks and limits are recorded in `docs/Testing.md`.
+The renamed app passed all 24 data/editor tests, two focused UI tests covering saved edits/relaunch and Reduce Motion navigation, and an unsigned generic iOS Release build. The simulator Home Screen shows Bearings with the accepted compass icon. At the rename milestone, the local branch became `codex/bearings-foundation`; original signing configuration and journal identities are preserved. Exact checks and limits are recorded in `docs/Testing.md`.
 
 The Bearings milestone's complete product, architecture, references, decisions, tests and progress were synchronized to [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69) under the existing Bearings Notion home on October 10, 2026. The saved six-document content and parent hierarchy were fetched and verified; `docs/NotionSync.md` records the final source hashes.
 
@@ -44,6 +44,16 @@ The latest owner request changes decorative app line colors to opaque `#323575`.
 Debug simulator compilation and two existing UI tests passed with zero failures. Timeline, day and editor screenshots were reviewed and show the navy linework. Source audit confirms the opaque sRGB token and complete coverage of custom line primitives. Exact checks and remaining verification limits are recorded in `docs/Testing.md`.
 
 This linework milestone was synchronized to [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69) under the existing Bearings home on October 10, 2026. The complete six-document saved snapshot and parent hierarchy were fetched and verified; `docs/NotionSync.md` records the final source hashes.
+
+## Public GitHub setup
+
+The owner requested GitHub setup for later Hacklanta submission, selected public visibility, and explicitly instructed that the project must not be submitted. The public [H-Blue/Bearings](https://github.com/H-Blue/Bearings) repository contains the committed app, icon, tests and documentation on its default `main` branch. Local `main` tracks `origin/main`; the prior local coding branch remains available. The README includes download/clone instructions, simulator setup, features, accurate test limits, and Codex/icon provenance. No hackathon submission has been made.
+
+An unsigned Debug simulator build passed from a clean export of the committed source, without local signing changes or owner working materials. The published source was cloned without credentials and matched the local source commit; its README was fetched anonymously and matched the committed file. Only `main` was pushed. Local journal stores, credentials, build evidence, untracked working materials and Codex checkpoint refs were excluded. Exact evidence and remaining test limits are in `docs/Testing.md` and `docs/GitHub.md`.
+
+The [Hacklanta guide](https://aluminum-soprano-222.notion.site/Hacklanta-2026-Hacker-Guide-3b81ccc4ed5c80f4b717c0ccc4b5df54#c5e8ee29f2bf4d9d954266fce5486f5c) requires public project code and a useful README; its submission checklist accepts clear run instructions as an alternative to a working demo link. GitHub setup covers those repository materials. Submission forms and a demo video remain separate owner work.
+
+This GitHub setup milestone was synchronized to [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69) under the existing Bearings home on October 10, 2026. The saved Decisions, Testing and Progress updates and the complete six-document snapshot were fetched and verified; `docs/NotionSync.md` records the final source hashes. No hackathon submission was made.
 
 ## Next work and boundaries
 

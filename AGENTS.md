@@ -21,6 +21,7 @@ Native iPhone journal built with Swift, SwiftUI, and SwiftData. The user's story
 - Timeline/day navigation must preserve spatial context, work in reverse, and respect Reduce Motion. Use native text editing, safe areas, keyboard behavior, Dynamic Type, and accessible controls.
 
 ## Documentation and collaboration
+- GitHub source repository: https://github.com/H-Blue/Bearings. The owner approved public repository setup; hackathon submission is explicitly excluded. Future publishing/pushing still requires authorization for the requested work.
 - Notion project home: https://app.notion.com/p/3f5076d4a2e18039877ed1727adbcb42. Notion is the product/design source; this repository is the implemented-code source.
 - Technical handoff: https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69. Synchronization evidence is in `docs/NotionSync.md`.
 - Maintain architecture, decisions, scope, progress, and tests under `docs/`; synchronize meaningful milestones to the existing Bearings Notion hierarchy and verify writes. Record pending synchronization explicitly.

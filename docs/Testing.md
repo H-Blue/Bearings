@@ -2,6 +2,29 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Public GitHub source setup
+
+Verified on October 10, 2026. The owner requested GitHub setup, selected public visibility, and explicitly excluded hackathon submission. The public repository is [H-Blue/Bearings](https://github.com/H-Blue/Bearings), with `main` as its default branch.
+
+- A clean export of committed source `897d848a5f2db768eb148ddc7939dad1e58d578c` (52 tracked files) passed an unsigned Debug build for generic iOS Simulator. Environment: macOS 26.6.2 (25G83), Xcode 27.0 (27A266a), Swift 6.4 compiler, iOS Simulator 27.0 SDK and iOS 17 deployment target. Evidence: `build/BearingsGitHubSourceBuild.log`; derived data: `build/BearingsGitHubSourceDerivedData`. Bearings branding, retained bundle identity, AppIcon and compiled assets were inspected. The only build warning was unused AppIntents metadata extraction.
+- The source/history audit found no recognized credential patterns, private journal data, database files, logs, result bundles or build artifacts in the intended source history. The app source, shared scheme, icon and privacy manifest are tracked. Owner signing changes and untracked working materials were preserved locally.
+- Only `main` was pushed. GitHub reported public visibility and the `main` default branch. A fresh clone with credential helpers disabled succeeded and matched the local source commit. An anonymous raw README download matched the committed file's SHA-256. Local Codex checkpoint refs were excluded.
+- Hosting and README/documentation changes do not change the app. Data/editor, UI, accessibility and Release checks were not rerun for GitHub setup; previous passing results and device/runtime limits below remain applicable. No hackathon submission was made.
+
+Commands actually run:
+
+```sh
+xcodebuild build -project build/GitHubSourceCheckout/Bearings.xcodeproj -scheme Bearings \
+  -configuration Debug -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath build/BearingsGitHubSourceDerivedData CODE_SIGNING_ALLOWED=NO
+GIT_TERMINAL_PROMPT=0 git -c credential.helper= -c credential.interactive=never clone \
+  --single-branch --branch main https://github.com/H-Blue/Bearings.git build/GitHubPublicCheckout
+curl -q -fLsS https://raw.githubusercontent.com/H-Blue/Bearings/main/README.md \
+  -o build/BearingsGitHubPublicREADME.md
+```
+
+The export was created by capturing `git archive --format=tar 897d848a5f2db768eb148ddc7939dad1e58d578c` through Python's `subprocess` module and extracting it with `tarfile` into an empty `build/GitHubSourceCheckout`, after validating that every archive path stayed inside that directory. Build artifacts and public-checkout evidence remain ignored local files. README/documentation changes following the compiled source do not change the app implementation.
+
 ## Owner-directed navy linework
 
 Verified on October 10, 2026 using Xcode 27.0 and iPhone 17e, iOS 26.5. All custom decorative linework now uses opaque sRGB `#323575`: timeline horizontal line/ticks, day branches, entry dividers and the editor rule. `Line` / `BearingsTheme.line` provides the native drawing color; the SVG rule's stroke uses the same value. Source review confirmed that the rule geometry, line widths, text/control ink, gray marker fills, paper and accepted app icon are preserved.

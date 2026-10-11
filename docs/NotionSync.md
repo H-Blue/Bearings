@@ -1,6 +1,6 @@
 # Bearings Notion synchronization
 
-The owner-directed navy-linework milestone was synchronized and the saved content fetched for verification on October 10, 2026. The preceding Bearings rename and owner-accepted app-icon milestone remains recorded below as verified history.
+The owner-authorized public GitHub setup milestone was synchronized and the saved content fetched for verification on October 10, 2026. GitHub setup does not submit the project to Hacklanta; no Devpost, Google Form or other hackathon submission has been made. The preceding linework, rename/icon and foundation snapshots remain recorded below as verified history.
 
 - Page: [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204).
 - Page ID: `3f5076d4-a2e1-8161-9c8b-ff6109e7ba69`.
@@ -8,8 +8,40 @@ The owner-directed navy-linework milestone was synchronized and the saved conten
 - Parent ID: `3f5076d4-a2e1-8039-877e-d1727adbcb42`.
 - Steps database: [Steps for Project Bearings](https://app.notion.com/p/3f5076d4a2e180ed841bd463c948dd36).
 - Steps data source ID: `3f5076d4-a2e1-80f3-938b-000b81e7b3f8`.
+- Source repository: [H-Blue/Bearings](https://github.com/H-Blue/Bearings), public, default branch `main`.
 
 ## Current saved scope
+
+Only the existing Decisions, Testing and Progress sections in iOS Development were updated for GitHub setup. Product, Architecture and ReferenceReview were preserved exactly in the saved native formatting. The complete handoff still contains all six maintained documents, including historical Figma source facts, the grey fill-only editor oval, navy interface linework, retained journal/bundle identities, owner-accepted icon, and prior validation limits.
+
+The updated sections record the owner's explicit public-repository authorization and no-submission instruction, useful README/run instructions and development/icon provenance, public `main` source publication, clean committed-source Debug simulator compilation, unauthenticated clone/README verification, excluded local working/signing/journal/build materials, and the distinction between repository setup and eventual submission requirements. Source-build evidence identifies commit `897d848a5f2db768eb148ddc7939dad1e58d578c`; subsequent README/documentation edits do not change app implementation. Exact commands, audit evidence and limits remain in Testing and the local `docs/GitHub.md`.
+
+The existing project home now links to the public implemented-source repository and records that no hackathon submission has been made. No new Notion pages or tasks were created, no task values were changed, and this Notion refresh uploaded no asset, screenshot, build-evidence or journal files.
+
+## Current verification evidence
+
+1. The existing Bearings home and six-section iOS Development handoff were fetched before edits. Connected Notion fetch/update access was confirmed available.
+2. Targeted content edits updated only Decisions, Testing and Progress. A full read-back matched the complete local six-document snapshot after native-format normalization: **69,996 normalized characters**. Product, Architecture and ReferenceReview retained identical saved native content.
+3. After that verification, only the precise pending-sync paragraph in local Progress was changed to the completed result. Its saved counterpart was patched, and the entire handoff fetched again. All six final documents matched: **70,281 normalized characters**. The final local source hashes are below.
+4. The existing home was updated with [H-Blue/Bearings](https://github.com/H-Blue/Bearings), public/default-`main` source context and the explicit setup-only/no-submission boundary. Its saved content was fetched to verify the link and wording.
+5. The fetched home still contains the same iOS Development child, and the saved child reports the intended Bearings parent path. Existing hierarchy, native formats and source facts are preserved.
+
+Normalization removes structural Markdown/XML formatting and whitespace differences, preserves native mention identity by URL and date identity, accepts self-closing mentions and resolved titles, ignores the Notion presentation query `pvs`, and treats shell fence-language aliases equivalently. Notion's canonicalization of the public Hacklanta `notion.site` link to its `app.notion.com/p/` form is accepted by identical page ID and anchor identity. This verifies saved content rather than byte-for-byte serialization. Fetch responses did not report truncation or unknown-block indicators; those fields were absent rather than explicitly false. Native Notion verification badges remain separate from these saved-content checks and were not changed.
+
+## Final source hashes
+
+These hashes identify the complete local six-document snapshot verified against the saved GitHub-setup handoff. Future documentation changes require resynchronization.
+
+| Local source | SHA-256 |
+| --- | --- |
+| `docs/Product.md` | `a596a00ee11628600ce63d1baf1fdc2a36eb1c975710338344a1a506703afd07` |
+| `docs/Architecture.md` | `6ed0ed7ccb5485d2036248cb05202710590019fe132b749ed69f7ecb4b7ebaa5` |
+| `docs/ReferenceReview.md` | `6796f22376e0228cc14e1bf5f6972da68647a3d4a0ce6a05b458827bee5ca778` |
+| `docs/Decisions.md` | `f5c7572f529fa0f6a8a3ba29741acac6f2f9b5687ae27d71f1be32cda5513e10` |
+| `docs/Testing.md` | `cd9602b99a311660843f6bead987720e61edcb34509dd5f82e66e01be593d5bb` |
+| `docs/Progress.md` | `f5d2b5a811c55177f47105ee0649076af8e0ee8217b58979fc67754fb4f6c78c` |
+
+## Previous linework saved scope
 
 The existing iOS Development child contains the complete current Product, Architecture, ReferenceReview, Decisions, Testing and Progress documents as six sections. They record the explicit owner override to opaque sRGB `#323575` for every custom decorative drawing stroke: timeline horizontal axis/ticks, day branches, entry dividers and editor rule. The editor oval is a grey fill with no stroke and remains unchanged. Text and control ink remain black, period/entry marker fills stay grey, paper remains `#C8AB89`, and the accepted app icon is preserved.
 
@@ -19,7 +51,7 @@ The latest milestone passed Debug simulator compilation and two existing UI test
 
 Tables and source/date references retain native Notion formatting. Local commands, paths and source hashes remain inspectable. Artwork, screenshots, test result files and journal content were not uploaded. Existing task values were not changed for this milestone.
 
-## Current verification evidence
+## Previous linework verification evidence
 
 1. The project home was updated to record the explicit owner navy-linework decision, its precedence over historical Figma black strokes, and the unchanged grey editor oval. The saved home was fetched to verify that exact scope.
 2. The existing iOS Development child was fetched before refreshing its six-document body. It had no child pages or databases to affect.
@@ -29,9 +61,9 @@ Tables and source/date references retain native Notion formatting. Local command
 
 Normalization removes structural Markdown/XML formatting and whitespace differences, preserves native mention identity by URL and date identity, accepts self-closing mentions and resolved titles, ignores the Notion presentation query `pvs`, and treats shell fence-language aliases equivalently. This verifies saved content rather than byte-for-byte serialization. Fetch responses did not report truncation or unknown-block indicators; those fields were absent rather than explicitly false. Native Notion verification badges remain separate from these saved-content checks and were not changed.
 
-## Final source hashes
+## Previous linework source hashes
 
-These hashes identify the complete local six-document snapshot verified against the saved linework handoff. Future documentation changes require resynchronization.
+These hashes identify the earlier six-document linework snapshot. They are historical evidence; the current GitHub-milestone source hashes are recorded above.
 
 | Local source | SHA-256 |
 | --- | --- |
