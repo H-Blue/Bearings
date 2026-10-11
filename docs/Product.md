@@ -51,7 +51,7 @@ The dedicated persistent store uses iOS file protection. Journal text is not log
 
 ## Future scope
 
-The owner-approved local AI milestone implements daily summaries, primary/secondary emotion suggestions, important moments and emotional trajectories, plus cached weekly/monthly reflections. Users can correct the primary emotion or return to the AI suggestion. Small outlined emotion indicators complement the existing navy lines and grey entry markers. Loading, earlier-result, unavailable, empty and retry states preserve access to writing. Entry metadata shows creation/modification times and supports independent journal-day reassignment.
+The owner-approved local AI milestone implements daily summaries, primary/secondary emotion suggestions, important moments and emotional trajectories, plus cached weekly/monthly reflections. Every displayed daily, weekly and monthly output includes a navy sextant refresh button for requesting a new on-device interpretation. Users can correct the primary emotion or return to the AI suggestion; their choice survives refresh. Small outlined emotion indicators complement the existing navy lines and grey entry markers. Loading, earlier-result, unavailable, empty and retry states preserve access to writing. Entry metadata shows creation/modification times and supports independent journal-day reassignment.
 
 Generation requires iOS 26 or later, compatible Apple Intelligence hardware, a ready model and supported settings/locale. iOS 17 journaling and manual emotion correction remain available. These minimal native reflection controls are implementation adaptations without new approved Figma frames. Semantic model accuracy and device verification limits are recorded in Testing.
 

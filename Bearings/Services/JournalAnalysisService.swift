@@ -56,23 +56,35 @@ final class JournalAnalysisService {
     }
 
     func analyze(day: JournalDay) async {
+        await analyze(day: day, reuseCache: true)
+    }
+
+    func regenerate(day: JournalDay) async {
+        await analyze(day: day, reuseCache: false)
+    }
+
+    private func analyze(day: JournalDay, reuseCache: Bool) async {
         let key = day.key
         if let task = tasks[key] { await task.value; return }
-        let task = Task { await runDaily(day) }
+        let task = Task { await runDaily(day, reuseCache: reuseCache) }
         tasks[key] = task
         await task.value
         tasks[key] = nil
     }
 
     func reflect(period: AnalysisPeriod) async {
-        _ = try? await requestReflection(period)
+        _ = try? await requestReflection(period, reuseCache: true)
     }
 
-    private func requestReflection(_ period: AnalysisPeriod) async throws -> StoredReflection? {
+    func regenerate(period: AnalysisPeriod) async {
+        _ = try? await requestReflection(period, reuseCache: false)
+    }
+
+    private func requestReflection(_ period: AnalysisPeriod, reuseCache: Bool = true) async throws -> StoredReflection? {
         let key = period.key
         if let task = reflectionTasks[key] { return try await task.value }
         let task = Task<StoredReflection?, Error> {
-            do { return try await generateReflection(period) }
+            do { return try await generateReflection(period, reuseCache: reuseCache) }
             catch is CancellationError { states[key] = .idle; throw CancellationError() }
             catch { states[key] = .failed(Self.safeMessage(error)); throw error }
         }
@@ -111,7 +123,7 @@ final class JournalAnalysisService {
         // tasks from being removed by an older completion.
     }
 
-    private func runDaily(_ day: JournalDay) async {
+    private func runDaily(_ day: JournalDay, reuseCache: Bool) async {
         let key = day.key
         do {
             availability = await engine.availability()
@@ -123,7 +135,7 @@ final class JournalAnalysisService {
                 }
                 let fingerprint = AnalysisFingerprint.entries(snapshots, version: Self.version)
                 let cached = try selectedDerivedCache { try store.dailyAnalysis(for: day) }
-                if let cached,
+                if reuseCache, let cached,
                    !cached.isStale, cached.analysisVersion == Self.version, cached.sourceFingerprint == fingerprint {
                     daily[key] = cached; states[key] = .idle
                     availability = await engine.availability()
@@ -152,12 +164,12 @@ final class JournalAnalysisService {
     }
 
     @discardableResult
-    private func generateReflection(_ period: AnalysisPeriod) async throws -> StoredReflection? {
+    private func generateReflection(_ period: AnalysisPeriod, reuseCache: Bool) async throws -> StoredReflection? {
         let key = period.key
         try Task.checkCancellation()
         let fingerprint = try store.reflectionFingerprint(for: period, version: Self.version)
         let cached = try selectedDerivedCache { try store.reflection(for: period) }
-        if let cached,
+        if reuseCache, let cached,
            !cached.isStale, cached.analysisVersion == Self.version, cached.sourceFingerprint == fingerprint {
             reflections[key] = cached; states[key] = .idle
             availability = await engine.availability()

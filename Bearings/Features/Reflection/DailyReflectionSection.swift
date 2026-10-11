@@ -18,7 +18,17 @@ struct DailyReflectionSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Divider().overlay(BearingsTheme.line)
-            Text("A reflection on this day").font(.headline)
+            HStack(spacing: 8) {
+                Text("A reflection on this day").font(.headline)
+                Spacer(minLength: 0)
+                if analysis != nil {
+                    AIRefreshButton(
+                        accessibilityLabel: "Refresh daily reflection",
+                        accessibilityIdentifier: "reflection.daily.refresh",
+                        isLoading: service.states[day.key] == .loading
+                    ) { Task { await service.regenerate(day: day) } }
+                }
+            }
             Text("On-device AI interpretations. Your writing is processed on this iPhone.")
                 .font(.footnote).foregroundStyle(BearingsTheme.quietInk)
             if !hasWriting {

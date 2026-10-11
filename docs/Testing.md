@@ -2,6 +2,14 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## AI sextant refresh controls — October 11, 2026
+
+Verified with Xcode 27.0 on the iPhone 17e simulator running iOS 26.5. All 14 `JournalAnalysisServiceTests` passed with zero failures in 0.394 seconds. The new `testExplicitRefreshBypassesCachesAndPreservesCorrection` verifies that ordinary repeated requests reuse daily and weekly caches, explicit refresh makes a second provider request for each output, and the saved manual emotion remains unchanged. The suite also retained its cache sharing, source-change retry, cancellation, corrupt-cache repair, unavailable-model and real read-only-save failure coverage.
+
+Two synthetic-provider UI tests passed with zero failures in 80.361 seconds: `testManualFeelingSurvivesRegenerationAndCanReturnToAISuggestion` and `testWeeklyAndMonthlyReflectionsUseSyntheticLocalProvider`. They locate and activate the daily and period refresh controls, cover daily correction preservation and refresh both weekly and monthly outputs. Exported daily, weekly and monthly attachments were inspected: each output header shows the custom sextant within an unclipped 44-point control, using the shared opaque navy `Line` color (`#323575`). The local result bundles are `/private/tmp/BearingsAIRefreshServiceSuite.xcresult` and `/private/tmp/BearingsAIRefreshUI.xcresult`.
+
+The complete app unit/UI suites, physical-device Foundation Models generation, failure during a real refresh and iOS 17 runtime were not rerun. Synthetic provider success verifies control and cache plumbing, not real model quality or availability.
+
 ## Single-entry day marker — October 11, 2026
 
 Verified with Xcode 27.0 on the iPhone 17e simulator running iOS 26.5. An unsigned Debug build for the generic iOS Simulator succeeded. `BearingsUITests/JournalFlowTests/testMorningBranchPersistsAndPeriodCanBeChanged` passed with zero failures in 66.147 seconds, covering creation, explicit save, the retained accessible label “Morning, 1 entry,” process relaunch, period reassignment and a second relaunch. The test's “Morning branch with saved memory” attachment was exported and visually inspected: the single morning entry appears as a centered navy dot inside the grey period circle, with no numeral 1. Source review confirms that counts above one remain numeric and that the dot uses shared `BearingsTheme.line`, whose asset value is opaque `#323575`.

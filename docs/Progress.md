@@ -2,6 +2,10 @@
 
 Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, GitHub setup, map opening screen, and centered timeline, October 10–11, 2026.
 
+## AI sextant refresh controls — October 11, 2026
+
+Daily, weekly and monthly generated outputs now show a shared 44-point navy sextant control. It requests a fresh on-device interpretation by bypassing the selected valid cache, preserves the prior output through loading/failure and leaves user emotion corrections intact. All 14 analysis-service tests and two synthetic-provider UI flows passed, covering daily, weekly and monthly refresh plus correction preservation; the three output screenshots were reviewed. The complete app unit/UI suites, physical-device model generation and iOS 17 runtime were not rerun. Notion synchronization is pending. No publishing or push was performed.
+
 ## Single-entry day marker — October 11, 2026
 
 The morning, midday and evening circles now show a centered 13-point navy `#323575` dot when that period has exactly one saved entry, replacing the numeral 1. Counts above one remain numeric, and VoiceOver continues to announce the exact entry count. A Debug simulator build and the focused period-save/reassignment/relaunch UI test passed; its saved-entry screenshot was reviewed and shows the centered navy dot. The full test suites, physical device and iOS 17 runtime were not rerun for this view-only change. Notion synchronization is pending. No publishing or push was performed.

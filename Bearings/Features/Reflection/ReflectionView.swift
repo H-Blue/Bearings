@@ -13,8 +13,18 @@ struct ReflectionView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("\(period.firstDay.shortLabel) – \(period.lastDay.shortLabel)")
-                        .font(.headline).accessibilityIdentifier("reflection.period")
+                    HStack(spacing: 8) {
+                        Text("\(period.firstDay.shortLabel) – \(period.lastDay.shortLabel)")
+                            .font(.headline).accessibilityIdentifier("reflection.period")
+                        Spacer(minLength: 0)
+                        if stored != nil {
+                            AIRefreshButton(
+                                accessibilityLabel: "Refresh \(period.kind == .weekly ? "weekly" : "monthly") reflection",
+                                accessibilityIdentifier: "reflection.period.refresh",
+                                isLoading: service.states[period.key] == .loading
+                            ) { Task { await service.regenerate(period: period) } }
+                        }
+                    }
                     Text("On-device AI interpretation. You can return to your original writing at any time.")
                         .font(.footnote).foregroundStyle(BearingsTheme.quietInk)
                     if let stored {

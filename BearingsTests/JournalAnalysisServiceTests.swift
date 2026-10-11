@@ -5,6 +5,36 @@ import XCTest
 
 final class JournalAnalysisServiceTests: XCTestCase {
     @MainActor
+    func testExplicitRefreshBypassesCachesAndPreservesCorrection() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let store = JournalStore(context: container.mainContext)
+        let day = JournalDay(key: "2026-10-01")!
+        _ = try store.create(day: day, body: "In-month walk with a friend.")
+        let model = ServiceFixtureIntelligence()
+        let service = JournalAnalysisService(store: store, intelligence: model)
+
+        await service.analyze(day: day)
+        await service.analyze(day: day)
+        var analysisCount = await model.analysisCount
+        XCTAssertEqual(analysisCount, 1)
+        XCTAssertTrue(service.setEmotion(.joy, for: day))
+        await service.regenerate(day: day)
+        analysisCount = await model.analysisCount
+        XCTAssertEqual(analysisCount, 2)
+        XCTAssertEqual(service.overrides[day.key], .joy)
+
+        let week = AnalysisPeriod.week(containing: day)
+        await service.reflect(period: week)
+        await service.reflect(period: week)
+        var reflectionCount = await model.reflectionPrompts.count
+        XCTAssertEqual(reflectionCount, 1)
+        await service.regenerate(period: week)
+        reflectionCount = await model.reflectionPrompts.count
+        XCTAssertEqual(reflectionCount, 2)
+        XCTAssertEqual(service.overrides[day.key], .joy)
+    }
+
+    @MainActor
     func testDailyConcurrentRequestsReuseCommittedCacheAndCorrections() async throws {
         let container = try PersistenceController.makeContainer(inMemory: true)
         let store = JournalStore(context: container.mainContext)
