@@ -378,3 +378,11 @@ Validated `docs/fixtures/RelationshipDemoJournal.json` with Python JSON parsing 
 Checked all 18 copy-ready Markdown paragraphs against the JSON and checked the saved JSON/Markdown deliverable copies. Verified local document links. Source fixture SHA-256: `d28e50555a1faaf9d0ffb91bad691e684be3c167692cacd096bc67634024534d`. Notion's saved demo page matches the source after normalization of native mentions, table tags/separators, formatting and whitespace: 20,283 normalized characters. All 18 numbered entry headings, prepared-reply labeling and the AI/loading guide are present. The existing Pitch body was preserved exactly below the inserted reference.
 
 No Xcode build, simulator/device test, JSON-to-SwiftData import, phone-store write, actual Apple-model inference, latency measurement or recap/lesson quality test was run for this fixture/documentation-only change. The app has no JSON import UI. Earlier deterministic-provider results and the physical modelNotReady limitation remain as recorded above; they do not validate this story's AI results.
+
+## Professional case study demo load — October 11, 2026
+
+- Built the current `Bearings` Debug scheme for the connected physical iPhone 16 Pro (iOS deployment target 17.0) with `xcodebuild`; build succeeded.
+- Installed the signed app and launched it with `--uitesting --reset-test-store --seed-professional-case-study --reduce-motion`. This selected and reset only `Library/Application Support/BearingsUITests/ui-tests.store`; the normal compatibility store was not selected or read.
+- Copied the separate demo-store files back from the device and inspected only structural metadata. `ZJOURNALENTRY` contained exactly 14 rows with civil-day bounds `2026-09-21` through `2026-10-04`.
+- Relaunched without `--reset-test-store`, copied the demo store again and confirmed it still contained 14 rows with the same day bounds. This verifies the empty-store guard prevented duplicate seeding.
+- The launch used the real Apple intelligence provider because neither synthetic-provider argument was supplied. No model generation was requested or semantically reviewed in this check. The installed UI was not visually audited, and iOS 17 execution remains unverified.
