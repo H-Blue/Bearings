@@ -1,6 +1,6 @@
 # Professional case study demo: loading and presentation
 
-The copy-ready source is [`ProfessionalCaseStudyJournal.md`](ProfessionalCaseStudyJournal.md). The machine-readable equivalent is [`fixtures/ProfessionalCaseStudyJournal.json`](fixtures/ProfessionalCaseStudyJournal.json). Both contain the same 14 fictional entries spanning two complete Sunday–Saturday weeks from September 27 through October 10, 2026.
+The copy-ready source is [`ProfessionalCaseStudyJournal.md`](ProfessionalCaseStudyJournal.md). The machine-readable equivalent is [`fixtures/ProfessionalCaseStudyJournal.json`](fixtures/ProfessionalCaseStudyJournal.json). Both contain the same 22 fictional entries spanning two complete Sunday–Saturday weeks from September 27 through October 10, 2026. September 30 and October 6 contain three entries each; September 28, October 1, October 7 and October 9 contain two each; the other eight days contain one.
 
 ## Installed demo path
 
@@ -14,7 +14,7 @@ The seeder intentionally does nothing when the selected store already contains e
 
 If the phone cannot be connected or the demo build cannot be installed, enter the paragraphs from the copy-ready document through the normal editor. Set the journal day and time shown in each heading, save, and confirm each entry appears before continuing. Manual entry preserves the civil journal dates but uses the actual paste/save time as creation metadata.
 
-For a staged presentation, load entries 01–07 and capture the September 27–October 3 reflection before adding entries 08–14. October 11 is intentionally empty; select that Sunday and request **Last week** to review the completed October 4–10 period. The automatic seeder loads both weeks at once, which is better for a complete browsing demo. Bearings computes reflections from the requested civil week, so week one remains separate even when week two is already present.
+For a staged presentation, load entries 01–11 and capture the September 27–October 3 reflection before adding entries 12–22. October 11 is intentionally empty; select that Sunday and request **Last week** to review the completed October 4–10 period. The automatic seeder loads both weeks at once, which is better for a complete browsing demo. Bearings computes reflections from the requested civil week, so week one remains separate even when week two is already present.
 
 ## Honest presenter label
 
