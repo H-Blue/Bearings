@@ -4,10 +4,12 @@ import SwiftData
 struct BearingsRootView: View {
     @Query private var entries: [JournalEntry]
     @State private var store: JournalStore
+    @State private var analysisService: JournalAnalysisService
     @State private var selectedDay: JournalDay?
     @State private var zoomAnchor = UnitPoint.center
     @State private var editor: EditorRoute?
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.scenePhase) private var scenePhase
     private let onRetryRead: () -> Void
 
     private var reduceMotion: Bool {
@@ -21,7 +23,9 @@ struct BearingsRootView: View {
         var descriptor = FetchDescriptor<JournalEntry>(sortBy: [SortDescriptor(\JournalEntry.createdAt)])
         descriptor.includePendingChanges = false
         _entries = Query(descriptor)
-        _store = State(initialValue: JournalStore(context: container.mainContext))
+        let store = JournalStore(context: container.mainContext)
+        _store = State(initialValue: store)
+        _analysisService = State(initialValue: JournalAnalysisService(store: store, intelligence: Self.intelligence()))
         self.onRetryRead = onRetryRead
     }
 
@@ -38,7 +42,7 @@ struct BearingsRootView: View {
                     Button("Try again", action: onRetryRead)
                 }
             } else {
-            TimelineView(entries: entries, selectedDay: selectedDay, onSelect: openDay)
+            TimelineView(entries: entries, emotions: timelineEmotions, selectedDay: selectedDay, onSelect: openDay)
                 .scaleEffect(selectedDay == nil || reduceMotion ? 1 : 1.8, anchor: zoomAnchor)
                 .offset(y: selectedDay == nil || reduceMotion ? 0 : -180)
                 .opacity(selectedDay == nil ? 1 : 0)
@@ -47,10 +51,12 @@ struct BearingsRootView: View {
                 .zIndex(1)
 
             if let day = selectedDay {
-                DayView(day: day, entries: entries.filter { $0.dayKey == day.key },
+                DayView(day: day, entries: entries.filter { $0.dayKey == day.key }, analysisService: analysisService,
                         onBack: closeDay, onEdit: { entry in
+                    analysisService.cancel()
                     editor = EditorRoute(day: day, entry: entry, period: entry.period)
                 }, onNew: { period in
+                    analysisService.cancel()
                     editor = EditorRoute(day: day, entry: nil, period: period)
                 })
                 .transition(reduceMotion ? .opacity : .offset(y: 160).combined(with: .opacity))
@@ -63,6 +69,53 @@ struct BearingsRootView: View {
         .sheet(item: $editor) { route in
             JournalEditorView(day: route.day, entry: route.entry, period: route.period, store: store)
         }
+        .safeAreaInset(edge: .bottom) {
+            if case .failed(let message)? = analysisService.states["storage"] {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(message).font(.footnote)
+                    Button("Try again") { analysisService.loadStored() }
+                        .frame(minHeight: 44).accessibilityIdentifier("reflection.storage.retry")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 24).padding(.vertical, 8)
+                .background(BearingsTheme.paper)
+            }
+        }
+        .task(id: RootAnalysisTrigger(day: selectedDay, writing: editor != nil, active: scenePhase == .active)) {
+            analysisService.loadStored()
+            await resumeAnalysis()
+        }
+        .onChange(of: store.revision) { _, _ in analysisService.loadStored() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { analysisService.cancel() }
+        }
+    }
+
+    private var timelineEmotions: [String: JournalEmotion] {
+        let writtenDays = Set(entries.filter { !$0.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.map(\.dayKey))
+        var emotions = analysisService.daily.filter {
+            writtenDays.contains($0.key) && !$0.value.isStale && $0.value.analysisVersion == JournalAnalysisService.version
+        }.mapValues { $0.content.primaryEmotion }
+        for (key, emotion) in analysisService.overrides where writtenDays.contains(key) { emotions[key] = emotion }
+        return emotions
+    }
+
+    private func resumeAnalysis() async {
+        guard !Task.isCancelled, editor == nil, scenePhase == .active, _entries.fetchError == nil else { return }
+        await analysisService.analyzeChangedDays()
+        guard !Task.isCancelled, editor == nil, scenePhase == .active else { return }
+        if let selectedDay { await analysisService.analyze(day: selectedDay) }
+    }
+
+    private static func intelligence() -> any JournalIntelligence {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("--uitesting") {
+            if arguments.contains("--ai-unavailable") { return SyntheticJournalIntelligence(isAvailable: false) }
+            if arguments.contains("--ai-fixture") { return SyntheticJournalIntelligence(isAvailable: true) }
+        }
+        #endif
+        return JournalIntelligenceFactory.make()
     }
 
     private func openDay(_ day: JournalDay, anchor: UnitPoint) {
@@ -78,6 +131,38 @@ struct BearingsRootView: View {
         }
     }
 }
+
+private struct RootAnalysisTrigger: Equatable {
+    let day: JournalDay?
+    let writing: Bool
+    let active: Bool
+}
+
+#if DEBUG
+/// Synthetic local responses for UI verification; never used by a release build.
+private struct SyntheticJournalIntelligence: JournalIntelligence {
+    let isAvailable: Bool
+
+    func availability() async -> IntelligenceAvailability {
+        isAvailable ? .available : .unavailable("On-device reflections are unavailable on this test device. You can keep writing and choose your own feeling.")
+    }
+
+    func analyze(_ text: String) async throws -> DailyAnalysisContent {
+        guard isAvailable else { throw AnalysisError.generationFailed }
+        return DailyAnalysisContent(summary: "A quiet day by the river brought a moment of peace.", primaryEmotion: .peace,
+                                    secondaryEmotion: .joy, importantEvents: ["A walk by the river"],
+                                    emotionalTrajectory: "The writing moves toward peace.")
+    }
+
+    func reflect(_ text: String, kind: ReflectionKind) async throws -> ReflectionContent {
+        guard isAvailable else { throw AnalysisError.generationFailed }
+        return ReflectionContent(overview: "This \(kind.rawValue) reflection remembers a quiet walk by the river.",
+                                 importantEvents: ["A walk by the river"], emotionalThemes: "Peace and joy appear in the writing.",
+                                 relationships: "The writing provides insufficient information about relationships.",
+                                 interests: "Walking outdoors appears in the writing.", changes: "The writing moves toward peace.")
+    }
+}
+#endif
 
 private struct EditorRoute: Identifiable {
     let id = UUID()

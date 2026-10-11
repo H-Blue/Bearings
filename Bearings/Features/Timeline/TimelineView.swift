@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TimelineView: View {
     let entries: [JournalEntry]
+    var emotions: [String: JournalEmotion] = [:]
     let selectedDay: JournalDay?
     let onSelect: (JournalDay, UnitPoint) -> Void
     @State private var month = JournalMonth()
@@ -96,6 +97,7 @@ struct TimelineView: View {
                             ForEach(days) { day in
                                 GeometryReader { tick in
                                     TimelineDayTick(day: day, count: counts[day.key, default: 0],
+                                                    emotion: emotions[day.key],
                                                     cellWidth: dayCellWidth,
                                                     markerAreaHeight: markerAreaHeight,
                                                     onSelect: {
@@ -139,6 +141,7 @@ struct TimelineView: View {
 private struct TimelineDayTick: View {
     let day: JournalDay
     let count: Int
+    let emotion: JournalEmotion?
     let cellWidth: CGFloat
     let markerAreaHeight: CGFloat
     let onSelect: () -> Void
@@ -168,11 +171,17 @@ private struct TimelineDayTick: View {
                 }.frame(height: 110)
                 Text("\(day.day)").font(.caption).monospacedDigit()
                     .fixedSize(horizontal: true, vertical: true)
+                    .overlay(alignment: .topTrailing) {
+                        if let emotion {
+                            EmotionIndicator(emotion: emotion)
+                                .offset(x: 14, y: -7)
+                        }
+                    }
             }
             .frame(width: cellWidth)
             .contentShape(Rectangle())
         }
-        .accessibilityLabel("\(day.longLabel), \(count) \(count == 1 ? "entry" : "entries")")
+        .accessibilityLabel("\(day.longLabel), \(count) \(count == 1 ? "entry" : "entries")\(emotion.map { ", \($0.title)" } ?? "")")
         .accessibilityHint("Open this day")
         .accessibilityIdentifier("timeline.openDay.\(day.key)")
     }

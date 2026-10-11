@@ -1,6 +1,6 @@
 # Bearings Notion synchronization
 
-The owner-directed centered-timeline milestone was synchronized and fetched for verification on October 11, 2026. The preceding opening-screen, public GitHub setup, linework, rename/icon and foundation snapshots remain verified history below. The timeline and opening-screen implementations are local; the public repository remains at the prior authorized setup milestone. No hackathon submission has been made.
+The approved local-intelligence scope and implementation milestone were synchronized and fetched for saved-content verification on October 11, 2026. The AI task remains In progress and unchecked pending real-model acceptance. The implementation is local; no implementation push or TestFlight distribution occurred. The earlier centered-timeline milestone and preceding snapshots remain verified history below. The preceding opening-screen, public GitHub setup, linework, rename/icon and foundation snapshots remain verified history below. The timeline and opening-screen implementations are local; the public repository remains at the prior authorized setup milestone. No hackathon submission has been made.
 
 - Page: [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204).
 - Page ID: `3f5076d4-a2e1-8161-9c8b-ff6109e7ba69`.
@@ -195,3 +195,29 @@ These hashes identify the earlier local six-document snapshot verified against t
 | `docs/Decisions.md` | `1aaf0638a5ff97f97be98f6214db3d01dd41a3bf0bfd9df836c7147f80323f55` |
 | `docs/Testing.md` | `c994df8594bb08d3c86fbd4360c0820135259a9f4566e685ee2f2568f61d4417` |
 | `docs/Progress.md` | `fd088f6d833c585609a64b513cda95876e64b24e6935cfbacd3a6216e6777395` |
+
+
+## Local intelligence saved scope — October 11, 2026
+
+The existing Bearings home records approved daily/weekly/monthly on-device reflections, persistent correctable emotions, timestamp metadata, iOS 17 journaling, preserved compatibility storage identifiers and the distribution boundary. The existing iOS Development child received a latest-status note and a scoped source snapshot: complete LocalIntelligence and Deployment documents, the current local-intelligence Testing section, and the approved-local-intelligence Progress section. These additions record architecture, schema migration, transaction/cache/correction recovery, civil periods, source segmentation, runtime gates, privacy/backup limits and exact executed tests. Its prior foundation snapshots are preserved; this is not a claim that all six historical full-document snapshots were replaced with current files.
+
+The existing AI task now records the implementation and pending real-model acceptance, with status `In progress` and `Checkbox = __NO__`. Real Apple-model generation and semantic quality are unverified because the physical phone reported modelNotReady. No new pages, uploaded journal data, images or test evidence were created in Notion. The public GitHub repository remains at the prior authorized setup milestone.
+
+## Local intelligence verification evidence
+
+1. Home, technical child, AI task, data-source status options and enhanced Markdown specification were read before scoped updates. The home scope decision and task property update were fetched and verified.
+2. The existing technical boundary paragraph was updated to the approved local AI scope, preserving broader exclusions. A scoped new implementation section was appended; its first read-back matched the source snapshot after native-format normalization.
+3. The final source snapshot includes 59 passing simulator unit tests plus one real-model simulator skip, 15 passing normal-size UI flows, five passing final maximum-text reflection flows, the earlier physical 53-pass/modelNotReady-skip suite, final Release/signed builds and local installation, initial failed attempts/remedies, and remaining device/distribution limits. The final complete addition matched **29,229 normalized characters** after fetch.
+4. The technical child reports the intended Bearings parent path. The home was fetched and retains the same iOS Development child; its installed-local-build/runtime-limits wording was verified. The AI task was fetched with saved implementation content, `In progress`, and unchecked state.
+5. Native tables and date/page mentions were used. Bare local-document references that Notion automatically linked as web domains were corrected to code-formatted source names. Final comparison removes structural Markdown/XML, escaped formatting, whitespace and shell fence-language aliases while preserving substantive text, dates and external URLs. Fetches did not report truncation or unknown-block fields; those indicators were absent rather than explicitly false. Native verification badges were not changed.
+
+## Local intelligence source snapshot hashes
+
+The table hashes exactly the complete documents or explicitly identified source sections synchronized in the new addition; other current local documents remain the implemented-code handoff source.
+
+| Local source / scope | SHA-256 |
+| --- | --- |
+| `docs/LocalIntelligence.md` | `cacb0daa195d64ca12854ec0da18c2e96a30d28dc3a59ddad17072209d9d0afb` |
+| `docs/Deployment.md` | `1325d35ffd138ccd41a8292e455ebdab940818706c194514a545f7bf04283428` |
+| `docs/Testing.md#local-intelligence` | `de804bf8318ad193620290a32c33e01f935e13cc99aaf5a776f8ef397be0d341` |
+| `docs/Progress.md#approved-local-intelligence` | `f32e27bc59d89c9a52a04554d60aaf8f53e47a175775ab945083d38d74850101` |

@@ -1,6 +1,6 @@
 # Bearings
 
-A native, private iPhone journal for revisiting your story. Browse a timeline, open a day, and write in morning, midday or evening. Entries stay in local SwiftData storage; the app has no network client, cloud sync, analytics or AI request path.
+A native, private iPhone journal for revisiting your story. Browse a timeline, open a day, and write in morning, midday or evening. Entries stay in local SwiftData storage; the app has no network client, cloud sync or analytics. On compatible iPhones, Apple’s on-device model adds local reflections.
 
 Built with Swift, SwiftUI and SwiftData for **iOS 17 and later**, using Apple frameworks without external runtime dependencies.
 
@@ -18,7 +18,7 @@ You need a Mac with Xcode supporting iOS 17 or later and an installed iOS Simula
 3. Choose the **Bearings** scheme and an **iPhone simulator** at the top of the window.
 4. Press **⌘R**. No developer-account configuration is needed for the simulator.
 
-For a physical iPhone, select a valid Apple signing team in the app target. Device signing is configured locally; no signing certificate is committed here. Physical-device installation and behavior remain unverified.
+For a physical iPhone, select a valid Apple signing team in the app target. Device signing is configured locally; no signing certificate is committed here. A local signed development build was installed and launched on an iPhone 16 Pro; the physical unit suite passed 53 tests with the real-model check skipped because Apple’s model was still preparing. TestFlight distribution remains unverified.
 
 ## Features
 
@@ -28,7 +28,7 @@ For a physical iPhone, select a valid Apple signing team in the app target. Devi
 - **Write** always creates another entry. The editor's time-of-day menu can change its assignment.
 - Changes save after a short pause and on **Done** or app backgrounding. **Saved** confirms a successful local save. Failed saves retain the editor draft with a retry action.
 - Delete through the editor's trash button and confirmation. Opening an unused editor creates no entry.
-- Saved entries retain their selected calendar date across time-zone changes. Native text editing, Dynamic Type and Reduce Motion support keep writing and navigation accessible.
+- Entry metadata shows creation/modification times and lets you reassign the journal day independently. Saved entries retain their selected calendar date across time-zone changes. Native text editing, Dynamic Type and Reduce Motion support keep writing and navigation accessible.
 
 ## Project map
 
@@ -46,6 +46,7 @@ Project regeneration requires Python 3 and macOS `plutil`. The script preserves 
 
 Recorded verification on October 10–11, 2026:
 
+- The local intelligence milestone passed 59 unit tests (one real-model check skipped), all 15 normal-size UI tests, and final signed Debug / unsigned Release builds. The physical suite passed 53 tests with its model check skipped because the model was not ready. See Testing for maximum-text checks and recovery evidence.
 - The centered timeline passed six selected UI test executions at normal and maximum text sizes, covering bottom thumb swipes, reverse context, month navigation, Reduce Motion and four-entry markers after reopening.
 - The map opening passed two selected UI tests; normal/maximum-size screenshots and a native recording verified its presentation and two-second floor.
 - A clean export of the committed app passed an unsigned Debug simulator build; the public GitHub source was also cloned without credentials.
@@ -53,7 +54,7 @@ Recorded verification on October 10–11, 2026:
 - The preceding rename/icon milestone passed all 24 data/editor tests, two focused UI tests and an unsigned generic iOS Release build.
 - Earlier foundation runs passed eight core UI tests and focused keyboard, accessibility, persistence and animation checks. The complete suite and device Release build were not rerun for the final color-only change.
 
-Exact commands, evidence and limits are in [Testing](docs/Testing.md). Physical-device behavior, a prior-version upgrade and an iOS 17 runtime remain unverified.
+Exact commands, evidence and limits are in [Testing](docs/Testing.md). Synthetic old-schema migration passed on simulator and device. Real model generation/quality, a private-journal upgrade, locked-device behavior and an iOS 17 runtime remain unverified.
 
 Use **⌘U** in Xcode to run tests on the selected simulator. For a command-line run:
 
@@ -77,6 +78,6 @@ Development was assisted by OpenAI Codex. The compass/topographic app-icon conce
 
 The owner direction sets decorative timeline lines and ticks, day branches, entry dividers and the editor rule to opaque `#323575`. The timeline’s fountain-pen shortcut uses the same navy. Other text and control tint retain black Ink, period/entry markers retain grey, and the paper background is unchanged. Timeline branding and helper text have been removed; the separate opening retains its title and slogan.
 
-AI, cloud sync, export/backup, and progressive design reveal remain future work. A local read-only snapshot interface exists for later integration; it sends nothing over the network.
+Daily interpretations, correctable emotion indicators and weekly/monthly reflections are implemented locally. Generation requires iOS 26+, eligible Apple Intelligence hardware and an available model; journaling remains supported from iOS 17. The broader assistant, cloud sync, export/backup and progressive design reveal remain future work. [Local intelligence architecture](docs/LocalIntelligence.md) and [deployment preparation](docs/Deployment.md) explain the implementation and limits.
 
 The public source repository is [H-Blue/Bearings](https://github.com/H-Blue/Bearings). GitHub setup is separate from a Hacklanta submission; no submission has been made. [Repository setup](docs/GitHub.md) records scope and verification.

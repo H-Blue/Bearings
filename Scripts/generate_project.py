@@ -230,20 +230,25 @@ def buildable(parent, name: str, target_ids: dict[str, str]) -> None:
                   ReferencedContainer="container:Bearings.xcodeproj")
 
 
-def write_scheme(target_ids: dict[str, str]) -> None:
+def write_scheme(target_ids: dict[str, str], *, device_tests: bool = False) -> None:
     scheme = ET.Element("Scheme", LastUpgradeVersion="1600", version="1.7")
     action = ET.SubElement(scheme, "BuildAction", parallelizeBuildables="YES", buildImplicitDependencies="YES")
     entries = ET.SubElement(action, "BuildActionEntries")
     for name in target_ids:
+        if device_tests and name == "BearingsUITests":
+            continue
         is_app = name == "Bearings"
         entry = ET.SubElement(entries, "BuildActionEntry", buildForTesting="YES", buildForRunning="YES" if is_app else "NO",
                               buildForProfiling="YES" if is_app else "NO", buildForArchiving="YES" if is_app else "NO",
                               buildForAnalyzing="YES")
         buildable(entry, name, target_ids)
     action = ET.SubElement(scheme, "TestAction", buildConfiguration="Debug", selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB",
-                           selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB", shouldUseLaunchSchemeArgsEnv="YES")
+                           selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB", shouldUseLaunchSchemeArgsEnv="NO" if device_tests else "YES")
+    if device_tests:
+        arguments = ET.SubElement(action, "CommandLineArguments")
+        ET.SubElement(arguments, "CommandLineArgument", argument="--uitesting", isEnabled="YES")
     testables = ET.SubElement(action, "Testables")
-    for name in ["BearingsTests", "BearingsUITests"]:
+    for name in (["BearingsTests"] if device_tests else ["BearingsTests", "BearingsUITests"]):
         testable = ET.SubElement(testables, "TestableReference", skipped="NO", parallelizable="NO")
         buildable(testable, name, target_ids)
     buildable(ET.SubElement(action, "MacroExpansion"), "Bearings", target_ids)
@@ -259,12 +264,15 @@ def write_scheme(target_ids: dict[str, str]) -> None:
     ET.indent(scheme, space="   ")
     scheme_directory = PROJECT / "xcshareddata/xcschemes"
     scheme_directory.mkdir(parents=True, exist_ok=True)
-    ET.ElementTree(scheme).write(scheme_directory / "Bearings.xcscheme", encoding="UTF-8", xml_declaration=True)
+    ET.ElementTree(scheme).write(scheme_directory / ("BearingsDeviceTests.xcscheme" if device_tests else "Bearings.xcscheme"), encoding="UTF-8", xml_declaration=True)
     workspace = PROJECT / "project.xcworkspace"
     workspace.mkdir(parents=True, exist_ok=True)
-    (workspace / "contents.xcworkspacedata").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<Workspace version="1.0">\n   <FileRef location="self:"></FileRef>\n</Workspace>\n')
+    if not (workspace / "contents.xcworkspacedata").exists():
+        (workspace / "contents.xcworkspacedata").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<Workspace version="1.0">\n   <FileRef location="self:"></FileRef>\n</Workspace>\n')
 
 
 if __name__ == "__main__":
-    write_scheme(build_project())
+    targets = build_project()
+    write_scheme(targets)
+    write_scheme(targets, device_tests=True)
     print("Generated Bearings.xcodeproj with shared Bearings scheme (app, unit tests, UI tests).")

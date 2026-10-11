@@ -1,0 +1,55 @@
+{
+  "purpose": "Synthetic manual evaluation material for on-device reflection quality. Suggested emotions are tentative human expectations, not exact-match automated assertions.",
+  "privacy": "All narratives are invented. Do not add private journals or log generated interpretations.",
+  "review": [
+    "Check that every extracted event is supported by the narrative.",
+    "Check that the writer's feelings are distinguished from other people's feelings.",
+    "Accept uncertainty or a reasonable alternative emotion; do not treat labels as diagnoses.",
+    "Check that summaries preserve the sequence of events without inventing growth or relationships.",
+    "Repeat on compatible hardware and each supported writing language before making quality claims."
+  ],
+  "cases": [
+    {
+      "id": "joy-and-connection",
+      "narrative": "I met an old friend for lunch. We laughed at stories from our school days, and I felt happy and connected for the rest of the afternoon.",
+      "suggestedPrimaryEmotion": "joy",
+      "possibleSecondaryEmotion": "love",
+      "notes": "Lunch and shared memories are supported. Do not invent a romantic relationship."
+    },
+    {
+      "id": "peace-after-worry",
+      "narrative": "I worried about my presentation this morning. It went more smoothly than I expected. A slow walk home helped me feel calm.",
+      "suggestedPrimaryEmotion": "peace",
+      "possibleSecondaryEmotion": "fear",
+      "notes": "A transition from worry to calm is supported. The dominant feeling is open to interpretation."
+    },
+    {
+      "id": "sadness-and-loneliness",
+      "narrative": "My friend moved to another city today. I helped carry the last boxes, and afterward the apartment felt empty. I missed having someone nearby to talk with.",
+      "suggestedPrimaryEmotion": "sadness",
+      "possibleSecondaryEmotion": "loneliness",
+      "notes": "A move and missing the friend are supported. Do not infer abandonment or a diagnosis."
+    },
+    {
+      "id": "anger-owned-by-writer",
+      "narrative": "The bus was canceled without warning. I waited outside for an hour and felt angry about missing the beginning of the concert. The staff helped me find a seat when I arrived.",
+      "suggestedPrimaryEmotion": "anger",
+      "possibleSecondaryEmotion": "uncertain",
+      "notes": "The writer's anger is explicit. Helpful staff do not establish that the writer's anger disappeared."
+    },
+    {
+      "id": "fear-and-support",
+      "narrative": "I was afraid before my first day at a new job. My sister called and listened while I talked through my worries. I still felt nervous, but I appreciated her support.",
+      "suggestedPrimaryEmotion": "fear",
+      "possibleSecondaryEmotion": "love",
+      "notes": "Support is explicit. Do not claim the worries resolved or infer a health condition."
+    },
+    {
+      "id": "other-peoples-feelings-and-ambiguity",
+      "narrative": "My coworker said she was angry about the schedule. I listened and helped check the dates. I am not sure how I felt about the conversation; I was tired and mostly wanted to get home.",
+      "suggestedPrimaryEmotion": "uncertain",
+      "possibleSecondaryEmotion": null,
+      "notes": "The coworker's anger must not become the writer's emotion. Uncertainty is appropriate."
+    }
+  ]
+}

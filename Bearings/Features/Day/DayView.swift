@@ -3,21 +3,42 @@ import SwiftUI
 struct DayView: View {
     let day: JournalDay
     let entries: [JournalEntry]
+    let analysisService: JournalAnalysisService
     let onBack: () -> Void
     let onEdit: (JournalEntry) -> Void
     let onNew: (JournalPeriod) -> Void
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var usesCompactHeader: Bool { dynamicTypeSize >= .accessibility4 }
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button(action: onBack) { Label("Timeline", systemImage: "chevron.left").frame(minHeight: 44) }
+                Button(action: onBack) {
+                    if usesCompactHeader {
+                        Label("Timeline", systemImage: "chevron.left").labelStyle(.iconOnly).font(.caption)
+                    } else {
+                        Label("Timeline", systemImage: "chevron.left")
+                    }
+                }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .accessibilityLabel("Timeline")
                     .accessibilityIdentifier("day.back")
                 Spacer()
-                Button { onNew(currentPeriod) } label: { Label("Write", systemImage: "square.and.pencil").frame(minHeight: 44) }
+                Button { onNew(currentPeriod) } label: {
+                    if usesCompactHeader {
+                        Label("Write", systemImage: "square.and.pencil").labelStyle(.iconOnly).font(.caption)
+                    } else {
+                        Label("Write", systemImage: "square.and.pencil")
+                    }
+                }
+                    .frame(minWidth: 44, minHeight: 44)
+                    .accessibilityLabel("Write")
                     .accessibilityIdentifier("day.newEntry")
             }
             .padding(.horizontal, 24).padding(.top, 12)
-            Text(day.longLabel).font(.title2).multilineTextAlignment(.center).padding(.horizontal, 24).padding(.top, 20)
+            Text(day.longLabel).font(usesCompactHeader ? .caption : .title2)
+                .multilineTextAlignment(.center).padding(.horizontal, 24).padding(.top, 20)
             ScrollView {
                 VStack(spacing: 20) {
                     dayBranches
@@ -41,6 +62,9 @@ struct DayView: View {
                             }
                         }.padding(.horizontal, 32)
                     }
+                    DailyReflectionSection(day: day,
+                                           hasWriting: entries.contains { !$0.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
+                                           service: analysisService)
                 }.padding(.bottom, 32)
             }
         }

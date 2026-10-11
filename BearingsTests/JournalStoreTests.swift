@@ -5,6 +5,42 @@ import XCTest
 
 final class JournalStoreTests: XCTestCase {
     @MainActor
+    func testCreationZoneAndTimestampRemainIndependentOfMovedCivilDay() throws {
+        let url = temporaryDirectory().appendingPathComponent("Journal.store")
+        let originalDay = try XCTUnwrap(JournalDay(key: "2026-03-08"))
+        let movedDay = try XCTUnwrap(JournalDay(key: "2026-03-07"))
+        let createdAt = Date(timeIntervalSince1970: 1_773_032_400)
+        let newYork = try XCTUnwrap(TimeZone(identifier: "America/New_York"))
+        let tokyo = try XCTUnwrap(TimeZone(identifier: "Asia/Tokyo"))
+        let id = try autoreleasepool {
+            let container = try PersistenceController.makeContainer(storeURL: url)
+            var clock = createdAt
+            var zone = newYork
+            let store = JournalStore(context: container.mainContext, now: { clock }, creationTimeZone: { zone })
+            let entry = try store.create(day: originalDay, body: "Written near midnight about an earlier day.")
+            XCTAssertEqual(entry.createdTimeZoneIdentifier, "America/New_York")
+            zone = tokyo
+            clock = createdAt.addingTimeInterval(120)
+            try store.update(entry: entry, body: entry.body, day: movedDay)
+            XCTAssertEqual(entry.createdAt, createdAt)
+            XCTAssertEqual(entry.modifiedAt, clock)
+            XCTAssertEqual(entry.dayKey, movedDay.key)
+            XCTAssertEqual(entry.createdTimeZoneIdentifier, "America/New_York")
+            XCTAssertEqual(store.takeChangedDays(), [movedDay, originalDay])
+            XCTAssertTrue(store.takeChangedDays().isEmpty)
+            return entry.id
+        }
+        let reopened = try PersistenceController.makeContainer(storeURL: url)
+        let store = JournalStore(context: reopened.mainContext)
+        XCTAssertTrue(try store.entries(for: originalDay).isEmpty)
+        let snapshot = try XCTUnwrap(store.snapshots(from: movedDay, through: movedDay).first)
+        XCTAssertEqual(snapshot.id, id)
+        XCTAssertEqual(snapshot.dayKey, movedDay.key)
+        XCTAssertEqual(snapshot.createdAt, createdAt)
+        XCTAssertEqual(snapshot.createdTimeZoneIdentifier, "America/New_York")
+    }
+
+    @MainActor
     func testFileBackedCreateEditDeleteAndReopen() throws {
         let directory = temporaryDirectory()
         let url = directory.appendingPathComponent("Journal.store")

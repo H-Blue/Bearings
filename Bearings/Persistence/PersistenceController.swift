@@ -2,11 +2,14 @@ import Foundation
 import SwiftData
 
 enum PersistenceController {
+    static var schema: Schema {
+        Schema([JournalEntry.self, DailyAnalysisRecord.self, ReflectionRecord.self, EmotionOverrideRecord.self])
+    }
     // These legacy identities must remain stable after the Bearings rename.
     // Existing installations continue reading the same local journal store.
     @MainActor
     static func makeContainer(inMemory: Bool = false, storeURL: URL? = nil) throws -> ModelContainer {
-        let schema = Schema([JournalEntry.self])
+        let schema = self.schema
         let configuration: ModelConfiguration
 
         if inMemory {

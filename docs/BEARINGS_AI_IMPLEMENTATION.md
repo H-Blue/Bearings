@@ -18,7 +18,7 @@ Use explicit Gregorian civil boundaries for daily, weekly and monthly reflection
 
 Make focused local commits while preserving existing work. This handoff authorizes implementation and local build/testing, not later implementation pushes, public releases, paid services, cloud AI, or external beta distribution. Prepare TestFlight requirements, but obtain explicit owner approval before uploading/distributing a build. Follow repository instructions for meaningful Notion milestone synchronization and record pending synchronization accurately.
 
-Handoff status: this is an approved task specification, not evidence of implemented AI. All implementation checklist items remain unchecked. The original 20 numbered sections and completion checklist are retained below, with repository-specific naming and persistence adaptations.
+Handoff status: this is the approved task specification. Its original acceptance checklist is retained below; current implementation and verified results are tracked in `docs/Progress.md`, `docs/Testing.md` and `docs/LocalIntelligence.md`. Code and deterministic tests are not evidence of real-model generation when Apple’s runtime is unavailable. The original 20 numbered sections and completion checklist are retained below, with repository-specific naming and persistence adaptations.
 
 ---
 

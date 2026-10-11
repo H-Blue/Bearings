@@ -10,4 +10,4 @@ Documentation-only change: checked all 20 numbered specification sections, 23 un
 
 ## Synchronization
 
-Notion synchronization of this scope approval is pending. The implementation chat should synchronize the approved milestone and subsequent meaningful implementation milestones into the existing Bearings hierarchy, verify saved writes, and update `docs/NotionSync.md`. Do not mark the existing AI task complete before implementation and verification.
+The approved scope and implementation milestone were synchronized to the existing Bearings home, iOS Development handoff and AI task on October 11, 2026. Saved content and parent/task state were fetched for verification; `docs/NotionSync.md` records the exact scope and source hashes. The AI task remains In progress and unchecked because real Apple-model generation and semantic acceptance are pending. Executed results and device/runtime limits are in `docs/Testing.md`.

@@ -5,6 +5,67 @@ import XCTest
 
 final class JournalFailureTests: XCTestCase {
     @MainActor
+    func testReadOnlyAnalysisCorrectionAndMoveFailuresKeepPersistedValuesForRetry() throws {
+        let url = temporaryStoreURL()
+        let day = try XCTUnwrap(JournalDay(key: "2026-09-30"))
+        let movedDay = try XCTUnwrap(JournalDay(key: "2026-10-01"))
+        let week = AnalysisPeriod.week(containing: day)
+        let month = AnalysisPeriod.month(containing: day)
+        let time = Date(timeIntervalSince1970: 1_792_000_000)
+        let daily = DailyAnalysisContent(summary: "A peaceful walk.", primaryEmotion: .peace,
+                                         secondaryEmotion: nil, importantEvents: ["A walk"],
+                                         emotionalTrajectory: "Peace throughout")
+        let reflection = ReflectionContent(overview: "Walking brought peace.", importantEvents: ["A walk"],
+                                            emotionalThemes: "Peace", relationships: "None mentioned",
+                                            interests: "Walking", changes: "None mentioned")
+        let writer = try PersistenceController.makeContainer(storeURL: url)
+        let writerStore = JournalStore(context: writer.mainContext, now: { time })
+        let fixture = try writerStore.create(day: day, body: "A peaceful walk.")
+        let dailyFingerprint = AnalysisFingerprint.entries(try writerStore.snapshots(from: day, through: day), version: 1)
+        try writerStore.saveDailyAnalysis(daily, for: day, sourceFingerprint: dailyFingerprint, version: 1)
+        try writerStore.setEmotionOverride(.love, for: day)
+        for period in [week, month] {
+            try writerStore.saveReflection(reflection, for: period,
+                                           sourceFingerprint: writerStore.reflectionFingerprint(for: period, version: 1),
+                                           version: 1)
+        }
+
+        let reader = try readOnlyContainer(at: url)
+        let context = ModelContext(reader)
+        let store = JournalStore(context: context, now: { time.addingTimeInterval(60) })
+        let entry = try XCTUnwrap(store.entries(for: day).first)
+        var replacementDaily = daily
+        replacementDaily.summary = "Replacement that must not be visible."
+        var replacementReflection = reflection
+        replacementReflection.overview = "Replacement that must not be visible."
+        let reflectionFingerprint = try store.reflectionFingerprint(for: week, version: 1)
+        for _ in 0..<2 {
+            XCTAssertThrowsError(try store.saveDailyAnalysis(replacementDaily, for: day,
+                                                            sourceFingerprint: dailyFingerprint, version: 1))
+            XCTAssertThrowsError(try store.saveReflection(replacementReflection, for: week,
+                                                         sourceFingerprint: reflectionFingerprint, version: 1))
+            XCTAssertThrowsError(try store.setEmotionOverride(.sadness, for: day))
+            XCTAssertThrowsError(try store.setEmotionOverride(nil, for: day))
+            XCTAssertThrowsError(try store.update(entry: entry, body: "Draft moved to a different day.", day: movedDay))
+            XCTAssertEqual(entry.id, fixture.id)
+            XCTAssertEqual(entry.body, "A peaceful walk.")
+            XCTAssertEqual(entry.dayKey, day.key)
+            XCTAssertEqual(entry.createdAt, time)
+            XCTAssertEqual(entry.modifiedAt, time)
+            XCTAssertEqual(try store.dailyAnalysis(for: day)?.content, daily)
+            XCTAssertFalse(try XCTUnwrap(store.dailyAnalysis(for: day)).isStale)
+            XCTAssertEqual(try store.reflection(for: week)?.content, reflection)
+            XCTAssertFalse(try XCTUnwrap(store.reflection(for: week)).isStale)
+            XCTAssertFalse(try XCTUnwrap(store.reflection(for: month)).isStale)
+            XCTAssertEqual(try store.emotionOverrides(from: day, through: movedDay), [day.key: .love])
+            XCTAssertTrue(try store.entries(for: movedDay).isEmpty)
+            XCTAssertFalse(context.hasChanges)
+            XCTAssertEqual(store.revision, 0)
+            XCTAssertTrue(store.takeChangedDays().isEmpty)
+        }
+    }
+
+    @MainActor
     func testReadOnlyCreateFailureRetainsDraftAndNeverLeavesAGhostEntry() throws {
         let url = temporaryStoreURL()
         let day = try XCTUnwrap(JournalDay(key: "2026-10-10"))
@@ -93,7 +154,7 @@ final class JournalFailureTests: XCTestCase {
 
     @MainActor
     private func readOnlyContainer(at url: URL) throws -> ModelContainer {
-        let schema = Schema([JournalEntry.self])
+        let schema = PersistenceController.schema
         let configuration = ModelConfiguration(
             "BearingsReadOnlyFailureTests", schema: schema, url: url,
             allowsSave: false, cloudKitDatabase: .none

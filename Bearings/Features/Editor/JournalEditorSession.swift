@@ -5,7 +5,7 @@ import Observation
 @Observable
 final class JournalEditorSession {
     enum SaveState { case empty, unsaved, saving, saved, failed }
-    let day: JournalDay
+    var day: JournalDay { didSet { if day != oldValue { saveState = .unsaved } } }
     private let store: JournalStore
     private var isDeleted = false
     private(set) var deleteFailed = false
@@ -46,7 +46,7 @@ final class JournalEditorSession {
         }
         saveState = .saving
         do {
-            if let entry { try store.update(entry: entry, body: body, period: period) }
+            if let entry { try store.update(entry: entry, body: body, period: period, day: day) }
             else { entry = try store.create(day: day, body: body, period: period) }
             saveState = .saved
             return true

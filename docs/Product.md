@@ -6,7 +6,7 @@ Status: approved product direction, reconciled with implemented source on Octobe
 
 Bearings is a native iPhone journal for personal stories, daily experiences, and emotional reflection. Its working tagline is “Find what's been lost inside.” The user's writing is the central experience. The app should feel private, reflective, tactile, and carefully made, without streaks or pressure to maintain engagement.
 
-The initial audience is people who want a calm place to write about their experiences and revisit their personal story. The MVP provides writing and navigation, without psychological diagnoses or an AI assistant.
+The initial audience is people who want a calm place to write about their experiences and revisit their personal story. The journaling foundation provides writing and navigation. The owner-approved next milestone adds on-device reflection and user-correctable emotion indicators; psychological diagnoses and the broader personal assistant remain outside scope.
 
 ## Approved experience
 
@@ -47,11 +47,15 @@ The Bearings rename preserves the existing application bundle and persistent-sto
 
 Entries are stored locally with SwiftData and operate without a network connection. Each has a stable unique identifier, associated civil date, explicit morning/midday/evening period, creation time, modification time, and text. A journal entry stays on the calendar date chosen by the user even if the device travels to another time zone. The displayed month is also a civil identity, so travel does not change the month being browsed.
 
-The dedicated persistent store uses iOS file protection. Journal text is not logged or sent to analytics, AI services or cloud services. Store initialization or entry-loading failures show explicit retry screens rather than silently using temporary storage or presenting a failure as an empty journal. Saving and deletion happen in isolated transactions; failed mutations preserve previously committed data and the editor draft for retry.
+The dedicated persistent store uses iOS file protection. Journal text is not logged or transmitted to external AI, analytics or cloud services. On supported devices, Apple Foundation Models analyzes committed local snapshots on device. Store initialization or entry-loading failures show explicit retry screens rather than silently using temporary storage or presenting a failure as an empty journal. Saving and deletion happen in isolated transactions; failed mutations preserve previously committed data and the editor draft for retry.
 
 ## Future scope
 
-AI reflection, on-device AI, optional sync, backup/export, progressive design reveal, guided writing tools, and reminders remain future possibilities. A local read-only retrieval boundary may support later work, but no AI client or network transport belongs in this foundation. Brainstorming notes are not approval to expand the MVP.
+The owner-approved local AI milestone implements daily summaries, primary/secondary emotion suggestions, important moments and emotional trajectories, plus cached weekly/monthly reflections. Users can correct the primary emotion or return to the AI suggestion. Small outlined emotion indicators complement the existing navy lines and grey entry markers. Loading, earlier-result, unavailable, empty and retry states preserve access to writing. Entry metadata shows creation/modification times and supports independent journal-day reassignment.
+
+Generation requires iOS 26 or later, compatible Apple Intelligence hardware, a ready model and supported settings/locale. iOS 17 journaling and manual emotion correction remain available. These minimal native reflection controls are implementation adaptations without new approved Figma frames. Semantic model accuracy and device verification limits are recorded in Testing.
+
+The broader personal assistant, optional sync, backup/export, progressive design reveal, guided writing tools, and reminders remain future possibilities. No external AI client or journal network transport is included. Brainstorming notes alone do not approve further expansion.
 
 Social networking, streaks, achievements, subscriptions, complex analytics, cloud services, and a separate web app are excluded. External publication of the repository or application requires the owner's approval.
 

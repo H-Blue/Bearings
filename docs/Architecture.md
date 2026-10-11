@@ -9,11 +9,11 @@ Bearings uses Swift, SwiftUI, SwiftData, and native Apple frameworks, with iOS 1
 | Folder | Responsibility |
 | --- | --- |
 | `Bearings/App` | Application launch, dependency creation, root view, persistent-store recovery. |
-| `Bearings/Models` | Journal entries, explicit journal periods, and calendar-day identity. |
+| `Bearings/Models` | Journal entries, calendar-day identity, analysis values, civil reflection periods and separate derived records. |
 | `Bearings/Persistence` | Dedicated SwiftData container and one store responsible for reads and mutations. |
-| `Bearings/Features` | Timeline, day view, journal editor, and navigation state. |
+| `Bearings/Features` | Timeline, day view, journal editor, reflection views and navigation state. |
 | `Bearings/Design` | Shared palette, typography, reusable drawing, and interface components. |
-| `Bearings/Services` | Local read-only entry snapshots for possible future integrations. |
+| `Bearings/Services` | Committed local snapshots, protocol-based intelligence, Apple on-device adapter, serialized analysis engine and cache/task coordinator. |
 
 SwiftUI owns transient screen state. The journal store owns persistent mutations. Keep view drafts separate from managed entries so an unsuccessful save cannot erase the user's current writing.
 
@@ -46,13 +46,13 @@ The SwiftData container uses a dedicated store in the application's Application 
 
 Application launch does not fall back to an in-memory store after a disk-store failure. Instead it presents the failure and a retry path. A root query fetch error also displays an explicit loading error with retry instead of appearing as an empty journal. In-memory configuration is reserved for isolated tests.
 
-`JournalStore` retains the container's observed context for reading, but creates a fresh `ModelContext` from the same container for **every create, update and delete transaction**. Autosave is disabled in both contexts. Updates and deletions resolve the entry by its stable UUID in the transaction context, then call `processPendingChanges()` and explicitly save. Successful edits mirror the confirmed body, period and modification timestamp into the original model held by the editor; failed saves never mirror those changes.
+`JournalStore` retains the container's observed context as a container reference and creates a fresh `ModelContext` for authoritative reads and **every journal, analysis and correction transaction**. Autosave is disabled in both contexts. Updates and deletions resolve the entry by its stable UUID in the transaction context, then call `processPendingChanges()` and explicitly save. Successful edits mirror the confirmed body, period, civil day and modification timestamp into the original model held by the editor; failed saves never mirror those changes.
 
 On a transaction save failure, the store rolls back that isolated context and lets the failed transaction be discarded while `JournalEditorSession` retains its independent draft. There is no native undo manager in this implementation. The store increments its revision only after successful commits. This isolation was chosen because failure fixtures exposed registered-model/cache behavior that rollback in the interface's shared context did not reliably restore.
 
 `JournalStore.entries(for:)`, `daysWithEntries()` and `snapshots(from:through:)` fetch with `includePendingChanges = false`. `BearingsRootView` initializes its `@Query` with an ascending creation-time descriptor that also excludes pending changes, then passes date-filtered committed entries to the day and timeline views. A missing UUID during update or deletion throws `JournalStoreError.entryNotFound` instead of creating a replacement entry.
 
-The editor requests saving 350 milliseconds after the most recent body or period edit using a cancellable SwiftUI task. Done, a transition out of the active scene, and editor disappearance also request saving. `JournalEditorSession.SaveState` is empty, unsaved, saving, saved or failed. Done only dismisses after a successful save, and interactive dismissal is disabled while edits remain unsaved. A visible retry action retains the draft when saving fails. A new empty or whitespace-only draft is not inserted. An existing entry can be edited to an empty body; deletion remains a separate deliberate operation.
+The editor requests saving 350 milliseconds after the most recent body, period or journal-day edit using a cancellable SwiftUI task. Done, a transition out of the active scene, and editor disappearance also request saving. `JournalEditorSession.SaveState` is empty, unsaved, saving, saved or failed. Done only dismisses after a successful save, and interactive dismissal is disabled while edits remain unsaved. A visible retry action retains the draft when saving fails. A new empty or whitespace-only draft is not inserted. An existing entry can be edited to an empty body; deletion remains a separate deliberate operation.
 
 Deletion requires confirmation. A successful deletion puts the session in a terminal deleted state so a pending autosave or disappearance callback cannot recreate the entry. A failed deletion is tracked separately from a failed edit save, and Try again retries deletion rather than substituting a save.
 
@@ -76,8 +76,12 @@ The app icon uses the owner-supplied and explicitly accepted `appIcon.png`, pres
 
 ## Future integration boundary
 
-`LocalJournalRetrieving.snapshots(from:through:)` returns immutable `JournalEntrySnapshot` values within an inclusive civil-date range, including period, identity, body and timestamps, sorted by day and creation time. It provides a narrow read-only local boundary; it has no network client, AI runtime, analytics SDK, automatic sharing, or sync infrastructure. Later integrations require explicit authorization before sending journal content outside the device.
+`LocalJournalRetrieving.snapshots(from:through:)` returns immutable `JournalEntrySnapshot` values within an inclusive civil-date range, including period, identity, body, timestamps and optional creation zone, sorted by day and creation time. It provides a narrow read-only local boundary; it has no network client, AI runtime, analytics SDK, automatic sharing, or sync infrastructure. The approved intelligence adapter consumes those snapshots only on device. Any future external transmission needs explicit authorization.
 
 ## Verification and documentation
 
 Validate calendar identity, period persistence, create/update/delete behavior, blank draft semantics, failure handling, disk persistence across container recreation, navigation, keyboard use, and normal/Reduce Motion transitions. The exact commands, results, and remaining limitations belong in `docs/Testing.md`. Milestone progress belongs in `docs/Progress.md`; significant choices are recorded in `docs/Decisions.md`. These documents must be synchronized to the existing Bearings Notion hierarchy and the saved Notion content fetched for verification.
+
+## On-device intelligence milestone
+
+The implemented service and schema extend the existing foundation rather than replace it. See [LocalIntelligence.md](LocalIntelligence.md) for additive migration, optional creation-zone metadata, isolated derived writes, fingerprint-based caching/invalidation, fixed emotions and separate corrections, Monday weeks and month-clipped weekly inputs, fact retention, Unicode/token budgets, SDK/OS/runtime gating, cancellation and privacy/backup limits. [Deployment.md](Deployment.md) records signing and local testing preparation. Executed results remain in Testing.md.

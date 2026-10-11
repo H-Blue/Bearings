@@ -212,7 +212,7 @@ Build artifacts, detailed logs, result bundles and screenshot evidence stay loca
 
 Earlier UI runs reported an unlocated frame-dimension warning as the keyboard opened. It did not recur in the final normal-text or accessibility keyboard runs after the floating keyboard toolbar was removed. Initial diagnostic collection stalled after a passing focused test; stopping only that completed run's `simctl diagnose` child allowed a successful exit/result export. Final runs use `-collect-test-diagnostics never` and complete normally.
 
-## Limits
+## Earlier foundation limits
 
 - No physical iPhone was attached or tested. Device signing, actual locked-device file protection, haptics, and real-device animation performance remain unverified.
 - iOS 17 is validated as the compilation/deployment target; an iOS 17 runtime is not installed here.
@@ -220,3 +220,87 @@ Earlier UI runs reported an unlocated frame-dimension warning as the keyboard op
 - Abrupt termination before the 350 ms debounce or a failed disk save can leave the newest draft unpersisted. Done and inactive/background transitions request immediate saves, and the editor retains failed drafts while open. Repeated failure will not be presented as saved.
 - File-backed read-only fixtures verified failed-save/delete isolation and repeated retries. Recovery from a real disk-full or locked-device failure, and its complete UI presentation, still require device-level testing.
 - Automated navigation checks establish working routes and reverse context. Final animation feel and frame-rate profiling require owner/device review.
+
+## Local intelligence milestone — October 11, 2026
+
+This section supersedes the earlier foundation's AI and device limits where explicitly verified below. Tests use invented writing. No private journal text was exported, logged or sent to a model service.
+
+| Executed check | Actual result / evidence |
+| --- | --- |
+| First integrated Debug simulator build, Xcode 27.0 / SDK 27, iOS 17 deployment target | Passed. `build/AIBuild.log`. |
+| First persistence/service suite on iPhone 17e, iOS 26.5 simulator | 38 passed, zero failures. `build/AIUnitTests.xcresult`. |
+| Expanded unit suite including engine, concurrency and civil-boundary checks, same simulator | 53 passed, zero failures. `build/AIUnitTestsFinal.xcresult`. |
+| Final complete simulator unit suite, iPhone 17e / iOS 26.5 | 60 executed: 59 passed, one real-model test skipped on simulator, zero failures. Includes cache repair, independent correction reads, repeated real failed correction saves/removals and cancellation resumption. `build/AIUnitTestsAcceptance.xcresult`. |
+| Signed Debug build for Harry's physical iPhone 16 Pro, iOS 27.0.1 | Passed after building outside the Documents file-provider directory; rerun after recovery refinements. `build/AIDeviceBuildAccessible.log`; strict signature verification passed. |
+| Local app installation and launch on that iPhone | Both succeeded with the retained bundle identifier. Launch used `--uitesting`, selecting the separate test journal. No TestFlight distribution. `build/AIDeviceLaunch.log`. Latest recovery build update-installation also succeeded (`build/AIDeviceInstallAccessible.log`); it was not relaunched while the phone remained locked. |
+| Real Apple-model smoke test on the physical iPhone | Skipped: runtime reports `modelNotReady` (“Apple’s on-device model is still preparing”). No real generation was performed. `build/AIRealDeviceTestsUnitScheme.xcresult`. |
+| Full physical-device unit suite | 54 executed: 53 passed, one model-readiness skip, zero failures. Includes actual file-backed old-schema migration, original repeated failed saves/retries, new derived save/correction/move failures, cache invalidation and cancellation resumption. `build/AIAllDeviceUnitTests.xcresult`. |
+| Complete native UI suite, iPhone 18 Pro / iOS 27.0 | 15 passed, zero failures: 10 foundation journal/navigation flows and five new reflection/metadata/correction/unavailable flows. `build/AIUITests.xcresult`; 781.970 seconds. Synthetic local AI provider, no real model. |
+| Final reflection UI suite at maximum accessibility text size, compact iPhone 17e / iOS 27.0 | 5 passed, zero failures on the final UI source. `build/AIReflectionAX5Final.xcresult`; 249.174 seconds, no reported runtime warnings. Native Form/menu scrolling, creation-time preservation, correction reset, unavailable/empty states and period results. |
+| Unsigned generic iOS Release build, rerun after final service/UI refinements | Passed with iOS 17 deployment target. `build/AIReleaseBuildAccessible.log`. Binary inspection confirmed minimum OS 17.0 and weak linkage to Foundation Models. |
+
+The initial signed product under Documents failed with “resource fork, Finder information, or similar detritus not allowed.” Removing extended metadata only from the generated product allowed signing, but the file provider reintroduced Finder metadata and strict verification failed afterward. Building in `/private/tmp/BearingsAIDeviceDerivedData` resolved this; source artwork and metadata were not changed. The original signed test attempt with the full scheme failed because no provisioning profile existed for the separate UI test runner. The new generated `BearingsDeviceTests` scheme builds hosted unit tests only and supplies `--uitesting` to the host, avoiding that account resource and the ordinary journal store. No profile was created or account setting changed.
+
+A follow-up full-device run waited at launch because the iPhone was locked and was stopped before tests executed (`build/AIAllDeviceUnitTestsFinal.log`). The successful earlier physical suite above remains the device evidence; the later cache/correction recovery refinements were separately verified in the final simulator suite.
+
+The initial maximum-text run passed three tests and failed two selectors that expected offscreen native Form/menu items to exist without scrolling (`build/AIReflectionAX5.xcresult`). The tests now reveal those native controls, and the final five-test run passed. Actual screen review also found wrapped day-header control labels at the two largest sizes; native icons with unchanged accessible names/44-point targets and a fully scalable caption date restore room for the scroll content. Normal-size geometry and branch linework are preserved. Reviewed normal and final maximum-size screenshots are under `docs/evidence/LocalAI`; the compact simulator font is restored to its original large setting after review. The 15-test normal suite predates these focused accessibility/retry refinements; the final maximum-size suite and final unit suite verify those changes.
+
+The reviewed maximum-size metadata screenshots show wrapped creation time/zone fields. The final test scrolls to and asserts Last edited, which is outside the selected screenshot viewport; complete maximum-size metadata in one screenshot is not claimed. Period text remains accessible by scrolling. Normal screenshots show all reflection fields.
+
+The project generator was rerun and preserved the project, both schemes, workspace and local signing byte-for-byte (`build/AIGeneratorValidation.json`).
+
+The new deterministic engine/service tests verify guided-output Codable shape and fixed taxonomy, every UTF-8 byte including oversized combining graphemes, long-source segmentation, adaptive context retries and explicit irreducible errors, independent extracted-event retention, one inference at a time, queued/in-flight cancellation, resumed work, duplicate day/period requests, month-clipped sources, override precedence and persisted cache reuse. They establish pipeline correctness with injected results, not Apple's semantic emotion accuracy.
+
+### Commands used for the AI milestone
+
+```sh
+python3 Scripts/generate_project.py
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath build/AIDerivedData \
+  CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/AIDerivedData -resultBundlePath build/AIUnitTestsAcceptance.xcresult \
+  -only-testing:BearingsTests -parallel-testing-enabled NO \
+  -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=795E69CB-C101-488F-A8B0-CF3ECD77C7EE' \
+  -derivedDataPath build/AIUIDerivedData -resultBundlePath build/AIUITests.xcresult \
+  -only-testing:BearingsUITests -parallel-testing-enabled NO \
+  -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcrun simctl ui AB0A92C0-900B-46A8-85A9-8053C46559E9 content_size accessibility-extra-extra-extra-large
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=AB0A92C0-900B-46A8-85A9-8053C46559E9' \
+  -derivedDataPath build/AIAX5DerivedData -resultBundlePath build/AIReflectionAX5Final.xcresult \
+  -only-testing:BearingsUITests/ReflectionFlowTests -parallel-testing-enabled NO \
+  -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcrun simctl ui AB0A92C0-900B-46A8-85A9-8053C46559E9 content_size large
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings -configuration Debug \
+  -destination 'platform=iOS,id=00008140-0011052A3C32801C' \
+  -derivedDataPath /private/tmp/BearingsAIDeviceDerivedData
+xcodebuild build -project Bearings.xcodeproj -scheme BearingsDeviceTests -configuration Debug \
+  -destination 'platform=iOS,id=00008140-0011052A3C32801C' \
+  -derivedDataPath /private/tmp/BearingsAIDeviceDerivedData
+codesign --verify --strict --verbose=2 /private/tmp/BearingsAIDeviceDerivedData/Build/Products/Debug-iphoneos/Bearings.app
+xcrun devicectl device install app --device 00008140-0011052A3C32801C \
+  /private/tmp/BearingsAIDeviceDerivedData/Build/Products/Debug-iphoneos/Bearings.app
+xcodebuild test -project Bearings.xcodeproj -scheme BearingsDeviceTests \
+  -destination 'platform=iOS,id=00008140-0011052A3C32801C' \
+  -derivedDataPath /private/tmp/BearingsAIDeviceDerivedData \
+  -resultBundlePath build/AIAllDeviceUnitTests.xcresult -only-testing:BearingsTests \
+  -parallel-testing-enabled NO -collect-test-diagnostics never \
+  -test-timeouts-enabled YES DEVELOPMENT_TEAM=9VLNGVF797
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings -configuration Release \
+  -destination 'generic/platform=iOS' -derivedDataPath /private/tmp/BearingsAIReleaseDerivedData \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+Build products, logs and result bundles remain local and ignored. The harmless skipped AppIntents metadata warning persists. UI automation's debugger lookup notices are judged separately from assertion results.
+
+### Current device/runtime limits
+
+- Actual Foundation Models daily/weekly/monthly generation, semantic quality, latency, energy and disconnected-device inference remain unverified because the physical device's model was not ready. Use `FoundationModelsDeviceTests` after Apple Intelligence is enabled/prepared; the six cases in `docs/fixtures/SyntheticJournalEvaluation.json` support later semantic evaluation.
+- iOS 17 is the verified compilation/deployment target. No iOS 17 runtime is installed; execution on that OS remains unverified.
+- File-backed old-schema migration succeeded on simulator and physical hardware with synthetic stores. Updating the owner's real journal was not used as a migration test.
+- Native protection attributes are applied; locked-device, disk-full and abrupt termination timing still require dedicated acceptance testing. In-app corrections and inference never modify original writing.
+- This is a local development installation. App Store Connect/distribution access, archive upload, TestFlight processing and beta distribution have not been performed or verified. They require separate owner authorization.
