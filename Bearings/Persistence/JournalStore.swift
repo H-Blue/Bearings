@@ -152,6 +152,25 @@ final class JournalStore {
         )
         descriptor.includePendingChanges = false
         for record in try transactionContext.fetch(descriptor) { record.isStale = true }
+        // A full weekly reflection may depend on exactly one preceding week.
+        // Invalidate that direct dependent without walking farther back or forward.
+        if let day = JournalDay(key: dayKey) {
+            let containingWeek = AnalysisPeriod.week(containing: day)
+            if let end = containingWeek.lastDay.date(calendar: Self.civilCalendar),
+               let nextDate = Self.civilCalendar.date(byAdding: .day, value: 1, to: end),
+               nextDate <= JournalDay(key: "9999-12-31")!.date(calendar: Self.civilCalendar)! {
+                let dependent = AnalysisPeriod.week(containing: JournalDay(date: nextDate, calendar: Self.civilCalendar))
+                if let record = try reflectionRecord(for: dependent.key, in: transactionContext) {
+                    record.isStale = true
+                }
+            }
+        }
+    }
+
+    private static var civilCalendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        return calendar
     }
 
     private func save(_ transactionContext: ModelContext) throws {
@@ -208,6 +227,13 @@ extension JournalStore {
         try reflectionRecord(for: period.key, in: makeTransactionContext())?.snapshot()
     }
 
+    func currentPrecedingWeeklyReflection(for period: AnalysisPeriod, version: Int) throws -> StoredReflection? {
+        guard let preceding = period.precedingFullWeek,
+              let record = try reflectionRecord(for: preceding.key, in: makeTransactionContext()),
+              !record.isStale, record.analysisVersion == version else { return nil }
+        return try record.snapshot()
+    }
+
     func emotionOverrides(from firstDay: JournalDay, through lastDay: JournalDay) throws -> [String: JournalEmotion] {
         try emotionOverrides(from: firstDay, through: lastDay, in: makeTransactionContext())
     }
@@ -250,6 +276,7 @@ extension JournalStore {
                                                          sourceFingerprint: sourceFingerprint, generatedAt: now(),
                                                          analysisVersion: version))
         }
+        try invalidateReflections(for: day.key, in: transactionContext)
         try save(transactionContext)
     }
 
@@ -279,6 +306,7 @@ extension JournalStore {
                                                       sourceFingerprint: sourceFingerprint, generatedAt: now(),
                                                       analysisVersion: version))
         }
+        if period.precedingFullWeek != nil { try invalidateDependentWeek(after: period, in: transactionContext) }
         try save(transactionContext)
     }
 
@@ -286,7 +314,60 @@ extension JournalStore {
                                        in transactionContext: ModelContext) throws -> String {
         let entries = try snapshots(from: period.firstDay, through: period.lastDay, in: transactionContext)
         let overrides = try emotionOverrides(from: period.firstDay, through: period.lastDay, in: transactionContext)
-        return AnalysisFingerprint.reflection(entries: entries, overrides: overrides, period: period, version: version)
+        var derivedInputs = try dailyRecords(from: period.firstDay, through: period.lastDay,
+                                             in: transactionContext).map(derivedFingerprint)
+        if let preceding = period.precedingFullWeek,
+           let record = try reflectionRecord(for: preceding.key, in: transactionContext),
+           !record.isStale, record.analysisVersion == version {
+            derivedInputs.append(derivedFingerprint(record))
+        }
+        if period.kind == .monthly {
+            for week in period.clippedWeeks {
+                if let record = try reflectionRecord(for: week.key, in: transactionContext),
+                   !record.isStale, record.analysisVersion == version {
+                    derivedInputs.append(derivedFingerprint(record))
+                }
+            }
+        }
+        return AnalysisFingerprint.reflection(entries: entries, overrides: overrides, period: period,
+                                              version: version, derivedInputs: derivedInputs.sorted())
+    }
+
+    private func dailyRecords(from firstDay: JournalDay, through lastDay: JournalDay,
+                              in transactionContext: ModelContext) throws -> [DailyAnalysisRecord] {
+        let firstKey = firstDay.key
+        let lastKey = lastDay.key
+        var descriptor = FetchDescriptor<DailyAnalysisRecord>(
+            predicate: #Predicate { $0.dayKey >= firstKey && $0.dayKey <= lastKey },
+            sortBy: [SortDescriptor(\DailyAnalysisRecord.dayKey)]
+        )
+        descriptor.includePendingChanges = false
+        return try transactionContext.fetch(descriptor)
+    }
+
+    private func derivedFingerprint(_ record: DailyAnalysisRecord) -> String {
+        ["daily", record.dayKey, record.contentData.base64EncodedString(), record.sourceFingerprint,
+         String(record.generatedAt.timeIntervalSince1970), String(record.analysisVersion), String(record.isStale)]
+            .joined(separator: "|")
+    }
+
+    private func derivedFingerprint(_ record: ReflectionRecord) -> String {
+        ["reflection", record.periodKey, record.contentData.base64EncodedString(), record.sourceFingerprint,
+         String(record.generatedAt.timeIntervalSince1970), String(record.analysisVersion), String(record.isStale)]
+            .joined(separator: "|")
+    }
+
+    private func invalidateDependentWeek(after period: AnalysisPeriod,
+                                         in transactionContext: ModelContext) throws {
+        guard period.days.count == 7, AnalysisPeriod.week(containing: period.firstDay) == period,
+              let end = period.lastDay.date(calendar: Self.civilCalendar),
+              let nextDate = Self.civilCalendar.date(byAdding: .day, value: 1, to: end),
+              nextDate <= JournalDay(key: "9999-12-31")!.date(calendar: Self.civilCalendar)!
+        else { return }
+        let dependent = AnalysisPeriod.week(containing: JournalDay(date: nextDate, calendar: Self.civilCalendar))
+        if let record = try reflectionRecord(for: dependent.key, in: transactionContext) {
+            record.isStale = true
+        }
     }
 
     private func dailyRecord(for key: String, in transactionContext: ModelContext) throws -> DailyAnalysisRecord? {

@@ -71,6 +71,43 @@ struct AppleJournalIntelligence: JournalIntelligence {
         return content
     }
 
+    func extractWeeklySignals(_ text: String) async throws -> WeeklySignals {
+        let result: GeneratedWeeklySignals = try await generate(
+            text,
+            task: "Extract only grounded weekly signals from this evidence segment. Current-week journal writing and daily analyses are authoritative. Material labeled preceding-week reflection is historical AI context only: use it only for relevant continuity, and never let it override or contradict current-week evidence. For every signal, copy exactly one bracketed evidence-line ID, such as E003, from the supplied material. Use only dates inside the requested week for dated events. Leave a category empty when unsupported. Do not infer goals, progress, deficiencies, relationships, growth, meaning, or events.",
+            generating: GeneratedWeeklySignals.self
+        )
+        return try result.weeklySignals(evidence: text)
+    }
+
+    func composeWeeklyReflection(_ text: String) async throws -> ReflectionContent {
+        let result: GeneratedWeeklyReflection = try await generate(
+            text,
+            task: "Write a concise weekly reflection using only this structured grounded-signal packet. Explain what the writer worked on, what happened, what progressed or changed, what remains unresolved, and what appeared to help. Offer one realistic improvement only when supported. Decide whether to continue the current lesson, move to a new lesson or challenge, or mark readiness as insufficient evidence. Readiness evidence must copy complete signal statements exactly from the packet. When readiness or improvement is unsupported, choose insufficient evidence, say so plainly, and provide one open-ended reflection question. Never invent goals, progress, relationships, deficiencies, growth, meaning, or events. Never diagnose or prescribe treatment.",
+            generating: GeneratedWeeklyReflection.self
+        )
+        let details = WeeklyReflectionDetails(
+            workFocus: result.workFocus.trimmingCharacters(in: .whitespacesAndNewlines),
+            progressAndUnfinished: result.progressAndUnfinished.trimmingCharacters(in: .whitespacesAndNewlines),
+            whatHelped: result.whatHelped.trimmingCharacters(in: .whitespacesAndNewlines),
+            realisticImprovement: result.realisticImprovement.trimmingCharacters(in: .whitespacesAndNewlines),
+            lessonReadiness: result.lessonReadiness.lessonReadiness,
+            readinessEvidence: result.readinessEvidence.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) },
+            reflectionQuestion: result.reflectionQuestion?.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        let content = ReflectionContent(
+            overview: result.whatHappened.trimmingCharacters(in: .whitespacesAndNewlines),
+            importantEvents: [],
+            emotionalThemes: result.emotionalChanges.trimmingCharacters(in: .whitespacesAndNewlines),
+            relationships: "",
+            interests: "",
+            changes: result.progressAndUnfinished.trimmingCharacters(in: .whitespacesAndNewlines),
+            weeklyDetails: details
+        )
+        try content.validate()
+        return content
+    }
+
     func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent {
         let result: GeneratedEmotionalZoom = try await generate(
             text,
@@ -202,6 +239,109 @@ private struct GeneratedDailyAnalysis {
     var importantEvents: [String]
     @Guide(description: "Brief supported emotional progression, or say no clear emotional change is expressed")
     var emotionalTrajectory: String
+}
+
+@available(iOS 26.0, *)
+@Generable
+private struct GeneratedGroundedWeeklySignal {
+    @Guide(description: "A concise grounded statement")
+    var statement: String
+    @Guide(description: "One exact evidence-line ID from the supplied material, such as E003")
+    var evidenceID: String
+
+    func groundedSignal(evidence: String) throws -> GroundedWeeklySignal {
+        GroundedWeeklySignal(statement: statement.trimmingCharacters(in: .whitespacesAndNewlines),
+                             evidenceExcerpt: try weeklyEvidenceLine(id: evidenceID, source: evidence))
+    }
+}
+
+@available(iOS 26.0, *)
+@Generable
+private struct GeneratedDatedWeeklyEvent {
+    @Guide(description: "Gregorian date from the requested week in YYYY-MM-DD format")
+    var dayKey: String
+    var statement: String
+    @Guide(description: "One exact evidence-line ID from the supplied material, such as E003")
+    var evidenceID: String
+
+    func datedEvent(evidence: String) throws -> DatedWeeklyEvent {
+        DatedWeeklyEvent(dayKey: dayKey.trimmingCharacters(in: .whitespacesAndNewlines),
+                         statement: statement.trimmingCharacters(in: .whitespacesAndNewlines),
+                         evidenceExcerpt: try weeklyEvidenceLine(id: evidenceID, source: evidence))
+    }
+}
+
+@available(iOS 26.0, *)
+@Generable
+private struct GeneratedWeeklySignals {
+    var focusAreas: [GeneratedGroundedWeeklySignal]
+    var importantEvents: [GeneratedDatedWeeklyEvent]
+    var explicitGoals: [GeneratedGroundedWeeklySignal]
+    var progress: [GeneratedGroundedWeeklySignal]
+    var obstacles: [GeneratedGroundedWeeklySignal]
+    var unfinishedThreads: [GeneratedGroundedWeeklySignal]
+    var emotionalChanges: [GeneratedGroundedWeeklySignal]
+    @Guide(description: "Only continuity supported by material explicitly labeled preceding-week reflection")
+    var precedingWeekContinuity: [GeneratedGroundedWeeklySignal]
+
+    func weeklySignals(evidence: String) throws -> WeeklySignals {
+        WeeklySignals(focusAreas: try focusAreas.map { try $0.groundedSignal(evidence: evidence) },
+                      importantEvents: try importantEvents.map { try $0.datedEvent(evidence: evidence) },
+                      explicitGoals: try explicitGoals.map { try $0.groundedSignal(evidence: evidence) },
+                      progress: try progress.map { try $0.groundedSignal(evidence: evidence) },
+                      obstacles: try obstacles.map { try $0.groundedSignal(evidence: evidence) },
+                      unfinishedThreads: try unfinishedThreads.map { try $0.groundedSignal(evidence: evidence) },
+                      emotionalChanges: try emotionalChanges.map { try $0.groundedSignal(evidence: evidence) },
+                      precedingWeekContinuity: try precedingWeekContinuity.map { try $0.groundedSignal(evidence: evidence) })
+    }
+}
+
+@available(iOS 26.0, *)
+private func weeklyEvidenceLine(id: String, source: String) throws -> String {
+    let normalized = id.trimmingCharacters(in: .whitespacesAndNewlines)
+        .trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+        .uppercased()
+    guard let line = source.split(separator: "\n", omittingEmptySubsequences: false).first(where: {
+        $0.hasPrefix("[\(normalized)] ")
+    }), let separator = line.firstIndex(of: " ") else {
+        throw AnalysisError.invalidOutput
+    }
+    return String(line[line.index(after: separator)...])
+}
+
+@available(iOS 26.0, *)
+@Generable
+private enum GeneratedLessonReadiness {
+    case continueCurrentLesson, readyForNewChallenge, insufficientEvidence
+
+    var lessonReadiness: LessonReadiness {
+        switch self {
+        case .continueCurrentLesson: .continueCurrentLesson
+        case .readyForNewChallenge: .readyForNewChallenge
+        case .insufficientEvidence: .insufficientEvidence
+        }
+    }
+}
+
+@available(iOS 26.0, *)
+@Generable
+private struct GeneratedWeeklyReflection {
+    @Guide(description: "What the writer repeatedly worked on or focused on")
+    var workFocus: String
+    @Guide(description: "A concise account of what happened during the week")
+    var whatHappened: String
+    @Guide(description: "What progressed or changed and what remains unresolved")
+    var progressAndUnfinished: String
+    @Guide(description: "What appeared to help, or insufficient evidence")
+    var whatHelped: String
+    @Guide(description: "One realistic supported improvement, or insufficient evidence")
+    var realisticImprovement: String
+    var emotionalChanges: String
+    var lessonReadiness: GeneratedLessonReadiness
+    @Guide(description: "Complete signal statements copied exactly from the packet that support readiness; empty only for insufficient evidence")
+    var readinessEvidence: [String]
+    @Guide(description: "One open-ended question when evidence is insufficient; otherwise nil")
+    var reflectionQuestion: String?
 }
 
 @available(iOS 26.0, *)

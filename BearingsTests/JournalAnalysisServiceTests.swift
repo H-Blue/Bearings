@@ -140,8 +140,8 @@ final class JournalAnalysisServiceTests: XCTestCase {
         async let monthly: Void = service.reflect(period: month)
         async let weekly: Void = service.reflect(period: month.clippedWeeks.first!)
         _ = await (monthly, weekly)
-        let prompts = await model.reflectionPrompts
-        XCTAssertEqual(prompts.filter { $0.contains("Requested weekly period") }.count, 1)
+        let extractionPrompts = await model.weeklyExtractionPrompts
+        XCTAssertEqual(extractionPrompts.filter { $0.contains("REQUESTED WEEK:") }.count, 1)
         XCTAssertNotNil(try store.reflection(for: month))
     }
 
@@ -312,12 +312,12 @@ final class JournalAnalysisServiceTests: XCTestCase {
             XCTAssertEqual(service.states["storage"], .idle)
             XCTAssertEqual(service.states[period.key], .idle)
             XCTAssertEqual(service.overrides[day.key], .joy)
-            let prompts = await model.reflectionPrompts
+            let prompts = await model.weeklyExtractionPrompts
             XCTAssertTrue(try XCTUnwrap(prompts.last).contains("Joy"),
                           "Regeneration must use the saved correction even while display caches are hidden.")
         }
 
-        let prompts = await model.reflectionPrompts
+        let prompts = await model.weeklyExtractionPrompts
         XCTAssertEqual(prompts.count, 3)
         let dailyCalls = await model.analysisCount
         XCTAssertEqual(dailyCalls, 1)
@@ -441,6 +441,86 @@ final class JournalAnalysisServiceTests: XCTestCase {
     }
 
     @MainActor
+    func testWeeklyReflectionUsesOnlyCurrentImmediatePrecedingContext() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let store = JournalStore(context: container.mainContext)
+        let olderDay = try XCTUnwrap(JournalDay(key: "2026-09-20"))
+        let precedingDay = try XCTUnwrap(JournalDay(key: "2026-09-27"))
+        let currentDay = try XCTUnwrap(JournalDay(key: "2026-10-04"))
+        _ = try store.create(day: olderDay, body: "Older-week private detail.")
+        _ = try store.create(day: precedingDay, body: "Preceding-week walk.")
+        _ = try store.create(day: currentDay, body: "Current-week walk.")
+        let model = ServiceFixtureIntelligence()
+        let service = JournalAnalysisService(store: store, intelligence: model)
+
+        await service.reflect(period: .week(containing: olderDay))
+        await service.reflect(period: .week(containing: precedingDay))
+        let promptCount = await model.weeklyExtractionPrompts.count
+        await service.reflect(period: .week(containing: currentDay))
+        let currentPrompts = Array((await model.weeklyExtractionPrompts).dropFirst(promptCount))
+        let currentEvidence = currentPrompts.joined(separator: "\n")
+
+        XCTAssertTrue(currentEvidence.contains("AUTHORITATIVE REQUESTED WEEKLY EVIDENCE"))
+        XCTAssertTrue(currentEvidence.contains("Current-week walk."))
+        XCTAssertTrue(currentEvidence.contains("HISTORICAL CONTEXT — IMMEDIATELY PRECEDING WEEK ONLY"))
+        XCTAssertTrue(currentEvidence.contains("Work focus: Walking with a friend."))
+        XCTAssertFalse(currentEvidence.contains("Older-week private detail."))
+        XCTAssertEqual(currentEvidence.components(separatedBy: "HISTORICAL CONTEXT — IMMEDIATELY PRECEDING WEEK ONLY").count - 1, 1)
+    }
+
+    @MainActor
+    func testWeeklyReflectionOmitsMissingOrStalePrecedingContext() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let store = JournalStore(context: container.mainContext)
+        let precedingDay = try XCTUnwrap(JournalDay(key: "2026-09-27"))
+        let currentDay = try XCTUnwrap(JournalDay(key: "2026-10-04"))
+        let precedingEntry = try store.create(day: precedingDay, body: "Preceding-week walk.")
+        _ = try store.create(day: currentDay, body: "Current-week walk.")
+        let model = ServiceFixtureIntelligence()
+        let service = JournalAnalysisService(store: store, intelligence: model)
+
+        // There is no saved preceding reflection for the first generation.
+        await service.reflect(period: .week(containing: currentDay))
+        var evidence = (await model.weeklyExtractionPrompts).joined(separator: "\n")
+        XCTAssertFalse(evidence.contains("HISTORICAL CONTEXT"))
+
+        await service.reflect(period: .week(containing: precedingDay))
+        try store.update(entry: precedingEntry, body: "Changed preceding-week walk.")
+        let beforeRegeneration = await model.weeklyExtractionPrompts.count
+        await service.regenerate(period: .week(containing: currentDay))
+        evidence = Array((await model.weeklyExtractionPrompts).dropFirst(beforeRegeneration)).joined(separator: "\n")
+        XCTAssertFalse(evidence.contains("HISTORICAL CONTEXT"), "A stale preceding interpretation is not usable context.")
+    }
+
+    @MainActor
+    func testCurrentWeeklyGenerationNeverRecursivelyGeneratesHistory() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let store = JournalStore(context: container.mainContext)
+        let weekOneDay = try XCTUnwrap(JournalDay(key: "2026-09-20"))
+        let weekTwoDay = try XCTUnwrap(JournalDay(key: "2026-09-27"))
+        let weekThreeDay = try XCTUnwrap(JournalDay(key: "2026-10-04"))
+        for (day, text) in [(weekOneDay, "First-week walk."), (weekTwoDay, "Second-week walk."),
+                            (weekThreeDay, "Third-week walk.")] {
+            _ = try store.create(day: day, body: text)
+        }
+        let model = ServiceFixtureIntelligence()
+        let service = JournalAnalysisService(store: store, intelligence: model)
+        await service.reflect(period: .week(containing: weekOneDay))
+        await service.reflect(period: .week(containing: weekTwoDay))
+        let extractionCount = await model.weeklyExtractionPrompts.count
+        let analysisCount = await model.analysisCount
+
+        await service.reflect(period: .week(containing: weekThreeDay))
+
+        let finalAnalysisCount = await model.analysisCount
+        XCTAssertEqual(finalAnalysisCount, analysisCount + 1)
+        let currentPrompts = Array((await model.weeklyExtractionPrompts).dropFirst(extractionCount))
+        XCTAssertFalse(currentPrompts.isEmpty)
+        XCTAssertTrue(currentPrompts.allSatisfy { $0.contains("REQUESTED WEEK: 2026-10-04 through 2026-10-10") })
+        XCTAssertFalse(currentPrompts.joined(separator: "\n").contains("First-week walk."))
+    }
+
+    @MainActor
     func testCancellationDoesNotPersistUnfinishedInterpretation() async throws {
         let container = try PersistenceController.makeContainer(inMemory: true)
         let store = JournalStore(context: container.mainContext)
@@ -466,6 +546,7 @@ private actor ServiceFixtureIntelligence: JournalIntelligence {
     let available: Bool
     private(set) var analysisCount = 0
     private(set) var reflectionPrompts: [String] = []
+    private(set) var weeklyExtractionPrompts: [String] = []
     private(set) var zoomPrompts: [String] = []
     init(delay: Duration = .zero, available: Bool = true) { self.delay = delay; self.available = available }
     func availability() async -> IntelligenceAvailability { available ? .available : .unavailable("Synthetic unavailable model") }
@@ -479,6 +560,39 @@ private actor ServiceFixtureIntelligence: JournalIntelligence {
         reflectionPrompts.append(text)
         return ReflectionContent(overview: "A remembered walk", importantEvents: ["Walk"], emotionalThemes: "Peace",
                                  relationships: "Friend", interests: "Walking", changes: "Insufficient information")
+    }
+    func extractWeeklySignals(_ text: String) async throws -> WeeklySignals {
+        weeklyExtractionPrompts.append(text)
+        let key = text.range(of: #"\d{4}-\d{2}-\d{2}"#, options: .regularExpression)
+            .map { String(text[$0]) } ?? "2026-10-01"
+        let excerpt = text.contains("Walk with a friend") ? "Walk with a friend" : "Committed synthetic writing"
+        return WeeklySignals(
+            focusAreas: [GroundedWeeklySignal(statement: "The writer focused on walking with a friend.",
+                                                evidenceExcerpt: excerpt)],
+            importantEvents: [DatedWeeklyEvent(dayKey: key, statement: "The writer walked with a friend.",
+                                                evidenceExcerpt: excerpt)],
+            explicitGoals: [], progress: [], obstacles: [], unfinishedThreads: [], emotionalChanges: [],
+            precedingWeekContinuity: text.contains("HISTORICAL CONTEXT")
+                ? [GroundedWeeklySignal(statement: "The preceding reflection mentioned walking.",
+                                        evidenceExcerpt: "Work focus")]
+                : []
+        )
+    }
+    func composeWeeklyReflection(_ text: String) async throws -> ReflectionContent {
+        reflectionPrompts.append(text)
+        return ReflectionContent(
+            overview: "A remembered walk", importantEvents: [], emotionalThemes: "Peace",
+            relationships: "", interests: "", changes: "",
+            weeklyDetails: WeeklyReflectionDetails(
+                workFocus: "Walking with a friend.",
+                progressAndUnfinished: "Progress is unclear and may remain unfinished.",
+                whatHelped: "The walk may have helped.",
+                realisticImprovement: "There is insufficient evidence for a specific improvement.",
+                lessonReadiness: .insufficientEvidence,
+                readinessEvidence: [],
+                reflectionQuestion: "What would you want to notice next week?"
+            )
+        )
     }
     func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent {
         zoomPrompts.append(text)

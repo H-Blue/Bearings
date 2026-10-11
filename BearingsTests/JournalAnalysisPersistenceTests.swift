@@ -29,6 +29,7 @@ final class JournalAnalysisPersistenceTests: XCTestCase {
             try saveReflection(week, store: store)
             _ = store.takeChangedDays()
             try saveDaily(on: day, store: store)
+            try saveReflection(week, store: store)
             XCTAssertTrue(store.takeChangedDays().isEmpty)
         }
         let reopened = try PersistenceController.makeContainer(storeURL: url)
@@ -143,6 +144,48 @@ final class JournalAnalysisPersistenceTests: XCTestCase {
         try store.setEmotionOverride(nil, for: day)
         XCTAssertTrue(try store.emotionOverrides(from: day, through: day).isEmpty)
         XCTAssertEqual(try store.reflectionFingerprint(for: week, version: 1), fingerprint)
+    }
+
+    @MainActor
+    func testPrecedingWeekChangesInvalidateOnlyItsDirectWeeklyDependent() throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        var clock = Date(timeIntervalSince1970: 1_792_000_000)
+        let store = JournalStore(context: container.mainContext, now: { clock })
+        let precedingDay = try XCTUnwrap(JournalDay(key: "2026-09-27"))
+        let currentDay = try XCTUnwrap(JournalDay(key: "2026-10-04"))
+        let nextDay = try XCTUnwrap(JournalDay(key: "2026-10-11"))
+        let precedingEntry = try store.create(day: precedingDay, body: "A peaceful walk outdoors.")
+        _ = try store.create(day: currentDay, body: "Another peaceful walk outdoors.")
+        _ = try store.create(day: nextDay, body: "A later peaceful walk outdoors.")
+        let preceding = AnalysisPeriod.week(containing: precedingDay)
+        let current = AnalysisPeriod.week(containing: currentDay)
+        let next = AnalysisPeriod.week(containing: nextDay)
+        for day in [precedingDay, currentDay, nextDay] { try saveDaily(on: day, store: store) }
+        for period in [preceding, current, next] { clock.addTimeInterval(1); try saveReflection(period, store: store) }
+        let initialCurrentFingerprint = try store.reflectionFingerprint(for: current, version: 1)
+
+        try store.update(entry: precedingEntry, body: "A changed peaceful walk outdoors.")
+        XCTAssertTrue(try XCTUnwrap(store.reflection(for: preceding)).isStale)
+        XCTAssertTrue(try XCTUnwrap(store.reflection(for: current)).isStale)
+        XCTAssertFalse(try XCTUnwrap(store.reflection(for: next)).isStale,
+                       "Invalidation must stop at the direct dependent week.")
+        XCTAssertNotEqual(try store.reflectionFingerprint(for: current, version: 1), initialCurrentFingerprint)
+
+        try saveDaily(on: precedingDay, store: store)
+        clock.addTimeInterval(1); try saveReflection(preceding, store: store)
+        clock.addTimeInterval(1); try saveReflection(current, store: store)
+        try store.setEmotionOverride(.joy, for: precedingDay)
+        XCTAssertTrue(try XCTUnwrap(store.reflection(for: preceding)).isStale)
+        XCTAssertTrue(try XCTUnwrap(store.reflection(for: current)).isStale)
+
+        clock.addTimeInterval(1); try saveReflection(preceding, store: store)
+        clock.addTimeInterval(1); try saveReflection(current, store: store)
+        clock.addTimeInterval(1); try saveReflection(next, store: store)
+        let beforePriorRegeneration = try store.reflectionFingerprint(for: current, version: 1)
+        clock.addTimeInterval(1); try saveReflection(preceding, store: store)
+        XCTAssertTrue(try XCTUnwrap(store.reflection(for: current)).isStale)
+        XCTAssertNotEqual(try store.reflectionFingerprint(for: current, version: 1), beforePriorRegeneration)
+        XCTAssertFalse(try XCTUnwrap(store.reflection(for: next)).isStale)
     }
 
     @MainActor

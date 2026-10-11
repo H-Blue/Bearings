@@ -60,6 +60,42 @@ actor JournalAnalysisEngine {
         return result
     }
 
+    /// Weekly work is deliberately two-stage. Extraction may use multiple
+    /// bounded calls, but the final writer sees one compact packet and no raw
+    /// journal transcript or recursively loaded history.
+    func reflectWeekly(evidence: String, period: AnalysisPeriod) async throws -> ReflectionContent {
+        await acquire()
+        defer { release() }
+        try Task.checkCancellation()
+        guard await intelligence.availability() == .available else { throw AnalysisError.generationFailed }
+        guard !evidence.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw AnalysisError.emptySource
+        }
+        var extracted: [WeeklySignals] = []
+        for chunk in Self.chunks(evidence) {
+            let evidenceLines = chunk.split(separator: "\n", omittingEmptySubsequences: true)
+                .enumerated()
+                .map { String(format: "[E%03d] %@", $0.offset + 1, String($0.element)) }
+                .joined(separator: "\n")
+            let boundedEvidence = """
+                REQUESTED WEEK: \(period.firstDay.key) through \(period.lastDay.key)
+                Each claim must cite one evidence-line ID from the evidence below.
+
+                \(evidenceLines)
+                """
+            extracted += try await extractWeeklySignals(boundedEvidence, period: period)
+        }
+        let signals = WeeklySignals.merged(extracted)
+        let packet = signals.compactPacket
+        var content = try await intelligence.composeWeeklyReflection(packet)
+        try Task.checkCancellation()
+        guard let details = content.weeklyDetails else { throw AnalysisError.invalidOutput }
+        try details.validate(supportedStatements: signals.supportedStatements)
+        content.importantEvents = signals.importantEvents.map { "\($0.dayKey): \($0.statement)" }
+        try content.validate()
+        return content
+    }
+
     func emotionalZoom(text: String) async throws -> EmotionalZoomContent {
         await acquire()
         defer { release() }
@@ -104,6 +140,23 @@ actor JournalAnalysisEngine {
             var result: [DailyAnalysisContent] = []
             for chunk in Self.chunks(text, byteLimit: max(128, text.utf8.count / 2)) {
                 result += try await analyzeText(chunk)
+            }
+            return result
+        }
+    }
+
+    private func extractWeeklySignals(_ text: String, period: AnalysisPeriod) async throws -> [WeeklySignals] {
+        try Task.checkCancellation()
+        do {
+            let result = try await intelligence.extractWeeklySignals(text)
+            try Task.checkCancellation()
+            try result.validate(source: text, period: period)
+            return [result]
+        } catch AnalysisError.contextTooLarge {
+            guard text.utf8.count > 256 else { throw AnalysisError.contextTooLarge }
+            var result: [WeeklySignals] = []
+            for chunk in Self.chunks(text, byteLimit: max(128, text.utf8.count / 2)) {
+                result += try await extractWeeklySignals(chunk, period: period)
             }
             return result
         }
@@ -172,7 +225,10 @@ actor JournalAnalysisEngine {
     }
 
     static func reflectionText(_ value: ReflectionContent) -> String {
-        "Overview: \(value.overview)\nEmotions: \(value.emotionalThemes)\nRelationships: \(value.relationships)\nInterests: \(value.interests)\nChanges: \(value.changes)"
+        if let weekly = value.weeklyDetails {
+            return "Work focus: \(weekly.workFocus)\nWhat happened: \(value.overview)\nProgress and unfinished: \(weekly.progressAndUnfinished)\nWhat helped: \(weekly.whatHelped)\nImprovement: \(weekly.realisticImprovement)\nEmotions: \(value.emotionalThemes)\nLesson direction: \(weekly.lessonReadiness.title)\nReadiness evidence: \(weekly.readinessEvidence.joined(separator: "; "))"
+        }
+        return "Overview: \(value.overview)\nEmotions: \(value.emotionalThemes)\nRelationships: \(value.relationships)\nInterests: \(value.interests)\nChanges: \(value.changes)"
     }
 
     private static func unique(_ values: [String]) -> [String] {

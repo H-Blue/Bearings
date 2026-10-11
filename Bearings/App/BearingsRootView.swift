@@ -163,6 +163,40 @@ private struct SyntheticJournalIntelligence: JournalIntelligence {
                                  interests: "Walking outdoors appears in the writing.", changes: "The writing moves toward peace.")
     }
 
+    func extractWeeklySignals(_ text: String) async throws -> WeeklySignals {
+        guard isAvailable else { throw AnalysisError.generationFailed }
+        let dayKey = text.range(of: #"\d{4}-\d{2}-\d{2}"#, options: .regularExpression)
+            .map { String(text[$0]) } ?? "2026-10-05"
+        let excerpt = text.contains("Walk with a friend") ? "Walk with a friend" : "A walk by the river"
+        let focus = GroundedWeeklySignal(statement: "The writer repeatedly focused on a walk with a friend.",
+                                         evidenceExcerpt: excerpt)
+        return WeeklySignals(focusAreas: [focus],
+                             importantEvents: [DatedWeeklyEvent(dayKey: dayKey,
+                                                                 statement: "The writer took a walk with a friend.",
+                                                                 evidenceExcerpt: excerpt)],
+                             explicitGoals: [], progress: [], obstacles: [], unfinishedThreads: [],
+                             emotionalChanges: [], precedingWeekContinuity: [])
+    }
+
+    func composeWeeklyReflection(_ text: String) async throws -> ReflectionContent {
+        guard isAvailable else { throw AnalysisError.generationFailed }
+        return ReflectionContent(
+            overview: "This weekly reflection remembers a quiet walk with a friend.",
+            importantEvents: [],
+            emotionalThemes: "The evidence is insufficient to describe a change in emotion.",
+            relationships: "", interests: "", changes: "",
+            weeklyDetails: WeeklyReflectionDetails(
+                workFocus: "The writer focused on a walk with a friend.",
+                progressAndUnfinished: "The evidence is insufficient to identify progress or unfinished work.",
+                whatHelped: "The evidence is insufficient to identify what helped.",
+                realisticImprovement: "There is insufficient evidence for a specific improvement.",
+                lessonReadiness: .insufficientEvidence,
+                readinessEvidence: [],
+                reflectionQuestion: "What would you want to notice if a similar moment happens next week?"
+            )
+        )
+    }
+
     func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent {
         guard isAvailable else { throw AnalysisError.generationFailed }
         let excerpt = text.localizedStandardContains("I feel bad") ? "I feel bad" : nil

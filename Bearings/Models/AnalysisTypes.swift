@@ -43,11 +43,145 @@ struct ReflectionContent: Codable, Equatable, Sendable {
     var relationships: String
     var interests: String
     var changes: String
+    var weeklyDetails: WeeklyReflectionDetails? = nil
 
     func validate() throws {
         guard !overview.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               importantEvents.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
         else { throw AnalysisError.invalidOutput }
+        try weeklyDetails?.validate()
+    }
+}
+
+struct GroundedWeeklySignal: Codable, Equatable, Hashable, Sendable {
+    var statement: String
+    var evidenceExcerpt: String
+
+    func validate(source: String) throws {
+        let statement = statement.trimmingCharacters(in: .whitespacesAndNewlines)
+        let excerpt = evidenceExcerpt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !statement.isEmpty, !excerpt.isEmpty, source.contains(excerpt) else {
+            throw AnalysisError.invalidOutput
+        }
+    }
+}
+
+struct DatedWeeklyEvent: Codable, Equatable, Hashable, Sendable {
+    var dayKey: String
+    var statement: String
+    var evidenceExcerpt: String
+
+    func validate(source: String, period: AnalysisPeriod) throws {
+        guard let day = JournalDay(key: dayKey), period.days.contains(day) else {
+            throw AnalysisError.invalidOutput
+        }
+        try GroundedWeeklySignal(statement: statement, evidenceExcerpt: evidenceExcerpt).validate(source: source)
+    }
+}
+
+struct WeeklySignals: Codable, Equatable, Sendable {
+    var focusAreas: [GroundedWeeklySignal]
+    var importantEvents: [DatedWeeklyEvent]
+    var explicitGoals: [GroundedWeeklySignal]
+    var progress: [GroundedWeeklySignal]
+    var obstacles: [GroundedWeeklySignal]
+    var unfinishedThreads: [GroundedWeeklySignal]
+    var emotionalChanges: [GroundedWeeklySignal]
+    var precedingWeekContinuity: [GroundedWeeklySignal]
+
+    func validate(source: String, period: AnalysisPeriod) throws {
+        for signal in focusAreas + explicitGoals + progress + obstacles + unfinishedThreads
+            + emotionalChanges + precedingWeekContinuity {
+            try signal.validate(source: source)
+        }
+        for event in importantEvents { try event.validate(source: source, period: period) }
+    }
+
+    var compactPacket: String {
+        func section(_ title: String, _ values: [GroundedWeeklySignal]) -> String {
+            let lines = values.map { "- \($0.statement) [evidence: \($0.evidenceExcerpt)]" }
+            return "\(title):\n\(lines.isEmpty ? "- none supported" : lines.joined(separator: "\n"))"
+        }
+        let events = importantEvents.map {
+            "- \($0.dayKey): \($0.statement) [evidence: \($0.evidenceExcerpt)]"
+        }
+        return [
+            section("Repeated focus or work", focusAreas),
+            "Important dated events:\n\(events.isEmpty ? "- none supported" : events.joined(separator: "\n"))",
+            section("Explicit goals or intentions", explicitGoals),
+            section("Progress", progress),
+            section("Obstacles", obstacles),
+            section("Unfinished threads", unfinishedThreads),
+            section("Supported emotional changes", emotionalChanges),
+            section("Relevant preceding-week continuity", precedingWeekContinuity)
+        ].joined(separator: "\n\n")
+    }
+
+    var supportedStatements: Set<String> {
+        Set((focusAreas + explicitGoals + progress + obstacles + unfinishedThreads
+             + emotionalChanges + precedingWeekContinuity).map(\.statement)
+            + importantEvents.map(\.statement))
+    }
+
+    static func merged(_ values: [WeeklySignals]) -> WeeklySignals {
+        func unique<T: Hashable>(_ values: [T]) -> [T] {
+            var seen = Set<T>()
+            return values.filter { seen.insert($0).inserted }
+        }
+        return WeeklySignals(
+            focusAreas: unique(values.flatMap(\.focusAreas)),
+            importantEvents: unique(values.flatMap(\.importantEvents)),
+            explicitGoals: unique(values.flatMap(\.explicitGoals)),
+            progress: unique(values.flatMap(\.progress)),
+            obstacles: unique(values.flatMap(\.obstacles)),
+            unfinishedThreads: unique(values.flatMap(\.unfinishedThreads)),
+            emotionalChanges: unique(values.flatMap(\.emotionalChanges)),
+            precedingWeekContinuity: unique(values.flatMap(\.precedingWeekContinuity))
+        )
+    }
+}
+
+enum LessonReadiness: String, Codable, Equatable, Sendable {
+    case continueCurrentLesson
+    case readyForNewChallenge
+    case insufficientEvidence
+
+    var title: String {
+        switch self {
+        case .continueCurrentLesson: "Continue the current lesson"
+        case .readyForNewChallenge: "Ready for a new lesson or challenge"
+        case .insufficientEvidence: "Insufficient evidence"
+        }
+    }
+}
+
+struct WeeklyReflectionDetails: Codable, Equatable, Sendable {
+    var workFocus: String
+    var progressAndUnfinished: String
+    var whatHelped: String
+    var realisticImprovement: String
+    var lessonReadiness: LessonReadiness
+    var readinessEvidence: [String]
+    var reflectionQuestion: String?
+
+    func validate(supportedStatements: Set<String>? = nil) throws {
+        let required = [workFocus, progressAndUnfinished, whatHelped, realisticImprovement]
+        guard required.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }),
+              readinessEvidence.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+        else { throw AnalysisError.invalidOutput }
+        if let supportedStatements,
+           !readinessEvidence.allSatisfy({ supportedStatements.contains($0) }) {
+            throw AnalysisError.invalidOutput
+        }
+        switch lessonReadiness {
+        case .insufficientEvidence:
+            guard let reflectionQuestion,
+                  !reflectionQuestion.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw AnalysisError.invalidOutput
+            }
+        case .continueCurrentLesson, .readyForNewChallenge:
+            guard !readinessEvidence.isEmpty else { throw AnalysisError.invalidOutput }
+        }
     }
 }
 
@@ -132,6 +266,15 @@ struct AnalysisPeriod: Hashable, Sendable {
         return result
     }
 
+    var precedingFullWeek: AnalysisPeriod? {
+        guard kind == .weekly, days.count == 7, Self.week(containing: firstDay) == self,
+              let start = firstDay.date(calendar: Self.civilCalendar),
+              let previous = Self.civilCalendar.date(byAdding: .day, value: -1, to: start),
+              previous >= JournalDay(key: "0001-01-01")!.date(calendar: Self.civilCalendar)!
+        else { return nil }
+        return Self.week(containing: JournalDay(date: previous, calendar: Self.civilCalendar))
+    }
+
     private static var civilCalendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
@@ -169,9 +312,10 @@ enum AnalysisFingerprint {
     }
 
     static func reflection(entries: [JournalEntrySnapshot], overrides: [String: JournalEmotion],
-                           period: AnalysisPeriod, version: Int) -> String {
+                           period: AnalysisPeriod, version: Int, derivedInputs: [String] = []) -> String {
         var parts = [period.key, self.entries(entries, version: version)]
         for key in overrides.keys.sorted() { parts += [key, overrides[key]!.rawValue] }
+        parts += derivedInputs
         return hash(parts)
     }
 

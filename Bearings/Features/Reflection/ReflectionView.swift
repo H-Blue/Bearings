@@ -33,17 +33,40 @@ struct ReflectionView: View {
                                 .font(.footnote.weight(.medium))
                                 .accessibilityIdentifier("reflection.period.stale")
                         }
-                        Text(stored.content.overview).accessibilityIdentifier("reflection.period.summary")
-                        if !stored.content.importantEvents.isEmpty {
-                            Text("Remembered moments").font(.headline)
-                            ForEach(Array(stored.content.importantEvents.enumerated()), id: \.offset) { _, event in
-                                Text("• \(event)")
+                        if period.kind == .weekly, let weekly = stored.content.weeklyDetails {
+                            detail("What you worked on", weekly.workFocus,
+                                   identifier: "reflection.weekly.focus")
+                            detail("What happened", stored.content.overview,
+                                   identifier: "reflection.period.summary")
+                            events(stored.content.importantEvents)
+                            detail("Progress and unfinished threads", weekly.progressAndUnfinished,
+                                   identifier: "reflection.weekly.progress")
+                            detail("Emotional changes", stored.content.emotionalThemes,
+                                   identifier: "reflection.weekly.emotions")
+                            detail("What appeared to help", weekly.whatHelped,
+                                   identifier: "reflection.weekly.helped")
+                            detail("One thing to try", weekly.realisticImprovement,
+                                   identifier: "reflection.weekly.improvement")
+                            detail("Lesson direction", weekly.lessonReadiness.title,
+                                   identifier: "reflection.weekly.readiness")
+                            if !weekly.readinessEvidence.isEmpty {
+                                Text("Evidence for this direction").font(.headline)
+                                ForEach(Array(weekly.readinessEvidence.enumerated()), id: \.offset) { _, evidence in
+                                    Text("• \(evidence)")
+                                }
                             }
+                            if let question = weekly.reflectionQuestion {
+                                detail("A question to consider", question,
+                                       identifier: "reflection.weekly.question")
+                            }
+                        } else {
+                            Text(stored.content.overview).accessibilityIdentifier("reflection.period.summary")
+                            events(stored.content.importantEvents)
+                            detail("Emotional themes", stored.content.emotionalThemes)
+                            detail("Relationships", stored.content.relationships)
+                            detail("Interests and aspirations", stored.content.interests)
+                            detail("Changes", stored.content.changes)
                         }
-                        detail("Emotional themes", stored.content.emotionalThemes)
-                        detail("Relationships", stored.content.relationships)
-                        detail("Interests and aspirations", stored.content.interests)
-                        detail("Changes", stored.content.changes)
                         Text("Reflected \(stored.generatedAt.formatted(date: .abbreviated, time: .shortened))")
                             .font(.caption).foregroundStyle(BearingsTheme.quietInk)
                     }
@@ -94,11 +117,21 @@ struct ReflectionView: View {
     }
 
     @ViewBuilder
-    private func detail(_ heading: String, _ text: String) -> some View {
+    private func detail(_ heading: String, _ text: String, identifier: String? = nil) -> some View {
         if !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 Text(heading).font(.headline)
-                Text(text)
+                Text(text).accessibilityIdentifier(identifier ?? "reflection.detail.\(heading)")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func events(_ values: [String]) -> some View {
+        if !values.isEmpty {
+            Text("Important dated events").font(.headline)
+            ForEach(Array(values.enumerated()), id: \.offset) { _, event in
+                Text("• \(event)")
             }
         }
     }

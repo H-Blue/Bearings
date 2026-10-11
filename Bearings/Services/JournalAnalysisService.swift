@@ -10,7 +10,7 @@ enum AnalysisState: Equatable {
 @MainActor
 @Observable
 final class JournalAnalysisService {
-    static let version = 4
+    static let version = 5
     private(set) var availability: IntelligenceAvailability = .unavailable("Checking on-device reflections…")
     private(set) var daily: [String: StoredDailyAnalysis] = [:]
     private(set) var reflections: [String: StoredReflection] = [:]
@@ -173,10 +173,10 @@ final class JournalAnalysisService {
     private func generateReflection(_ period: AnalysisPeriod, reuseCache: Bool) async throws -> StoredReflection? {
         let key = period.key
         try Task.checkCancellation()
-        let fingerprint = try store.reflectionFingerprint(for: period, version: Self.version)
+        let cachedFingerprint = try store.reflectionFingerprint(for: period, version: Self.version)
         let cached = try selectedDerivedCache { try store.reflection(for: period) }
         if reuseCache, let cached,
-           !cached.isStale, cached.analysisVersion == Self.version, cached.sourceFingerprint == fingerprint {
+           !cached.isStale, cached.analysisVersion == Self.version, cached.sourceFingerprint == cachedFingerprint {
             reflections[key] = cached; states[key] = .idle
             availability = await engine.availability()
             return cached
@@ -191,7 +191,7 @@ final class JournalAnalysisService {
         availability = await engine.availability()
         guard availability == .available else { states[key] = .idle; return nil }
         states[key] = .loading
-        var source = ["Requested \(period.kind.rawValue) period: \(period.firstDay.key) through \(period.lastDay.key). Only these days are included. Emotions are interpretations; a user correction takes priority."]
+        var source = ["AUTHORITATIVE REQUESTED \(period.kind.rawValue.uppercased()) EVIDENCE\nPeriod: \(period.firstDay.key) through \(period.lastDay.key). Only these days are current evidence. Current journal writing and current daily analyses take priority over any historical AI context. Emotions are interpretations; a user correction takes priority."]
         var events: [String] = []
         let sourceDays = Set(snapshots.map(\.dayKey))
         for day in period.days where sourceDays.contains(day.key) {
@@ -207,11 +207,20 @@ final class JournalAnalysisService {
             let dayEvents = value.content.importantEvents.map { "\(day.key): \($0)" }
             events += dayEvents
             if period.kind == .weekly {
-                source.append("\(day.key): \(value.content.summary)\nEmotion: \(emotion.title)\nTrajectory: \(value.content.emotionalTrajectory)\nEvents:\n\(dayEvents.joined(separator: "\n"))")
+                let writing = daySnapshots.map {
+                    "Journal entry (\($0.period.title)):\n\($0.body)"
+                }.joined(separator: "\n")
+                source.append("CURRENT DAY \(day.key)\n\(writing)\nDaily AI summary: \(value.content.summary)\nCorrected or suggested emotion: \(emotion.title)\nDaily emotional trajectory: \(value.content.emotionalTrajectory)\nDaily extracted events:\n\(dayEvents.joined(separator: "\n"))")
             } else {
                 // Independent daily facts prevent repeated summaries from erasing events.
                 source.append("\(day.key) emotion: \(emotion.title). Daily facts:\n\(dayEvents.joined(separator: "\n"))")
             }
+        }
+        if period.kind == .weekly,
+           let preceding = try selectedDerivedCache({
+               try store.currentPrecedingWeeklyReflection(for: period, version: Self.version)
+           }) {
+            source.append("HISTORICAL CONTEXT — IMMEDIATELY PRECEDING WEEK ONLY\nThis is a prior AI interpretation, not current-week evidence. It may support continuity but must not override or contradict the current writing.\nPeriod: \(preceding.period.firstDay.key) through \(preceding.period.lastDay.key)\n\(JournalAnalysisEngine.reflectionText(preceding.content))")
         }
         if period.kind == .monthly {
             for week in period.clippedWeeks {
@@ -221,10 +230,16 @@ final class JournalAnalysisService {
                 } else { throw AnalysisError.generationFailed }
             }
         }
-        var content = try await engine.reflect(text: source.joined(separator: "\n\n"), kind: period.kind)
-        // Retain all independently extracted daily facts, even if prose is shorter.
-        var seen = Set<String>()
-        content.importantEvents = events.filter { seen.insert($0).inserted }
+        let fingerprint = try store.reflectionFingerprint(for: period, version: Self.version)
+        var content: ReflectionContent
+        if period.kind == .weekly {
+            content = try await engine.reflectWeekly(evidence: source.joined(separator: "\n\n"), period: period)
+        } else {
+            content = try await engine.reflect(text: source.joined(separator: "\n\n"), kind: period.kind)
+            // Retain all independently extracted daily facts, even if prose is shorter.
+            var seen = Set<String>()
+            content.importantEvents = events.filter { seen.insert($0).inserted }
+        }
         try Task.checkCancellation()
         try store.saveReflection(content, for: period, sourceFingerprint: fingerprint, version: Self.version)
         let value = try store.reflection(for: period)

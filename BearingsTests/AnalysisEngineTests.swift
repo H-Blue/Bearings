@@ -192,6 +192,41 @@ final class AnalysisEngineTests: XCTestCase {
         try result.validate(source: source)
     }
 
+    func testWeeklyPipelineExtractsGroundedSignalsBeforeInsufficientEvidenceReflection() async throws {
+        let period = AnalysisPeriod.week(containing: try XCTUnwrap(JournalDay(key: "2026-10-06")))
+        let evidence = "CURRENT DAY 2026-10-06\nI planned to finish the draft. Private raw detail."
+        let mock = WeeklyPipelineMock()
+        let engine = JournalAnalysisEngine(intelligence: mock)
+
+        let result = try await engine.reflectWeekly(evidence: evidence, period: period)
+        let calls = await mock.calls()
+
+        XCTAssertEqual(calls.extractions.count, 1)
+        XCTAssertTrue(calls.extractions[0].contains("I planned to finish the draft."))
+        XCTAssertEqual(calls.compositions.count, 1)
+        XCTAssertTrue(calls.compositions[0].contains("Explicit goals or intentions"))
+        XCTAssertTrue(calls.compositions[0].contains("Finish the draft."))
+        XCTAssertFalse(calls.compositions[0].contains("Private raw detail"),
+                       "The final writing stage should receive only the compact signal packet.")
+        XCTAssertEqual(result.importantEvents, ["2026-10-06: The writer planned to finish the draft."])
+        XCTAssertEqual(result.weeklyDetails?.lessonReadiness, .insufficientEvidence)
+        XCTAssertEqual(result.weeklyDetails?.reflectionQuestion, "What would show that the draft is moving forward?")
+    }
+
+    func testWeeklyPipelineRejectsUngroundedExtractionAndUnsupportedReadinessEvidence() async throws {
+        let period = AnalysisPeriod.week(containing: try XCTUnwrap(JournalDay(key: "2026-10-06")))
+        let evidence = "CURRENT DAY 2026-10-06\nI planned to finish the draft."
+        for mode in [WeeklyPipelineMock.Mode.ungroundedExtraction, .unsupportedReadinessEvidence] {
+            let engine = JournalAnalysisEngine(intelligence: WeeklyPipelineMock(mode: mode))
+            do {
+                _ = try await engine.reflectWeekly(evidence: evidence, period: period)
+                XCTFail("Unsupported weekly claims must be rejected.")
+            } catch {
+                XCTAssertEqual(error as? AnalysisError, .invalidOutput)
+            }
+        }
+    }
+
     @MainActor
     func testEngineRejectsMalformedProviderOutput() async throws {
         let entries = try committedSnapshots(["I felt uncertain about a difficult day."])
@@ -292,6 +327,57 @@ final class AnalysisEngineTests: XCTestCase {
             clock = clock.addingTimeInterval(60)
         }
         return try store.snapshots(from: day, through: day)
+    }
+}
+
+private actor WeeklyPipelineMock: JournalIntelligence {
+    enum Mode: Equatable { case valid, ungroundedExtraction, unsupportedReadinessEvidence }
+    private let mode: Mode
+    private var extractionInputs: [String] = []
+    private var compositionInputs: [String] = []
+
+    init(mode: Mode = .valid) { self.mode = mode }
+
+    func availability() async -> IntelligenceAvailability { .available }
+    func analyze(_ text: String) async throws -> DailyAnalysisContent { throw AnalysisError.generationFailed }
+    func reflect(_ text: String, kind: ReflectionKind) async throws -> ReflectionContent { throw AnalysisError.generationFailed }
+
+    func extractWeeklySignals(_ text: String) async throws -> WeeklySignals {
+        extractionInputs.append(text)
+        let excerpt = mode == .ungroundedExtraction ? "Words absent from evidence" : "I planned to finish the draft."
+        let signal = GroundedWeeklySignal(statement: "Finish the draft.", evidenceExcerpt: excerpt)
+        return WeeklySignals(
+            focusAreas: [signal],
+            importantEvents: [DatedWeeklyEvent(dayKey: "2026-10-06",
+                                                statement: "The writer planned to finish the draft.",
+                                                evidenceExcerpt: excerpt)],
+            explicitGoals: [signal], progress: [], obstacles: [], unfinishedThreads: [],
+            emotionalChanges: [], precedingWeekContinuity: []
+        )
+    }
+
+    func composeWeeklyReflection(_ text: String) async throws -> ReflectionContent {
+        compositionInputs.append(text)
+        let readiness: LessonReadiness = mode == .unsupportedReadinessEvidence
+            ? .readyForNewChallenge : .insufficientEvidence
+        return ReflectionContent(
+            overview: "The writer planned to finish a draft.", importantEvents: [], emotionalThemes: "No emotional change was supported.",
+            relationships: "", interests: "", changes: "",
+            weeklyDetails: WeeklyReflectionDetails(
+                workFocus: "Finishing the draft.",
+                progressAndUnfinished: "The draft remained an explicit intention; progress was not documented.",
+                whatHelped: "There was insufficient evidence about what helped.",
+                realisticImprovement: "There is insufficient evidence for a specific improvement.",
+                lessonReadiness: readiness,
+                readinessEvidence: mode == .unsupportedReadinessEvidence ? ["Unsupported progress claim."] : [],
+                reflectionQuestion: mode == .unsupportedReadinessEvidence
+                    ? nil : "What would show that the draft is moving forward?"
+            )
+        )
+    }
+
+    func calls() -> (extractions: [String], compositions: [String]) {
+        (extractionInputs, compositionInputs)
     }
 }
 
