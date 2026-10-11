@@ -292,6 +292,26 @@ final class JournalFlowTests: XCTestCase {
                        "Returning from a day must retain the scrolled timeline position.")
     }
 
+    func testMonthTitleAppearsDuringHorizontalScrollThenHides() {
+        let datePicker = app.buttons["timeline.datePicker"]
+        XCTAssertEqual(waitFor(datePicker).label, "Choose date",
+                       "The month title should stay hidden until the timeline moves.")
+
+        let right = app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.7))
+        let left = app.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.7))
+        right.press(forDuration: 0.1, thenDragTo: left)
+        let revealed = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label != %@", "Choose date"), object: datePicker
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [revealed], timeout: 2), .completed)
+
+        let hidden = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label == %@", "Choose date"), object: datePicker
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [hidden], timeout: 6.5), .completed,
+                       "The month title should hide five seconds after horizontal scrolling ends.")
+    }
+
     private func timelineTodayDateButton() throws -> XCUIElement {
         // Match the app's local Gregorian date identity. These tests assume a
         // run does not cross local midnight or a time-zone change.

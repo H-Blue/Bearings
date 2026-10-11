@@ -119,6 +119,12 @@ Rechecked existing test result summaries and inspected the current local AI/pers
 
 The PDF was rendered and every final page visually reviewed; Testing.md records the exact documentation checks and pending device/behavior evidence. App code, model generation instructions, private journals and project membership were not changed. The judging rubric has not yet been supplied. Notion synchronization remains pending for this local review draft; no publication, pushing, submission or messaging occurred.
 
+## Transient timeline month label — October 11, 2026
+
+The timeline no longer holds the month and year on screen continuously. Its center date-picker control uses a calendar icon at rest; a horizontal timeline drag or previous/next-month action reveals the current month and year, restarts a five-second timer, then returns to the icon. The state transition respects Reduce Motion, and the control's accessible label follows the visible state while retaining the selected month as its value.
+
+A focused simulator UI test verified the title is hidden initially, appears after a horizontal drag and hides after five seconds. The signed Debug app was rebuilt, installed and launched on the connected iPhone with the existing isolated professional demo store preserved. Notion synchronization is pending; no push, publication or submission occurred.
+
 ## Professional case study demo journal — October 11, 2026
 
 Prepared [ProfessionalCaseStudyJournal.md](ProfessionalCaseStudyJournal.md) and the matching `docs/fixtures/ProfessionalCaseStudyJournal.json`: 14 fictional Alex/Priya entries across two complete Sunday–Saturday weeks from September 27 through October 10. There is one entry per civil day, leaving Sunday, October 11 empty for the completed prior-week reflection. The story moves from defensive feedback conversations through a small clarifying-question practice, partial success, a relapse and repair, a work boundary and a self-reported “partly helped” review. [ProfessionalCaseStudyDemoGuide.md](ProfessionalCaseStudyDemoGuide.md) records the presentation labels and manual fallback.

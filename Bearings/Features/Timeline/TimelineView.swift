@@ -8,6 +8,9 @@ struct TimelineView: View {
     @State private var month = JournalMonth()
     @State private var pickerDate = Date()
     @State private var showsDatePicker = false
+    @State private var showsMonthLabel = false
+    @State private var monthLabelDismissTask: Task<Void, Never>?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .caption) private var dateCaptionAllowance: CGFloat = 20
     @ScaledMetric(relativeTo: .caption2) private var markerCaptionAllowance: CGFloat = 16
 
@@ -77,9 +80,23 @@ struct TimelineView: View {
                     pickerDate = month.days.first?.date() ?? month.displayDate
                     showsDatePicker = true
                 } label: {
-                    Text(JournalDay.format(month.displayDate, template: "MMMM yyyy")).font(.headline).frame(minHeight: 44)
+                    ZStack {
+                        if showsMonthLabel {
+                            Text(JournalDay.format(month.displayDate, template: "MMMM yyyy"))
+                                .font(.headline)
+                                .transition(.opacity)
+                        } else {
+                            Image(systemName: "calendar")
+                                .transition(.opacity)
+                        }
+                    }
+                    .frame(minWidth: 140, minHeight: 44)
                 }
-                .accessibilityLabel("Choose date").accessibilityIdentifier("timeline.datePicker")
+                .accessibilityLabel(showsMonthLabel
+                                    ? JournalDay.format(month.displayDate, template: "MMMM yyyy")
+                                    : "Choose date")
+                .accessibilityValue(JournalDay.format(month.displayDate, template: "MMMM yyyy"))
+                .accessibilityIdentifier("timeline.datePicker")
                 Spacer(minLength: 0)
                 Button { moveMonth(1) } label: { Image(systemName: "chevron.right").frame(width: 44, height: 44) }
                     .accessibilityLabel("Next month").accessibilityIdentifier("timeline.nextMonth")
@@ -118,6 +135,17 @@ struct TimelineView: View {
                         .contentShape(Rectangle())
                     }
                     .scrollIndicators(.hidden)
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 8)
+                            .onChanged { value in
+                                guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                                revealMonthLabel(scheduleDismissal: false)
+                            }
+                            .onEnded { value in
+                                guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                                revealMonthLabel(scheduleDismissal: true)
+                            }
+                    )
                     .accessibilityIdentifier("timeline.scroll")
                     .onAppear { scrollToFocus(proxy) }
                     .onChange(of: month) { _, _ in scrollToFocus(proxy) }
@@ -125,10 +153,31 @@ struct TimelineView: View {
             }
         }
         .buttonStyle(.plain)
+        .onDisappear { monthLabelDismissTask?.cancel() }
     }
 
     private func moveMonth(_ amount: Int) {
-        if let next = month.adding(months: amount) { month = next }
+        if let next = month.adding(months: amount) {
+            month = next
+            revealMonthLabel(scheduleDismissal: true)
+        }
+    }
+
+    private func revealMonthLabel(scheduleDismissal: Bool) {
+        monthLabelDismissTask?.cancel()
+        if !showsMonthLabel {
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                showsMonthLabel = true
+            }
+        }
+        guard scheduleDismissal else { return }
+        monthLabelDismissTask = Task {
+            do { try await Task.sleep(for: .seconds(5)) } catch { return }
+            guard !Task.isCancelled else { return }
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                showsMonthLabel = false
+            }
+        }
     }
 
     private func scrollToFocus(_ proxy: ScrollViewProxy) {

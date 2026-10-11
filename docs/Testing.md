@@ -394,3 +394,9 @@ No Xcode build, simulator/device test, JSON-to-SwiftData import, phone-store wri
 - Built and launched the Debug app in the simulator with the synthetic demo fixture. Visual inspection confirmed the long timeline tick falls on Sunday, October 11; neighboring days use short ticks.
 - Ran the two affected reflection UI tests with the deterministic provider: 2 passed and 0 failed. They verify Sunday prior-week routing, the empty prior-week unavailable case, weekly generation from the seeded October 4–10 fixture, monthly generation and refresh.
 - Built, signed, installed and launched the revised Debug app on the connected physical iPhone 16 Pro. The isolated device demo store contains the revised 14-day fixture. Real Foundation Models generation, the proposed lesson feature, and physical-device pixel inspection remain unverified.
+
+## Transient timeline month label — October 11, 2026
+
+- Built the changed Debug app and ran `JournalFlowTests.testMonthTitleAppearsDuringHorizontalScrollThenHides` in the iPhone 16 Pro simulator. The first execution failed because the visible text was combined into its parent button's accessibility element rather than exposed as a separate static text. The control was changed so its accessible label follows the visible state.
+- Reran the focused UI test: 1 passed and 0 failed. It verified the resting “Choose date” state, a different month/year label after a horizontal drag, and return to “Choose date” five seconds after the drag ended.
+- Rebuilt, signed, installed and launched the Debug app on the connected physical iPhone 16 Pro without resetting the isolated demo store. Compilation, signing, installation and launch succeeded. Physical-device pixel timing and a maximum-Dynamic-Type visual pass remain unverified.
