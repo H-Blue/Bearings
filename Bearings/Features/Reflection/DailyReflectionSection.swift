@@ -12,7 +12,15 @@ struct DailyReflectionSection: View {
     private var chosenEmotion: JournalEmotion? { service.overrides[day.key] }
     private var isCurrent: Bool { analysis?.isStale == false && analysis?.analysisVersion == JournalAnalysisService.version }
     private var displayedEmotion: JournalEmotion? {
-        chosenEmotion ?? (isCurrent ? analysis?.content.primaryEmotion : nil)
+        chosenEmotion ?? (isCurrent ? analysis?.content.notableEmotions.first : nil)
+    }
+    private var notableEmotions: [JournalEmotion] {
+        var emotions = chosenEmotion.map { [$0] } ?? []
+        guard isCurrent, let analysis else { return emotions }
+        for emotion in analysis.content.notableEmotions where !emotions.contains(emotion) {
+            emotions.append(emotion)
+        }
+        return emotions
     }
     private var weeklyPeriod: AnalysisPeriod { .weekForReview(on: day) }
     private var weeklyTitle: String { AnalysisPeriod.isWeekStart(day) ? "Last week" : "This week" }
@@ -38,18 +46,32 @@ struct DailyReflectionSection: View {
                     .foregroundStyle(BearingsTheme.quietInk)
                     .accessibilityIdentifier("reflection.daily.empty")
             } else {
-                emotionMenu
                 if let analysis {
                     if !isCurrent {
                         Text("Earlier reflection — your writing has changed.")
                             .font(.footnote.weight(.medium))
                             .accessibilityIdentifier("reflection.daily.stale")
                     }
-                    Text(analysis.content.summary).accessibilityIdentifier("reflection.daily.summary")
-                    if let secondary = analysis.content.secondaryEmotion {
-                        Text("AI also suggested: \(secondary.title)")
-                            .font(.subheadline).foregroundStyle(BearingsTheme.quietInk)
+                    Text("Day summary")
+                        .font(.subheadline.weight(.medium))
+                        .accessibilityIdentifier("reflection.daily.summaryHeading")
+                    Text(analysis.content.summary)
+                        .accessibilityIdentifier("reflection.daily.summary")
+                }
+                if !notableEmotions.isEmpty {
+                    Text("Notable emotions")
+                        .font(.subheadline.weight(.medium))
+                        .accessibilityIdentifier("reflection.daily.notableEmotions")
+                    ForEach(notableEmotions) { emotion in
+                        HStack(spacing: 10) {
+                            EmotionIndicator(emotion: emotion)
+                            Text(emotion.title)
+                                .accessibilityIdentifier("reflection.daily.emotion.\(emotion.rawValue)")
+                        }
                     }
+                }
+                emotionMenu
+                if let analysis {
                     if !analysis.content.importantEvents.isEmpty {
                         Text("Remembered moments").font(.subheadline.weight(.medium))
                         ForEach(Array(analysis.content.importantEvents.enumerated()), id: \.offset) { _, event in

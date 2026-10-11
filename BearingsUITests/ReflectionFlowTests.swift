@@ -76,8 +76,15 @@ final class ReflectionFlowTests: XCTestCase {
     func testManualFeelingSurvivesRegenerationAndCanReturnToAISuggestion() throws {
         openToday()
         createEntry("A synthetic memory of a quiet walk by the river.")
-        reveal(app.staticTexts["reflection.daily.summary"])
-        XCTAssertTrue(app.staticTexts["reflection.daily.summary"].label.contains("peace"))
+        let summaryHeading = app.staticTexts["reflection.daily.summaryHeading"]
+        let summary = app.staticTexts["reflection.daily.summary"]
+        let emotionsHeading = app.staticTexts["reflection.daily.notableEmotions"]
+        reveal(emotionsHeading)
+        XCTAssertEqual(summaryHeading.label, "Day summary")
+        XCTAssertTrue(summary.label.contains("peace"))
+        XCTAssertEqual(emotionsHeading.label, "Notable emotions")
+        XCTAssertTrue(app.staticTexts["reflection.daily.emotion.peace"].exists)
+        XCTAssertLessThan(summaryHeading.frame.minY, emotionsHeading.frame.minY)
         XCTAssertTrue(app.buttons["reflection.daily.refresh"].exists)
         attachScreenshot("Synthetic daily reflection")
         chooseFeeling("Joy")

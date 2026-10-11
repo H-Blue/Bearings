@@ -14,6 +14,20 @@ struct DailyAnalysisContent: Codable, Equatable, Sendable {
     var importantEvents: [String]
     var emotionalTrajectory: String
 
+    /// Only emotions specific enough to present as notable findings. An
+    /// uncertain classification still remains in the stored interpretation,
+    /// but does not become a claimed emotion in the reflection UI.
+    var notableEmotions: [JournalEmotion] {
+        var emotions: [JournalEmotion] = []
+        if primaryEmotion != .uncertain { emotions.append(primaryEmotion) }
+        if let secondaryEmotion,
+           secondaryEmotion != .uncertain,
+           !emotions.contains(secondaryEmotion) {
+            emotions.append(secondaryEmotion)
+        }
+        return emotions
+    }
+
     func validate() throws {
         guard !summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               !emotionalTrajectory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,

@@ -126,6 +126,19 @@ final class AnalysisEngineTests: XCTestCase {
         )
         let data = try JSONEncoder().encode(original)
         XCTAssertEqual(try JSONDecoder().decode(DailyAnalysisContent.self, from: data), original)
+        XCTAssertEqual(original.notableEmotions, [.peace, .sadness])
+        XCTAssertEqual(DailyAnalysisContent(summary: "A day without a stated feeling.",
+                                            primaryEmotion: .uncertain,
+                                            secondaryEmotion: nil,
+                                            importantEvents: [],
+                                            emotionalTrajectory: "No clear emotional change was expressed.").notableEmotions,
+                       [])
+        XCTAssertEqual(DailyAnalysisContent(summary: "A peaceful day.",
+                                            primaryEmotion: .peace,
+                                            secondaryEmotion: .peace,
+                                            importantEvents: [],
+                                            emotionalTrajectory: "Peace remained steady.").notableEmotions,
+                       [.peace])
         let invalid = String(decoding: data, as: UTF8.self)
             .replacingOccurrences(of: "\"peace\"", with: "\"unsupportedDiagnosis\"")
         XCTAssertThrowsError(try JSONDecoder().decode(DailyAnalysisContent.self,

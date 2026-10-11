@@ -118,9 +118,9 @@ actor JournalAnalysisEngine {
             for index in stride(from: 0, to: pieces.count, by: 2) {
                 if index + 1 == pieces.count { next.append(pieces[index]); continue }
                 let text = [pieces[index], pieces[index + 1]].map {
-                    "Summary: \($0.summary)\nPrimary interpretation: \($0.primaryEmotion.title)\nSecondary: \($0.secondaryEmotion?.title ?? "none")\nTrajectory: \($0.emotionalTrajectory)"
+                    "Day summary: \($0.summary)\nNotable emotion: \($0.primaryEmotion.title)\nSecond notable emotion: \($0.secondaryEmotion?.title ?? "none")\nTrajectory: \($0.emotionalTrajectory)"
                 }.joined(separator: "\n\n")
-                let merged = try await analyzeText("Combine these consecutive interpretations of one day. Preserve ambiguity; do not invent experiences.\n\(text)")
+                let merged = try await analyzeText("Combine these consecutive interpretations of one day. Summarize the day first, retain only supported writer emotions, and use uncertain when no notable emotion is supported. Preserve ambiguity; do not invent experiences.\n\(text)")
                 // If the model's output is itself oversized, report it explicitly
                 // rather than dropping a section or entering an unbounded loop.
                 guard merged.count == 1 else { throw AnalysisError.contextTooLarge }
