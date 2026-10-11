@@ -53,6 +53,26 @@ final class JournalAnalysisServiceTests: XCTestCase {
     }
 
     @MainActor
+    func testWeeklyReflectionUsesJournalWhenNoDailyAnalysisExists() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let store = JournalStore(context: container.mainContext)
+        let day = try XCTUnwrap(JournalDay(key: "2026-10-06"))
+        _ = try store.create(day: day, body: "I listened before offering advice.")
+        let model = ServiceFixtureIntelligence()
+        let service = JournalAnalysisService(store: store, intelligence: model)
+
+        await service.reflect(period: .week(containing: day))
+
+        XCTAssertEqual(service.states[AnalysisPeriod.week(containing: day).key], .idle)
+        XCTAssertNotNil(try store.reflection(for: .week(containing: day)))
+        let dailyCalls = await model.analysisCount
+        XCTAssertEqual(dailyCalls, 0)
+        let evidence = (await model.weeklyExtractionPrompts).joined(separator: "\n")
+        XCTAssertTrue(evidence.contains("I listened before offering advice."))
+        XCTAssertTrue(evidence.contains("No current daily AI analysis is available"))
+    }
+
+    @MainActor
     func testDailyConcurrentRequestsReuseCommittedCacheAndCorrections() async throws {
         let container = try PersistenceController.makeContainer(inMemory: true)
         let store = JournalStore(context: container.mainContext)
@@ -110,6 +130,7 @@ final class JournalAnalysisServiceTests: XCTestCase {
         let service = JournalAnalysisService(store: store, intelligence: model)
         service.loadStored()
         let month = AnalysisPeriod.month(containing: inside)
+        await service.analyze(day: inside)
         await service.reflect(period: month)
         let saved = try XCTUnwrap(store.reflection(for: month))
         XCTAssertEqual(saved.content.importantEvents, ["2026-10-01: Walk with a friend"])
@@ -126,6 +147,24 @@ final class JournalAnalysisServiceTests: XCTestCase {
         XCTAssertEqual(clipped.firstDay.key, "2026-10-01")
         XCTAssertEqual(clipped.lastDay.key, "2026-10-03")
         XCTAssertNotNil(try store.reflection(for: clipped))
+    }
+
+    @MainActor
+    func testMonthlyUsesWeeklyEventsWhenDailyAnalysisIsMissing() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let store = JournalStore(context: container.mainContext)
+        let day = try XCTUnwrap(JournalDay(key: "2026-10-06"))
+        _ = try store.create(day: day, body: "I took a walk with a friend.")
+        let model = ServiceFixtureIntelligence()
+        let service = JournalAnalysisService(store: store, intelligence: model)
+
+        let month = AnalysisPeriod.month(containing: day)
+        await service.reflect(period: month)
+
+        let saved = try XCTUnwrap(store.reflection(for: month))
+        XCTAssertEqual(saved.content.importantEvents, ["2026-10-06: The writer walked with a friend."])
+        let dailyCalls = await model.analysisCount
+        XCTAssertEqual(dailyCalls, 0)
     }
 
     @MainActor
@@ -320,7 +359,7 @@ final class JournalAnalysisServiceTests: XCTestCase {
         let prompts = await model.weeklyExtractionPrompts
         XCTAssertEqual(prompts.count, 3)
         let dailyCalls = await model.analysisCount
-        XCTAssertEqual(dailyCalls, 1)
+        XCTAssertEqual(dailyCalls, 0)
         let unchanged = try XCTUnwrap(store.snapshots(from: day, through: day).first)
         XCTAssertEqual(unchanged.id, original.id)
         XCTAssertEqual(unchanged.body, original.body)
@@ -513,7 +552,7 @@ final class JournalAnalysisServiceTests: XCTestCase {
         await service.reflect(period: .week(containing: weekThreeDay))
 
         let finalAnalysisCount = await model.analysisCount
-        XCTAssertEqual(finalAnalysisCount, analysisCount + 1)
+        XCTAssertEqual(finalAnalysisCount, analysisCount)
         let currentPrompts = Array((await model.weeklyExtractionPrompts).dropFirst(extractionCount))
         XCTAssertFalse(currentPrompts.isEmpty)
         XCTAssertTrue(currentPrompts.allSatisfy { $0.contains("REQUESTED WEEK: 2026-10-04 through 2026-10-10") })
@@ -563,9 +602,18 @@ private actor ServiceFixtureIntelligence: JournalIntelligence {
     }
     func extractWeeklySignals(_ text: String) async throws -> WeeklySignals {
         weeklyExtractionPrompts.append(text)
-        let key = text.range(of: #"\d{4}-\d{2}-\d{2}"#, options: .regularExpression)
-            .map { String(text[$0]) } ?? "2026-10-01"
-        let excerpt = text.contains("Walk with a friend") ? "Walk with a friend" : "Committed synthetic writing"
+        let evidenceValues = text.split(separator: "\n").compactMap { line -> String? in
+            guard line.hasPrefix("[E"), let separator = line.firstIndex(of: " ") else { return nil }
+            return String(line[line.index(after: separator)...])
+        }
+        let daySource = evidenceValues.first(where: { $0.hasPrefix("CURRENT DAY ") }) ?? text
+        let key = daySource.range(of: #"\d{4}-\d{2}-\d{2}"#, options: .regularExpression)
+            .map { String(daySource[$0]) } ?? "2026-10-01"
+        let excerpt = evidenceValues.first(where: {
+            let lowercased = $0.lowercased()
+            return lowercased.contains("walk") || lowercased.contains("writing")
+                || lowercased.contains("listened")
+        }) ?? evidenceValues.first ?? ""
         return WeeklySignals(
             focusAreas: [GroundedWeeklySignal(statement: "The writer focused on walking with a friend.",
                                                 evidenceExcerpt: excerpt)],

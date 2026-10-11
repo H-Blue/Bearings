@@ -6,12 +6,13 @@ enum IntelligenceAvailability: Equatable, Sendable {
 }
 
 enum AnalysisError: LocalizedError, Equatable {
-    case contextTooLarge, invalidOutput, generationFailed, sourceChanged, emptySource
+    case contextTooLarge, invalidOutput, generationFailed, modelBusy, sourceChanged, emptySource
     var errorDescription: String? {
         switch self {
         case .contextTooLarge: "The on-device reflection couldn’t finish this writing yet. Try again. Your journal is saved."
         case .invalidOutput: "The on-device model returned an incomplete reflection. Try again."
         case .generationFailed: "The on-device reflection couldn’t finish. Try again. Your writing is saved."
+        case .modelBusy: "The on-device model is busy right now. Try again in a moment. Your writing is saved."
         case .sourceChanged: "Your writing changed during the reflection. Try again to use the latest version."
         case .emptySource: "Write something in this period to begin a reflection."
         }

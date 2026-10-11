@@ -87,6 +87,31 @@ final class AnalysisEngineTests: XCTestCase {
         XCTAssertTrue(stats.reflectionAttempts.isEmpty)
     }
 
+    func testBusyModelRetriesThenReturnsReflection() async throws {
+        let mock = BusyThenSuccessIntelligence(failuresBeforeSuccess: 2)
+        let engine = JournalAnalysisEngine(intelligence: mock, busyRetryDelays: [.zero, .zero])
+
+        let result = try await engine.reflect(text: "A synthetic week.", kind: .monthly)
+
+        XCTAssertEqual(result.overview, "A completed synthetic reflection.")
+        let successfulAttempts = await mock.reflectionAttempts()
+        XCTAssertEqual(successfulAttempts, 3)
+    }
+
+    func testBusyModelRetryIsBounded() async throws {
+        let mock = BusyThenSuccessIntelligence(failuresBeforeSuccess: .max)
+        let engine = JournalAnalysisEngine(intelligence: mock, busyRetryDelays: [.zero, .zero])
+
+        do {
+            _ = try await engine.reflect(text: "A synthetic week.", kind: .monthly)
+            XCTFail("A persistently busy model should remain a visible retryable failure.")
+        } catch {
+            XCTAssertEqual(error as? AnalysisError, .modelBusy)
+        }
+        let failedAttempts = await mock.reflectionAttempts()
+        XCTAssertEqual(failedAttempts, 3)
+    }
+
     @MainActor
     func testEmptyCommittedSourcesDoNotInvokeGeneration() async throws {
         let container = try PersistenceController.makeContainer(inMemory: true)
@@ -439,6 +464,33 @@ private actor ZoomMockIntelligence: JournalIntelligence {
             probingQuestion: "What detail would make this clearer to you?"
         )
     }
+}
+
+private actor BusyThenSuccessIntelligence: JournalIntelligence {
+    private let failuresBeforeSuccess: Int
+    private var attempts = 0
+
+    init(failuresBeforeSuccess: Int) {
+        self.failuresBeforeSuccess = failuresBeforeSuccess
+    }
+
+    func availability() async -> IntelligenceAvailability { .available }
+    func analyze(_ text: String) async throws -> DailyAnalysisContent { throw AnalysisError.generationFailed }
+    func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent { throw AnalysisError.generationFailed }
+    func reflect(_ text: String, kind: ReflectionKind) async throws -> ReflectionContent {
+        attempts += 1
+        if attempts <= failuresBeforeSuccess { throw AnalysisError.modelBusy }
+        return ReflectionContent(
+            overview: "A completed synthetic reflection.",
+            importantEvents: [],
+            emotionalThemes: "Insufficient information.",
+            relationships: "Insufficient information.",
+            interests: "Insufficient information.",
+            changes: "Insufficient information."
+        )
+    }
+
+    func reflectionAttempts() -> Int { attempts }
 }
 
 /// Synthetic material only; this fixture exercises input plumbing, not model quality.

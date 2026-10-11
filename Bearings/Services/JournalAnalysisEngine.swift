@@ -4,11 +4,18 @@ import Foundation
 /// facts are retained separately from the lossy prose aggregation hierarchy.
 actor JournalAnalysisEngine {
     private let intelligence: any JournalIntelligence
+    private let busyRetryDelays: [Duration]
     private var busy = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
     static let inputByteBudget = 2400
 
-    init(intelligence: any JournalIntelligence) { self.intelligence = intelligence }
+    init(
+        intelligence: any JournalIntelligence,
+        busyRetryDelays: [Duration] = [.milliseconds(500), .seconds(2)]
+    ) {
+        self.intelligence = intelligence
+        self.busyRetryDelays = busyRetryDelays
+    }
 
     func availability() async -> IntelligenceAvailability { await intelligence.availability() }
 
@@ -87,7 +94,9 @@ actor JournalAnalysisEngine {
         }
         let signals = WeeklySignals.merged(extracted)
         let packet = signals.compactPacket
-        var content = try await intelligence.composeWeeklyReflection(packet)
+        var content = try await retryWhenModelIsBusy {
+            try await intelligence.composeWeeklyReflection(packet)
+        }
         try Task.checkCancellation()
         guard let details = content.weeklyDetails else { throw AnalysisError.invalidOutput }
         try details.validate(supportedStatements: signals.supportedStatements)
@@ -131,7 +140,9 @@ actor JournalAnalysisEngine {
     private func analyzeText(_ text: String) async throws -> [DailyAnalysisContent] {
         try Task.checkCancellation()
         do {
-            let result = try await intelligence.analyze(text)
+            let result = try await retryWhenModelIsBusy {
+                try await intelligence.analyze(text)
+            }
             try Task.checkCancellation()
             try result.validate()
             return [result]
@@ -148,7 +159,9 @@ actor JournalAnalysisEngine {
     private func extractWeeklySignals(_ text: String, period: AnalysisPeriod) async throws -> [WeeklySignals] {
         try Task.checkCancellation()
         do {
-            let result = try await intelligence.extractWeeklySignals(text)
+            let result = try await retryWhenModelIsBusy {
+                try await intelligence.extractWeeklySignals(text)
+            }
             try Task.checkCancellation()
             try result.validate(source: text, period: period)
             return [result]
@@ -187,7 +200,9 @@ actor JournalAnalysisEngine {
     private func reflectText(_ text: String, kind: ReflectionKind) async throws -> [ReflectionContent] {
         try Task.checkCancellation()
         do {
-            let result = try await intelligence.reflect(text, kind: kind)
+            let result = try await retryWhenModelIsBusy {
+                try await intelligence.reflect(text, kind: kind)
+            }
             try Task.checkCancellation()
             try result.validate()
             return [result]
@@ -204,7 +219,9 @@ actor JournalAnalysisEngine {
     private func zoomText(_ text: String) async throws -> [EmotionalZoomContent] {
         try Task.checkCancellation()
         do {
-            let result = try await intelligence.emotionalZoom(text)
+            let result = try await retryWhenModelIsBusy {
+                try await intelligence.emotionalZoom(text)
+            }
             try Task.checkCancellation()
             try result.validate(source: text)
             return [result]
@@ -234,6 +251,19 @@ actor JournalAnalysisEngine {
     private static func unique(_ values: [String]) -> [String] {
         var seen = Set<String>()
         return values.filter { seen.insert($0).inserted }
+    }
+
+    private func retryWhenModelIsBusy<Value>(
+        _ operation: () async throws -> Value
+    ) async throws -> Value {
+        for delay in busyRetryDelays {
+            do { return try await operation() }
+            catch AnalysisError.modelBusy {
+                try Task.checkCancellation()
+                try await Task.sleep(for: delay)
+            }
+        }
+        return try await operation()
     }
 
     private func acquire() async {

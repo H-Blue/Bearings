@@ -10,7 +10,7 @@ enum AnalysisState: Equatable {
 @MainActor
 @Observable
 final class JournalAnalysisService {
-    static let version = 5
+    static let version = 6
     private(set) var availability: IntelligenceAvailability = .unavailable("Checking on-device reflections…")
     private(set) var daily: [String: StoredDailyAnalysis] = [:]
     private(set) var reflections: [String: StoredReflection] = [:]
@@ -193,27 +193,46 @@ final class JournalAnalysisService {
         states[key] = .loading
         var source = ["AUTHORITATIVE REQUESTED \(period.kind.rawValue.uppercased()) EVIDENCE\nPeriod: \(period.firstDay.key) through \(period.lastDay.key). Only these days are current evidence. Current journal writing and current daily analyses take priority over any historical AI context. Emotions are interpretations; a user correction takes priority."]
         var events: [String] = []
+        var daysWithCurrentDailyAnalysis = Set<JournalDay>()
         let sourceDays = Set(snapshots.map(\.dayKey))
         for day in period.days where sourceDays.contains(day.key) {
-            await analyze(day: day)
-            try Task.checkCancellation()
             let daySnapshots = try store.snapshots(from: day, through: day)
             if daySnapshots.allSatisfy({ $0.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) { continue }
-            guard let value = try store.dailyAnalysis(for: day), !value.isStale,
-                  value.analysisVersion == Self.version,
-                  value.sourceFingerprint == AnalysisFingerprint.entries(daySnapshots, version: Self.version)
-            else { throw AnalysisError.generationFailed }
-            let emotion = sourceOverrides[day.key] ?? value.content.primaryEmotion
-            let dayEvents = value.content.importantEvents.map { "\(day.key): \($0)" }
+            let storedDaily = try selectedDerivedCache { try store.dailyAnalysis(for: day) }
+            let expectedDailyFingerprint = AnalysisFingerprint.entries(daySnapshots, version: Self.version)
+            let currentDaily = storedDaily.flatMap { value in
+                !value.isStale && value.analysisVersion == Self.version
+                    && value.sourceFingerprint == expectedDailyFingerprint ? value : nil
+            }
+            let dayEvents = currentDaily?.content.importantEvents.map { "\(day.key): \($0)" } ?? []
+            if currentDaily != nil { daysWithCurrentDailyAnalysis.insert(day) }
             events += dayEvents
             if period.kind == .weekly {
                 let writing = daySnapshots.map {
                     "Journal entry (\($0.period.title)):\n\($0.body)"
                 }.joined(separator: "\n")
-                source.append("CURRENT DAY \(day.key)\n\(writing)\nDaily AI summary: \(value.content.summary)\nCorrected or suggested emotion: \(emotion.title)\nDaily emotional trajectory: \(value.content.emotionalTrajectory)\nDaily extracted events:\n\(dayEvents.joined(separator: "\n"))")
-            } else {
+                var dayEvidence = ["CURRENT DAY \(day.key)", writing]
+                if let currentDaily {
+                    let emotion = sourceOverrides[day.key] ?? currentDaily.content.primaryEmotion
+                    dayEvidence += [
+                        "Current daily AI summary: \(currentDaily.content.summary)",
+                        "Corrected or suggested emotion: \(emotion.title)",
+                        "Current daily emotional trajectory: \(currentDaily.content.emotionalTrajectory)",
+                        "Current daily extracted events:\n\(dayEvents.joined(separator: "\n"))"
+                    ]
+                } else if let correctedEmotion = sourceOverrides[day.key] {
+                    dayEvidence.append("User-corrected emotion: \(correctedEmotion.title)")
+                    dayEvidence.append("No current daily AI analysis is available; use the journal writing as authoritative evidence.")
+                } else {
+                    dayEvidence.append("No current daily AI analysis is available; use the journal writing as authoritative evidence.")
+                }
+                source.append(dayEvidence.joined(separator: "\n"))
+            } else if let currentDaily {
+                let emotion = sourceOverrides[day.key] ?? currentDaily.content.primaryEmotion
                 // Independent daily facts prevent repeated summaries from erasing events.
                 source.append("\(day.key) emotion: \(emotion.title). Daily facts:\n\(dayEvents.joined(separator: "\n"))")
+            } else if let correctedEmotion = sourceOverrides[day.key] {
+                source.append("\(day.key) user-corrected emotion: \(correctedEmotion.title). No current daily AI facts are available.")
             }
         }
         if period.kind == .weekly,
@@ -227,6 +246,12 @@ final class JournalAnalysisService {
                 guard sourceDays.contains(where: { $0 >= week.firstDay.key && $0 <= week.lastDay.key }) else { continue }
                 if let value = try await requestReflection(week) {
                     source.append("Clipped week \(week.firstDay.key) through \(week.lastDay.key):\n\(JournalAnalysisEngine.reflectionText(value.content))")
+                    events += value.content.importantEvents.filter { event in
+                        guard let separator = event.firstIndex(of: ":"),
+                              let eventDay = JournalDay(key: String(event[..<separator])) else { return false }
+                        return eventDay >= week.firstDay && eventDay <= week.lastDay
+                            && !daysWithCurrentDailyAnalysis.contains(eventDay)
+                    }
                 } else { throw AnalysisError.generationFailed }
             }
         }

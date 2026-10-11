@@ -208,9 +208,21 @@ private struct SyntheticJournalIntelligence: JournalIntelligence {
 
     func extractWeeklySignals(_ text: String) async throws -> WeeklySignals {
         guard isAvailable else { throw AnalysisError.generationFailed }
-        let dayKey = text.range(of: #"\d{4}-\d{2}-\d{2}"#, options: .regularExpression)
-            .map { String(text[$0]) } ?? "2026-10-05"
-        let excerpt = text.contains("Walk with a friend") ? "Walk with a friend" : "A walk by the river"
+        let evidenceLines = text.split(separator: "\n").compactMap { line -> String? in
+            guard line.hasPrefix("[E"), let separator = line.firstIndex(of: " ") else { return nil }
+            return String(line[line.index(after: separator)...])
+        }
+        guard let excerpt = evidenceLines.first(where: {
+            let value = $0.lowercased()
+            return value.contains("walk") || value.contains("journal entry")
+        }) ?? evidenceLines.first else { throw AnalysisError.invalidOutput }
+        // Prefer the journal day's evidence line. The requested-week header
+        // remains a valid in-period fallback when a long packet is split in
+        // the middle of an entry and the chunk has no day heading.
+        let currentDayLine = evidenceLines.first { $0.hasPrefix("CURRENT DAY ") }
+        let daySource = currentDayLine ?? text
+        let dayKey = daySource.range(of: #"\d{4}-\d{2}-\d{2}"#, options: .regularExpression)
+            .map { String(daySource[$0]) } ?? "2026-10-05"
         let focus = GroundedWeeklySignal(statement: "The writer repeatedly focused on a walk with a friend.",
                                          evidenceExcerpt: excerpt)
         return WeeklySignals(focusAreas: [focus],

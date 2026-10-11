@@ -75,7 +75,8 @@ struct AppleJournalIntelligence: JournalIntelligence {
         let result: GeneratedWeeklySignals = try await generate(
             text,
             task: "Extract only grounded weekly signals from this evidence segment. Current-week journal writing and daily analyses are authoritative. Material labeled preceding-week reflection is historical AI context only: use it only for relevant continuity, and never let it override or contradict current-week evidence. For every signal, copy exactly one bracketed evidence-line ID, such as E003, from the supplied material. Use only dates inside the requested week for dated events. Leave a category empty when unsupported. Do not infer goals, progress, deficiencies, relationships, growth, meaning, or events.",
-            generating: GeneratedWeeklySignals.self
+            generating: GeneratedWeeklySignals.self,
+            maximumResponseTokens: 1_100
         )
         return try result.weeklySignals(evidence: text)
     }
@@ -84,7 +85,8 @@ struct AppleJournalIntelligence: JournalIntelligence {
         let result: GeneratedWeeklyReflection = try await generate(
             text,
             task: "Write a concise weekly reflection using only this structured grounded-signal packet. Explain what the writer worked on, what happened, what progressed or changed, what remains unresolved, and what appeared to help. Offer one realistic improvement only when supported. Decide whether to continue the current lesson, move to a new lesson or challenge, or mark readiness as insufficient evidence. Readiness evidence must copy complete signal statements exactly from the packet. When readiness or improvement is unsupported, choose insufficient evidence, say so plainly, and provide one open-ended reflection question. Never invent goals, progress, relationships, deficiencies, growth, meaning, or events. Never diagnose or prescribe treatment.",
-            generating: GeneratedWeeklyReflection.self
+            generating: GeneratedWeeklyReflection.self,
+            maximumResponseTokens: 900
         )
         let details = WeeklyReflectionDetails(
             workFocus: result.workFocus.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -147,7 +149,8 @@ struct AppleJournalIntelligence: JournalIntelligence {
     private func generate<Content: Generable>(
         _ text: String,
         task: String,
-        generating type: Content.Type
+        generating type: Content.Type,
+        maximumResponseTokens: Int = 650
     ) async throws -> Content {
         try Task.checkCancellation()
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -165,7 +168,7 @@ struct AppleJournalIntelligence: JournalIntelligence {
                 let schemaTokens = try await model.tokenCount(for: Content.generationSchema)
                 // Reserve output and framework overhead; older runtimes rely on central
                 // chunking and the framework's context-size error for adaptive retries.
-                guard promptTokens + instructionTokens + schemaTokens + 1_200 <= model.contextSize else {
+                guard promptTokens + instructionTokens + schemaTokens + maximumResponseTokens + 450 <= model.contextSize else {
                     throw AnalysisError.contextTooLarge
                 }
             }
@@ -177,7 +180,7 @@ struct AppleJournalIntelligence: JournalIntelligence {
                 to: Prompt(prompt),
                 generating: type,
                 includeSchemaInPrompt: true,
-                options: GenerationOptions(samplingMode: .greedy, maximumResponseTokens: 650)
+                options: GenerationOptions(samplingMode: .greedy, maximumResponseTokens: maximumResponseTokens)
             )
             try Task.checkCancellation()
             return response.content
@@ -189,13 +192,20 @@ struct AppleJournalIntelligence: JournalIntelligence {
             // Framework error descriptions and transcripts can contain source material.
             // Match only the error kind, and never expose or log its payload.
             if #available(iOS 27.0, *),
-               let modelError = error as? LanguageModelError,
-               case .contextSizeExceeded = modelError {
-                throw AnalysisError.contextTooLarge
+               let modelError = error as? LanguageModelError {
+                switch modelError {
+                case .contextSizeExceeded: throw AnalysisError.contextTooLarge
+                case .rateLimited, .timeout: throw AnalysisError.modelBusy
+                default: throw AnalysisError.generationFailed
+                }
             }
-            if let generationError = error as? LanguageModelSession.GenerationError,
-               case .exceededContextWindowSize = generationError {
-                throw AnalysisError.contextTooLarge
+            if let generationError = error as? LanguageModelSession.GenerationError {
+                switch generationError {
+                case .exceededContextWindowSize: throw AnalysisError.contextTooLarge
+                case .rateLimited, .concurrentRequests: throw AnalysisError.modelBusy
+                case .decodingFailure: throw AnalysisError.invalidOutput
+                default: throw AnalysisError.generationFailed
+                }
             }
             if Task.isCancelled { throw CancellationError() }
             throw AnalysisError.generationFailed
