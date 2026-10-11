@@ -311,6 +311,18 @@ The planning-only update adds HacklantaPlan.md, EmotionalLearningSpec.md and Pit
 
 No Xcode build, simulator UI test, physical-device inference or app regression test was run for this documentation-only change. The earlier implementation evidence and modelNotReady limitation remain unchanged. New feature acceptance tests described in EmotionalLearningSpec.md are future work, not executed evidence.
 
+## Professional case study and safety assessment — October 11, 2026
+
+Created docs/ProfessionalCaseStudy.md and output/pdf/BearingsProfessionalCaseStudy.pdf as a fictional workplace design case and an evidence-based prototype safety assessment. The proposed lesson and its mixed outcome are authored illustrations, not actual AI responses, participant observations or app-benefit evidence. The owner reports working AI, but this request did not verify actual device generation; the prior modelNotReady skip remains the last recorded physical-model result.
+
+Re-read the existing Xcode result bundles using xcresulttool summaries: AIUnitTestsAcceptance reports 59 passed and 1 skipped out of 60; AIAllDeviceUnitTests reports 53 passed and 1 skipped out of 54; AIUITests reports 15 passed; AIReflectionAX5Final reports 5 passed. All four have zero failures. These are prior executions with overlapping coverage, not newly run or independent safety tests.
+
+Source review checked provider instructions/error handling, CloudKit-disabled store configuration, isolated saves, file protection and source-fingerprint checks. The app source search found no journal network client, analytics SDK, content logger, backup exclusion or separate in-app biometric lock. This is a source review, not a network or device-security audit. Findings: iOS backup behavior needs an explicit policy; completeUntilFirstUserAuthentication does not require unlock on every access; refusals have a generic failure experience; finer emotion/assumption/lesson safeguards remain proposed. Apple and NIST primary references are included in the case study.
+
+Generated the PDF with the bundled Python/ReportLab runtime, rendered all five final pages through bundled Poppler and inspected the page images for clipping, table wrapping, pagination and readable references. The draft's orphaned acceptance section was repaired before final inspection. Text extraction verifies five pages with substantive content and the required fictional/evidence-status labels. git diff --check is part of this documentation validation.
+
+No Xcode build, new app test, physical inference, app change, publication, submission, push or external message was performed. Real output quality and sensitive-content behavior, offline traffic behavior, locked-device/file attributes, backup handling, and proposed learning acceptance remain unverified. Notion synchronization of this local draft is pending.
+
 ## Research reference checks — October 11, 2026
 
 ResearchEvidence.md adds 37 sequentially numbered source cards, direct original-source links, a six-source shortlist, feature implications and pitch/evaluation notes. Checked card numbering, source-link presence, sibling Markdown links and Git whitespace. Key intervention statistics and limitations were checked against available original papers/abstracts, including the five-day differentiation trial, null word-learning trial, online adult EI program and its 91-person follow-up, workplace training review, empathy review, progress-monitoring review and breathing study. This was a targeted literature review, not a registered systematic review or independent study-quality audit.
