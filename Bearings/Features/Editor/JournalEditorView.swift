@@ -11,13 +11,18 @@ struct JournalEditorView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private let analysisService: JournalAnalysisService
+    private let onCommittedSave: (String) -> Void
+    private let onSafetyReset: () -> Void
 
     private var usesCompactHeader: Bool { dynamicTypeSize >= .accessibility4 }
 
     init(day: JournalDay, entry: JournalEntry?, period: JournalPeriod, store: JournalStore,
-         analysisService: JournalAnalysisService) {
+         analysisService: JournalAnalysisService, onCommittedSave: @escaping (String) -> Void = { _ in },
+         onSafetyReset: @escaping () -> Void = {}) {
         _session = State(initialValue: JournalEditorSession(day: day, entry: entry, period: period, store: store))
         self.analysisService = analysisService
+        self.onCommittedSave = onCommittedSave
+        self.onSafetyReset = onSafetyReset
     }
 
     var body: some View {
@@ -78,7 +83,7 @@ struct JournalEditorView: View {
                         Button("Try again") {
                             if session.deleteFailed {
                                 if session.delete() { writing = false; dismiss() }
-                            } else { session.save() }
+                            } else { save(evaluatingSafety: true) }
                         }
                             .frame(minHeight: 44).accessibilityIdentifier("editor.retry")
                     }.padding(.horizontal, 28).padding(.vertical, 8)
@@ -106,7 +111,7 @@ struct JournalEditorView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
-                        if session.save() { writing = false; dismiss() }
+                        if save(evaluatingSafety: true) { writing = false; dismiss() }
                     }.accessibilityIdentifier("editor.done")
                 }
                 ToolbarItem(placement: .topBarLeading) {
@@ -142,10 +147,10 @@ struct JournalEditorView: View {
             guard session.hasUnsavedChanges else { return }
             do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
             guard !Task.isCancelled else { return }
-            session.save()
+            save(evaluatingSafety: false)
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase != .active { session.save() }
+            if phase != .active { save(evaluatingSafety: false) }
         }
         .onChange(of: session.body) {
             zoomTask?.cancel()
@@ -154,8 +159,21 @@ struct JournalEditorView: View {
         }
         .onDisappear {
             zoomTask?.cancel()
-            session.save()
+            save(evaluatingSafety: false)
         }
+    }
+
+    @discardableResult
+    private func save(evaluatingSafety: Bool) -> Bool {
+        let attemptedChange = session.hasUnsavedChanges
+        let succeeded = session.save()
+        if succeeded, evaluatingSafety,
+           !session.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            onCommittedSave(session.body)
+        } else if attemptedChange || evaluatingSafety {
+            onSafetyReset()
+        }
+        return succeeded
     }
 
     @ViewBuilder

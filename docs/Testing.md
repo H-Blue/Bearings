@@ -2,6 +2,33 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Trusted contacts and safety check-in — October 11, 2026
+
+The project was regenerated after adding the trusted-contact, safety-service and settings Swift files. An unsigned generic iOS Simulator Release build succeeded. The complete `BearingsTests` suite then executed 78 tests with zero failures; the single hosted Foundation Models smoke test skipped because it requires supported physical hardware. The new deterministic suites cover explicit self-harm and serious-other-harm fixtures; sadness, anger, loneliness, figurative, historical, quoted, fictional, news and third-person negatives; successful-save gating; evaluator failure after a real committed journal save; no-contact state; recipient and message stages; transport invocation only at final confirmation; contact create/edit/disable/delete/relaunch; real read-only failure/retry; and additive migration from the frozen pre-AI journal schema. Existing persistence failure tests also passed.
+
+Two focused UI flows passed on the iPhone 17e simulator running iOS 26.5. The settings flow verified that horizontal timeline movement does not open Settings, visible Settings controls work from timeline and day, dismissal preserves the selected day, and a deliberate downward root gesture opens Settings. The safety flow saved a synthetic explicit-intent fixture, displayed the non-diagnostic offer and no-automatic-send timer, reached the no-contact creation route, dismissed with Not now before any send state, and confirmed the committed entry remained visible. Together with the injected transport session test, this verifies there is no transport call before final confirmation. Static professional-resource text was checked against current official United States and Canadian sources; the UI does not initiate calls, messages or URLs.
+
+```sh
+python3 Scripts/generate_project.py
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings -configuration Release \
+  -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+  CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,name=iPhone 17e,OS=26.5' \
+  -only-testing:BearingsTests -parallel-testing-enabled NO \
+  -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,name=iPhone 17e,OS=26.5' \
+  -only-testing:BearingsUITests/JournalFlowTests/testSettingsButtonAndDownwardGesturePreserveNavigationContext \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,name=iPhone 17e,OS=26.5' \
+  -only-testing:BearingsUITests/JournalFlowTests/testExplicitSavedLanguageShowsNoContactSafetyRouteAndNeverAutoSends \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+```
+
+The entire UI suite was not repeated. A physical-device run, an actual iOS 17 runtime, maximum Dynamic Type, live VoiceOver/Switch Control use, background/termination timing, the 15/30/60-second timeout variants, and future real transport remain unverified. Foundation Models are not part of the safety decision; existing simulator coverage continues to verify iOS 17-compatible journaling when the model provider is unavailable. No live contact data or personal journal writing was used. Notion synchronization for this milestone was not performed and remains pending.
+
 ## Emotional Zoom clarity pass — October 11, 2026
 
 The editor clarity slice passed an unsigned generic iOS Simulator build. The final complete `BearingsTests` run executed 64 tests with zero failures and one expected physical-device Foundation Models skip in 1.923 seconds. A preceding focused engine/service run executed 30 tests with zero failures in 0.612 seconds. New coverage rejects blank questions/explanations and excerpts not present in the draft, verifies complete long-draft segmentation, exercises the transient service route, confirms no journal record is created by the output, and adds Emotional Zoom to the real-device smoke path. After the owner replaced the eyeglasses direction with the supplied traditional magnifier reference, the focused synthetic UI flow passed again with zero failures in 32.898 seconds. It typed vague writing, used the navy magnifying-glass control, asserted the exact excerpt/explanation/question, refreshed through the navy sextant, saved the original entry and captured a screenshot. The screenshot was exported and visually reviewed; the clean circular-lens/diagonal-handle symbol is below Done and above the rule, and the result and refresh control are legible below the writing.

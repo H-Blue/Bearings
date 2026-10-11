@@ -3,7 +3,8 @@ import SwiftData
 
 enum PersistenceController {
     static var schema: Schema {
-        Schema([JournalEntry.self, DailyAnalysisRecord.self, ReflectionRecord.self, EmotionOverrideRecord.self])
+        Schema([JournalEntry.self, DailyAnalysisRecord.self, ReflectionRecord.self, EmotionOverrideRecord.self,
+                TrustedContact.self])
     }
     // These legacy identities must remain stable after the Bearings rename.
     // Existing installations continue reading the same local journal store.

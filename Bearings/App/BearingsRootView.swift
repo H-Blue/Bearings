@@ -5,12 +5,19 @@ struct BearingsRootView: View {
     @Query private var entries: [JournalEntry]
     @State private var store: JournalStore
     @State private var analysisService: JournalAnalysisService
+    @State private var contactStore: TrustedContactStore
     @State private var selectedDay: JournalDay?
     @State private var zoomAnchor = UnitPoint.center
     @State private var editor: EditorRoute?
+    @State private var showsSettings = false
+    @State private var pendingSafetyCheckIn = false
+    @State private var showsSafetyCheckIn = false
+    @AppStorage("safetyCheckInOfferSeconds") private var safetyOfferSeconds = 30
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @Environment(\.scenePhase) private var scenePhase
     private let onRetryRead: () -> Void
+    private let safetyService: JournalSafetyCheckService
+    private let contactPinger: any TrustedContactPinging
 
     private var reduceMotion: Bool {
         #if DEBUG
@@ -19,13 +26,18 @@ struct BearingsRootView: View {
         return systemReduceMotion
     }
 
-    init(container: ModelContainer, onRetryRead: @escaping () -> Void) {
+    init(container: ModelContainer, onRetryRead: @escaping () -> Void,
+         safetyEvaluator: any JournalSafetyEvaluating = ConservativeJournalSafetyEvaluator(),
+         contactPinger: any TrustedContactPinging = PreviewOnlyTrustedContactPinger()) {
         var descriptor = FetchDescriptor<JournalEntry>(sortBy: [SortDescriptor(\JournalEntry.createdAt)])
         descriptor.includePendingChanges = false
         _entries = Query(descriptor)
         let store = JournalStore(context: container.mainContext)
         _store = State(initialValue: store)
         _analysisService = State(initialValue: JournalAnalysisService(store: store, intelligence: Self.intelligence()))
+        _contactStore = State(initialValue: TrustedContactStore(context: container.mainContext))
+        safetyService = JournalSafetyCheckService(evaluator: safetyEvaluator)
+        self.contactPinger = contactPinger
         self.onRetryRead = onRetryRead
     }
 
@@ -42,7 +54,8 @@ struct BearingsRootView: View {
                     Button("Try again", action: onRetryRead)
                 }
             } else {
-            TimelineView(entries: entries, emotions: timelineEmotions, selectedDay: selectedDay, onSelect: openDay)
+            TimelineView(entries: entries, emotions: timelineEmotions, selectedDay: selectedDay,
+                         onSelect: openDay, onSettings: openSettings)
                 .scaleEffect(selectedDay == nil || reduceMotion ? 1 : 1.8, anchor: zoomAnchor)
                 .offset(y: selectedDay == nil || reduceMotion ? 0 : -180)
                 .opacity(selectedDay == nil ? 1 : 0)
@@ -58,7 +71,7 @@ struct BearingsRootView: View {
                 }, onNew: { period in
                     analysisService.cancel()
                     editor = EditorRoute(day: day, entry: nil, period: period)
-                })
+                }, onSettings: openSettings)
                 .transition(reduceMotion ? .opacity : .offset(y: 160).combined(with: .opacity))
                 .zIndex(2)
             }
@@ -66,9 +79,24 @@ struct BearingsRootView: View {
         }
         .coordinateSpace(name: "timelineRoot")
         .foregroundStyle(BearingsTheme.ink)
-        .sheet(item: $editor) { route in
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 24).onEnded { value in
+                guard selectedDay == nil, value.translation.height > 100,
+                      abs(value.translation.height) > abs(value.translation.width) * 1.8 else { return }
+                openSettings()
+            }
+        )
+        .sheet(item: $editor, onDismiss: presentPendingSafetyCheckIn) { route in
             JournalEditorView(day: route.day, entry: route.entry, period: route.period, store: store,
-                              analysisService: analysisService)
+                              analysisService: analysisService, onCommittedSave: evaluateCommittedWriting,
+                              onSafetyReset: { pendingSafetyCheckIn = false })
+        }
+        .sheet(isPresented: $showsSettings) {
+            SettingsView(contactStore: contactStore)
+        }
+        .sheet(isPresented: $showsSafetyCheckIn) {
+            SafetyCheckInView(contactStore: contactStore, pinger: contactPinger,
+                              offerSeconds: safetyOfferSeconds)
         }
         .safeAreaInset(edge: .bottom) {
             if case .failed(let message)? = analysisService.states["storage"] {
@@ -89,6 +117,7 @@ struct BearingsRootView: View {
         .onChange(of: store.revision) { _, _ in analysisService.loadStored() }
         .onChange(of: scenePhase) { _, phase in
             if phase != .active { analysisService.cancel() }
+            else { presentPendingSafetyCheckIn() }
         }
     }
 
@@ -130,6 +159,27 @@ struct BearingsRootView: View {
         withAnimation(reduceMotion ? .easeInOut(duration: 0.18) : BearingsTheme.transition) {
             selectedDay = nil
         }
+    }
+
+    private func openSettings() {
+        guard editor == nil, !showsSafetyCheckIn else { return }
+        showsSettings = true
+    }
+
+    private func evaluateCommittedWriting(_ committedText: String) {
+        do {
+            let signals = try safetyService.evaluateAfterSave(succeeded: true, committedText: committedText)
+            pendingSafetyCheckIn = !signals.isEmpty
+        } catch {
+            // Evaluation failure never changes or blocks the committed journal.
+            pendingSafetyCheckIn = false
+        }
+    }
+
+    private func presentPendingSafetyCheckIn() {
+        guard pendingSafetyCheckIn, editor == nil, !showsSettings, scenePhase == .active else { return }
+        pendingSafetyCheckIn = false
+        showsSafetyCheckIn = true
     }
 }
 

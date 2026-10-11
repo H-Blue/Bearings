@@ -5,6 +5,7 @@ struct TimelineView: View {
     var emotions: [String: JournalEmotion] = [:]
     let selectedDay: JournalDay?
     let onSelect: (JournalDay, UnitPoint) -> Void
+    let onSettings: () -> Void
     @State private var month = JournalMonth()
     @State private var pickerDate = Date()
     @State private var showsDatePicker = false
@@ -54,6 +55,10 @@ struct TimelineView: View {
     private func timelineContent(viewport: GeometryProxy) -> some View {
         VStack(spacing: 0) {
             HStack {
+                Button(action: onSettings) {
+                    Image(systemName: "gearshape").frame(width: 44, height: 44).contentShape(Rectangle())
+                }
+                .accessibilityLabel("Settings").accessibilityIdentifier("timeline.settings")
                 Spacer()
                 Button {
                     month = JournalMonth()
@@ -153,6 +158,7 @@ struct TimelineView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityAction(named: "Open Settings", onSettings)
         .onDisappear { monthLabelDismissTask?.cancel() }
     }
 

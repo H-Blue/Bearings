@@ -76,6 +76,7 @@ final class JournalMigrationTests: XCTestCase {
             XCTAssertEqual(second.createdAt, created)
             XCTAssertNil(second.createdTimeZoneIdentifier)
             XCTAssertNil(try store.dailyAnalysis(for: firstDay))
+            XCTAssertTrue(try TrustedContactStore(context: migrated.mainContext).contacts().isEmpty)
             try store.setEmotionOverride(.peace, for: firstDay)
             try store.update(entry: first, body: first.body + " Updated after migration.")
             XCTAssertNil(first.createdTimeZoneIdentifier)

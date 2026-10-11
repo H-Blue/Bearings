@@ -7,6 +7,8 @@ struct DayView: View {
     let onBack: () -> Void
     let onEdit: (JournalEntry) -> Void
     let onNew: (JournalPeriod) -> Void
+    let onSettings: () -> Void
+    @State private var scrollTop: CGFloat = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var usesCompactHeader: Bool { dynamicTypeSize >= .accessibility4 }
@@ -25,6 +27,10 @@ struct DayView: View {
                     .accessibilityLabel("Timeline")
                     .accessibilityIdentifier("day.back")
                 Spacer()
+                Button(action: onSettings) {
+                    Image(systemName: "gearshape").frame(width: 44, height: 44).contentShape(Rectangle())
+                }
+                .accessibilityLabel("Settings").accessibilityIdentifier("day.settings")
                 Button { onNew(currentPeriod) } label: {
                     if usesCompactHeader {
                         Label("Write", systemImage: "square.and.pencil").labelStyle(.iconOnly).font(.caption)
@@ -41,6 +47,10 @@ struct DayView: View {
                 .multilineTextAlignment(.center).padding(.horizontal, 24).padding(.top, 20)
             ScrollView {
                 VStack(spacing: 20) {
+                    GeometryReader { geometry in
+                        Color.clear.preference(key: DayScrollTopKey.self,
+                                               value: geometry.frame(in: .named("dayScroll")).minY)
+                    }.frame(height: 0)
                     dayBranches
                     if entries.isEmpty {
                         Text("A place for this day.\nChoose morning, midday, or evening to begin.")
@@ -67,9 +77,19 @@ struct DayView: View {
                                            service: analysisService)
                 }.padding(.bottom, 32)
             }
+            .coordinateSpace(name: "dayScroll")
+            .onPreferenceChange(DayScrollTopKey.self) { scrollTop = $0 }
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 24).onEnded { value in
+                    guard scrollTop >= -2, value.translation.height > 100,
+                          abs(value.translation.height) > abs(value.translation.width) * 1.8 else { return }
+                    onSettings()
+                }
+            )
         }
         .buttonStyle(.plain)
         .background(BearingsTheme.paper)
+        .accessibilityAction(named: "Open Settings", onSettings)
     }
 
     private var dayBranches: some View {
@@ -134,4 +154,9 @@ struct DayView: View {
         let trimmed = body.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? "Untitled entry" : String(trimmed.prefix(180))
     }
+}
+
+private struct DayScrollTopKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }

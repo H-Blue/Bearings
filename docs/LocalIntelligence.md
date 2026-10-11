@@ -14,7 +14,9 @@ Implementation reference, October 11, 2026. This document describes the current 
 | `JournalAnalysisService` | Observable availability/results, cache reuse, task coordination, cancellation and completion triggers. |
 | `AnalysisTypes` / `AnalysisRecords` | Framework-independent values, civil periods, fingerprints and separate SwiftData derived records. |
 | `DailyReflectionSection` / `ReflectionView` / `EmotionPalette` | Daily and period results, correction/retry controls and accessible timeline indicators. |
-| `JournalEditorView` | A user-triggered, transient Emotional Zoom over the current draft; the result is discarded when the draft changes. |
+| `JournalEditorView` | A user-triggered, transient Emotional Zoom over the current draft; the result is discarded when the draft changes. After a committed change, it separately invokes the local safety boundary. |
+| `JournalSafetyCheckService` / `ConservativeJournalSafetyEvaluator` | A Foundation Models-independent, injectable check for a small reviewed set of explicit current first-person intent phrases. |
+| `TrustedContactStore` / `TrustedContactPinging` | Isolated local contact persistence and an injectable future transport boundary. The shipping transport cannot send. |
 
 Original journal writing remains authoritative. Summaries and emotion suggestions are interpretations, stored separately and labeled in the interface. The broader assistant, book retrieval, cloud inference, sync and progressive design reveal are outside this milestone.
 
@@ -24,11 +26,21 @@ Original journal writing remains authoritative. Summaries and emotion suggestion
 
 The selected day describes the experience rather than the saving instant. A backdated entry can be created today, retain today's exact creation timestamp and zone, and belong to yesterday's `dayKey`. Travel never reinterprets that key. The editor maintains a separate selected-day draft and explicitly saves it with the writing and period.
 
-The SwiftData schema contains `JournalEntry`, `DailyAnalysisRecord`, `ReflectionRecord` and `EmotionOverrideRecord`. Daily records have a unique day key; period records have a unique kind/start/end key. They store validated Codable content as JSON `Data`, source fingerprints, generation timestamps, analysis versions and stale flags. Corrections are separate records with an emotion and modification timestamp. Removing a day's last entry or regenerating its analysis preserves its correction.
+The SwiftData schema contains `JournalEntry`, `DailyAnalysisRecord`, `ReflectionRecord`, `EmotionOverrideRecord` and `TrustedContact`. Trusted contacts are a separate table and never become analysis input. Daily records have a unique day key; period records have a unique kind/start/end key. They store validated Codable content as JSON `Data`, source fingerprints, generation timestamps, analysis versions and stale flags. Corrections are separate records with an emotion and modification timestamp. Removing a day's last entry or regenerating its analysis preserves its correction.
 
 The optional journal addition and new empty tables permit SwiftData's inferred additive migration. No historical timestamp or zone is fabricated. `JournalMigrationTests` writes the frozen pre-AI `JournalEntry` shape into a real file store, then opens it through the current schema and verifies journal identity/content/timestamps, unknown legacy zones, new correction storage and a further reopen. Its executed result belongs in Testing.md.
 
 The bundle identifier, configuration name `ReCollect`, and Application Support `ReCollect/Journal.store` path remain compatibility values. Initialization failures reach the existing visible retry screen; production never substitutes an empty temporary store.
+
+## Optional safety check-in boundary
+
+The safety check-in is an optional local offer. It is not diagnosis, continuous monitoring, prediction, a risk score, guaranteed detection or automatic outreach. It does not use Foundation Models. `JournalSafetyEvaluating` receives only the committed body after the user completes a successful isolated editor save. Draft keystrokes, debounce autosaves, background saves and failed saves do not run it. The initial deterministic evaluator normalizes case and ordinary punctuation, then recognizes a deliberately small reviewed set of explicit current first-person intent statements. It suppresses quoted text and sentences marked as historical, fictional, lyrical, reported or news context. A negative result does not establish safety. An evaluator error leaves the committed journal readable and unchanged.
+
+Signals exist only in root view state long enough to offer the sheet. Bearings stores no matched excerpt, safety event, diagnosis or permanent label. Journal entries, daily analyses, period reflections, emotion overrides and trusted contacts remain separate. Contact names and phone numbers never enter prompts, summaries, fingerprints, analytics or logs.
+
+The check-in states that Bearings may be misunderstanding the writing. Its configurable 15, 30 or 60 second timer controls only the prominent offer and dismisses without action. Reaching the transport requires four deliberate steps: choose Reach out, select exact enabled recipients, review and edit the exact neutral message, then press Send. Every stage retains Not now. Dismissal, timeout, navigation, backgrounding and termination do not call transport. The `PreviewOnlyTrustedContactPinger` used in production always returns “Sending is not available in this build”; it performs no SMS, call, notification or network request. Professional resources are static text and do not silently open another app.
+
+Trusted contacts are entered manually, so Bearings requests no Contacts permission. `TrustedContactStore` uses fresh SwiftData transaction contexts, explicit saves and rollback on failure. Settings shows retryable failures. The model is an additive table in the existing `ReCollect` store, preserving compatibility identities and existing journal data. A visible Settings control and a named accessibility action exist on both timeline and day screens. A predominantly vertical downward drag over 100 points also opens the native Settings sheet; the day gesture is enabled only at the scroll view’s top boundary, while horizontal timeline movement remains available.
 
 ## Transaction and cache correctness
 

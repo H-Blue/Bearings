@@ -312,6 +312,54 @@ final class JournalFlowTests: XCTestCase {
                        "The month title should hide five seconds after horizontal scrolling ends.")
     }
 
+    func testSettingsButtonAndDownwardGesturePreserveNavigationContext() throws {
+        let right = app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.7))
+        let left = app.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.7))
+        right.press(forDuration: 0.1, thenDragTo: left)
+        XCTAssertFalse(app.otherElements["settings.screen"].exists,
+                       "A horizontal timeline drag must not open Settings.")
+
+        waitFor(app.buttons["timeline.settings"]).tap()
+        waitFor(app.otherElements["settings.screen"])
+        waitFor(app.buttons["settings.done"]).tap()
+        waitFor(app.buttons["timeline.today"]).tap()
+        waitFor(app.buttons["day.newEntry"])
+        waitFor(app.buttons["day.settings"]).tap()
+        waitFor(app.otherElements["settings.screen"])
+        waitFor(app.buttons["settings.done"]).tap()
+        XCTAssertTrue(waitFor(app.buttons["day.newEntry"]).exists,
+                      "Dismissing Settings must preserve the selected day.")
+
+        app.buttons["day.back"].tap()
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+        start.press(forDuration: 0.1, thenDragTo: end)
+        waitFor(app.otherElements["settings.screen"])
+    }
+
+    func testExplicitSavedLanguageShowsNoContactSafetyRouteAndNeverAutoSends() {
+        openToday()
+        waitFor(app.buttons["day.newEntry"]).tap()
+        let editor = bodyEditor()
+        editor.tap()
+        editor.typeText("I am going to kill myself.")
+        let saved = app.staticTexts["editor.saved"]
+        let savedStatus = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Saved"), object: saved)
+        XCTAssertEqual(XCTWaiter.wait(for: [savedStatus], timeout: 8), .completed)
+        app.buttons["editor.done"].tap()
+
+        waitFor(app.otherElements["safety.screen"])
+        XCTAssertTrue(app.staticTexts["safety.timer"].label.contains("Nothing will be sent automatically"))
+        waitFor(app.buttons["safety.reachOut"]).tap()
+        XCTAssertTrue(waitFor(app.buttons["safety.addContact"]).exists)
+        XCTAssertFalse(app.staticTexts["safety.unavailable"].exists,
+                       "No send state should be reached before recipients and final confirmation.")
+        waitFor(app.buttons["safety.notNow"]).tap()
+        waitFor(app.buttons["day.newEntry"])
+        XCTAssertTrue(entryButton(containing: "I am going to kill myself.").exists,
+                      "The committed journal must remain available after dismissing the check-in.")
+    }
+
     private func timelineTodayDateButton() throws -> XCUIElement {
         // Match the app's local Gregorian date identity. These tests assume a
         // run does not cross local midnight or a time-zone change.
