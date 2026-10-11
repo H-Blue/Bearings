@@ -1,6 +1,6 @@
 # Bearings
 
-Native iPhone journal built with Swift, SwiftUI, and SwiftData. The user's story is the central experience: timeline → day → writing. Keep the MVP local, offline, private, and free of streaks, social features, analytics, AI requests, subscriptions, and cloud infrastructure.
+Native iPhone journal built with Swift, SwiftUI, and SwiftData. The user's story is the central experience: timeline → day → writing. Keep the MVP local, offline, private, and free of streaks, social features, analytics, external AI requests, subscriptions, and cloud infrastructure. The owner approved on-device AI summaries and emotional day indicators as the next milestone; implement `docs/BEARINGS_AI_IMPLEMENTATION.md` while preserving the journaling foundation and iOS 17 support.
 
 ## Engineering
 - Target iOS 17 or later; use Apple frameworks without external dependencies.
@@ -27,5 +27,5 @@ Native iPhone journal built with Swift, SwiftUI, and SwiftData. The user's story
 - Technical handoff: https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69. Synchronization evidence is in `docs/NotionSync.md`.
 - Maintain architecture, decisions, scope, progress, and tests under `docs/`; synchronize meaningful milestones to the existing Bearings Notion hierarchy and verify writes. Record pending synchronization explicitly.
 - Make routine reversible decisions autonomously. Explain consequential decisions plainly; identify real blockers and keep working on independent foundations.
-- Future AI has an explicit local retrieval boundary only; no journal content leaves the device without user authorization. Progressive design reveal remains future scope.
+- The approved AI milestone extends the existing local retrieval boundary for on-device daily analysis, weekly/monthly reflections, and user-correctable emotion indicators. No journal content leaves the device. Gate Foundation Models by SDK/OS/runtime availability and preserve isolated saves, Gregorian civil day identity, compatibility storage identifiers and owner-selected design. The broader personal assistant and progressive design reveal remain future scope.
 - Update these instructions when actual architecture or workflow changes. Do not duplicate the full specification here.
