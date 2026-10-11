@@ -37,6 +37,20 @@ struct ReflectionContent: Codable, Equatable, Sendable {
     }
 }
 
+struct EmotionalZoomContent: Equatable, Sendable {
+    var vagueExcerpt: String?
+    var explanation: String
+    var probingQuestion: String
+
+    func validate(source: String) throws {
+        let excerpt = vagueExcerpt?.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !explanation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !probingQuestion.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              excerpt.map({ !$0.isEmpty && source.contains($0) }) ?? true
+        else { throw AnalysisError.invalidOutput }
+    }
+}
+
 enum ReflectionKind: String, Codable, Sendable { case weekly, monthly }
 
 /// Monday–Sunday weeks and calendar months, calculated in UTC civil space.

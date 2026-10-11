@@ -10,7 +10,7 @@ enum AnalysisState: Equatable {
 @MainActor
 @Observable
 final class JournalAnalysisService {
-    static let version = 1
+    static let version = 2
     private(set) var availability: IntelligenceAvailability = .unavailable("Checking on-device reflections…")
     private(set) var daily: [String: StoredDailyAnalysis] = [:]
     private(set) var reflections: [String: StoredReflection] = [:]
@@ -78,6 +78,12 @@ final class JournalAnalysisService {
 
     func regenerate(period: AnalysisPeriod) async {
         _ = try? await requestReflection(period, reuseCache: false)
+    }
+
+    func emotionalZoom(text: String) async throws -> EmotionalZoomContent {
+        availability = await engine.availability()
+        guard availability == .available else { throw AnalysisError.generationFailed }
+        return try await engine.emotionalZoom(text: text)
     }
 
     private func requestReflection(_ period: AnalysisPeriod, reuseCache: Bool = true) async throws -> StoredReflection? {

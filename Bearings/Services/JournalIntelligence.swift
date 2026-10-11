@@ -22,4 +22,11 @@ protocol JournalIntelligence: Sendable {
     func availability() async -> IntelligenceAvailability
     func analyze(_ text: String) async throws -> DailyAnalysisContent
     func reflect(_ text: String, kind: ReflectionKind) async throws -> ReflectionContent
+    func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent
+}
+
+extension JournalIntelligence {
+    func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent {
+        throw AnalysisError.generationFailed
+    }
 }

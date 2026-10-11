@@ -1,12 +1,14 @@
 # Bearings emotional learning: feature contract and demo stories
 
-Prepared October 11, 2026 from the owner's feature direction. This is a proposed implementation contract, not evidence that the features already work. It supplements the existing local AI milestone without replacing the journaling foundation. Read LocalIntelligence.md and Deployment.md before extending the model boundary.
+Prepared October 11, 2026 from the owner's feature direction. Most of this document remains a proposed implementation contract. The first Emotional Zoom clarity slice is implemented: a user-triggered editor control identifies one exact vague excerpt when present, explains the ambiguity tentatively and asks one probing question. Feeling candidates, confirmed finer words and persisted accept/edit/reject choices remain future work. Read LocalIntelligence.md and Deployment.md before extending the model boundary.
 
 ## Product loop
 
 Write → name feelings → inspect assumptions → choose one practice → review what helped. The writer is the authority on their own experience. AI offers tentative interpretations and educational prompts. Lessons encourage learning without streaks, scores, pressure or claims that feelings are wrong.
 
 ### Emotional Zoom
+
+Implemented first slice: the current draft can be reviewed on demand without being treated as committed journal data. A navy eyeglasses button below Done and above the editor rule sends the visible draft only to the on-device provider. The transient response appears below the writing, must ground any highlighted phrase as an exact excerpt, and asks one open-ended question. Editing clears the result. Nothing is written back to the journal or stored as a confirmed interpretation.
 
 Input is saved writing and the user's initial description. Output includes a small set of feeling candidates, a short reviewed distinction, a clarifying question, user-confirmed finer words and an optional contextual sentence. Examples can include hurt, disappointed, lonely, frustrated, anxious, relieved, proud or grateful. Permit multiple/custom/uncertain choices. Do not force every experience into a single label.
 

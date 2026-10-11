@@ -7,7 +7,7 @@ import XCTest
 /// depend on Apple's model, and all journal material here is synthetic.
 final class FoundationModelsDeviceTests: XCTestCase {
     @MainActor
-    func testOnDeviceDailyWeeklyMonthlyPersistenceAndCache() async throws {
+    func testOnDeviceEmotionalZoomDailyWeeklyMonthlyPersistenceAndCache() async throws {
         #if targetEnvironment(simulator)
         throw XCTSkip("Real Foundation Models smoke coverage requires a supported physical device.")
         #else
@@ -31,6 +31,10 @@ final class FoundationModelsDeviceTests: XCTestCase {
         let service = JournalAnalysisService(store: store, intelligence: intelligence)
         service.loadStored()
         defer { service.cancel() }
+
+        let zoomSource = "I felt bad about the thing that happened before lunch."
+        let zoom = try await service.emotionalZoom(text: zoomSource)
+        try zoom.validate(source: zoomSource)
 
         await service.analyze(day: day)
         XCTAssertEqual(service.states[day.key], .idle)

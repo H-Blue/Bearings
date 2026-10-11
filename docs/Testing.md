@@ -2,6 +2,34 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Emotional Zoom clarity pass — October 11, 2026
+
+The editor clarity slice passed an unsigned generic iOS Simulator build. The final complete `BearingsTests` run executed 64 tests with zero failures and one expected physical-device Foundation Models skip in 1.923 seconds. A preceding focused engine/service run executed 30 tests with zero failures in 0.612 seconds. New coverage rejects blank questions/explanations and excerpts not present in the draft, verifies complete long-draft segmentation, exercises the transient service route, confirms no journal record is created by the output, and adds Emotional Zoom to the real-device smoke path. The focused synthetic UI flow passed one test with zero failures in 39.454 seconds: it typed vague writing, used the navy eyeglasses control, asserted the exact excerpt/explanation/question, refreshed through the navy sextant, saved the original entry and captured a screenshot. The screenshot was exported and visually reviewed; the control is below Done and above the rule, and the result and refresh control are legible below the writing.
+
+```sh
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ZoomDerivedData \
+  CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/ZoomDerivedData -resultBundlePath build/ZoomUnitTestsFinal.xcresult \
+  -only-testing:BearingsTests/AnalysisEngineTests \
+  -only-testing:BearingsTests/JournalAnalysisServiceTests \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/ZoomDerivedData -resultBundlePath build/ZoomAllUnitTestsFinal.xcresult \
+  -only-testing:BearingsTests -parallel-testing-enabled NO \
+  -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=795E69CB-C101-488F-A8B0-CF3ECD77C7EE' \
+  -derivedDataPath build/ZoomUIDerivedData -resultBundlePath build/ZoomUITestFinal.xcresult \
+  -only-testing:BearingsUITests/ReflectionFlowTests/testEmotionalZoomFindsVagueWritingAndAsksAQuestion \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+```
+
+These checks use a deterministic synthetic on-device-provider fixture and do not establish real Foundation Models wording quality. Real-model generation for the new guided schema, a physical-device run, iOS 17 runtime behavior, maximum Dynamic Type and the complete UI suite remain unverified for this change. The harmless AppIntents metadata warning and simulator debugger lookup notice persisted. No project regeneration was needed because no Swift file was added. Notion synchronization is pending.
+
 ## AI sextant refresh controls — October 11, 2026
 
 Verified with Xcode 27.0 on the iPhone 17e simulator running iOS 26.5. All 14 `JournalAnalysisServiceTests` passed with zero failures in 0.394 seconds. The new `testExplicitRefreshBypassesCachesAndPreservesCorrection` verifies that ordinary repeated requests reuse daily and weekly caches, explicit refresh makes a second provider request for each output, and the saved manual emotion remains unchanged. The suite also retained its cache sharing, source-change retry, cancellation, corrupt-cache repair, unavailable-model and real read-only-save failure coverage.

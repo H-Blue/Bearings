@@ -60,6 +60,20 @@ actor JournalAnalysisEngine {
         return result
     }
 
+    func emotionalZoom(text: String) async throws -> EmotionalZoomContent {
+        await acquire()
+        defer { release() }
+        try Task.checkCancellation()
+        guard await intelligence.availability() == .available else { throw AnalysisError.generationFailed }
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw AnalysisError.emptySource }
+        var results: [EmotionalZoomContent] = []
+        for chunk in Self.chunks(text) { results += try await zoomText(chunk) }
+        guard let result = results.first(where: { $0.vagueExcerpt != nil }) ?? results.first else {
+            throw AnalysisError.invalidOutput
+        }
+        return result
+    }
+
     /// UTF-8 is a conservative budget, not a claim about tokenizer equivalence.
     /// Unicode scalar boundaries preserve every byte, including large graphemes.
     static func chunks(_ text: String, byteLimit: Int = inputByteBudget) -> [String] {
@@ -129,6 +143,23 @@ actor JournalAnalysisEngine {
             var result: [ReflectionContent] = []
             for chunk in Self.chunks(text, byteLimit: max(128, text.utf8.count / 2)) {
                 result += try await reflectText(chunk, kind: kind)
+            }
+            return result
+        }
+    }
+
+    private func zoomText(_ text: String) async throws -> [EmotionalZoomContent] {
+        try Task.checkCancellation()
+        do {
+            let result = try await intelligence.emotionalZoom(text)
+            try Task.checkCancellation()
+            try result.validate(source: text)
+            return [result]
+        } catch AnalysisError.contextTooLarge {
+            guard text.utf8.count > 256 else { throw AnalysisError.contextTooLarge }
+            var result: [EmotionalZoomContent] = []
+            for chunk in Self.chunks(text, byteLimit: max(128, text.utf8.count / 2)) {
+                result += try await zoomText(chunk)
             }
             return result
         }

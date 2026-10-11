@@ -2,17 +2,22 @@ import SwiftUI
 
 struct JournalEditorView: View {
     @State private var session: JournalEditorSession
+    @State private var zoomState: EmotionalZoomState = .idle
+    @State private var zoomTask: Task<Void, Never>?
     @State private var confirmsDelete = false
     @State private var showsMetadata = false
     @FocusState private var writing: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    private let analysisService: JournalAnalysisService
 
     private var usesCompactHeader: Bool { dynamicTypeSize >= .accessibility4 }
 
-    init(day: JournalDay, entry: JournalEntry?, period: JournalPeriod, store: JournalStore) {
+    init(day: JournalDay, entry: JournalEntry?, period: JournalPeriod, store: JournalStore,
+         analysisService: JournalAnalysisService) {
         _session = State(initialValue: JournalEditorSession(day: day, entry: entry, period: period, store: store))
+        self.analysisService = analysisService
     }
 
     var body: some View {
@@ -34,6 +39,18 @@ struct JournalEditorView: View {
                         .accessibilityIdentifier("editor.period")
                     }
                     Spacer(minLength: 0)
+                    Button(action: zoomIn) {
+                        Image(systemName: "eyeglasses")
+                            .font(.title3.weight(.medium))
+                            .foregroundStyle(BearingsTheme.line)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(session.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || zoomState == .loading)
+                    .accessibilityLabel("Zoom in on this writing")
+                    .accessibilityHint("Finds unclear language and suggests a question to explore")
+                    .accessibilityIdentifier("editor.zoom")
                 }.padding(.horizontal, 32).padding(.top, 12).padding(.bottom, 20)
                 Image("EditorRule").resizable().frame(height: 1).padding(.horizontal, 34).accessibilityHidden(true)
                 ZStack(alignment: .topLeading) {
@@ -51,6 +68,8 @@ struct JournalEditorView: View {
                             .allowsHitTesting(false).accessibilityHidden(true)
                     }
                 }.padding(.horizontal, 28).padding(.top, 24)
+
+                emotionalZoomPanel
 
                 if session.saveState == .failed || session.deleteFailed {
                     HStack(alignment: .center, spacing: 12) {
@@ -128,8 +147,106 @@ struct JournalEditorView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase != .active { session.save() }
         }
-        .onDisappear { session.save() }
+        .onChange(of: session.body) {
+            zoomTask?.cancel()
+            zoomTask = nil
+            zoomState = .idle
+        }
+        .onDisappear {
+            zoomTask?.cancel()
+            session.save()
+        }
     }
+
+    @ViewBuilder
+    private var emotionalZoomPanel: some View {
+        switch zoomState {
+        case .idle:
+            EmptyView()
+        case .loading:
+            HStack(spacing: 10) {
+                ProgressView()
+                Text("Looking more closely…")
+            }
+            .font(.footnote)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 28).padding(.vertical, 12)
+            .accessibilityIdentifier("editor.zoom.loading")
+        case .result(let content):
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Text("A closer look").font(.headline)
+                    Spacer(minLength: 0)
+                    AIRefreshButton(
+                        accessibilityLabel: "Refresh closer look",
+                        accessibilityIdentifier: "editor.zoom.refresh",
+                        isLoading: false,
+                        action: zoomIn
+                    )
+                }
+                if let excerpt = content.vagueExcerpt {
+                    Text("“\(excerpt)”")
+                        .font(.body.italic())
+                        .accessibilityIdentifier("editor.zoom.excerpt")
+                }
+                Text(content.explanation)
+                    .font(.footnote)
+                    .foregroundStyle(BearingsTheme.quietInk)
+                    .accessibilityIdentifier("editor.zoom.explanation")
+                Text("A question to explore").font(.headline).padding(.top, 4)
+                Text(content.probingQuestion)
+                    .font(.body)
+                    .accessibilityIdentifier("editor.zoom.question")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 28).padding(.vertical, 12)
+        case .unavailable(let message), .failed(let message):
+            VStack(alignment: .leading, spacing: 8) {
+                Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("editor.zoom.error")
+                Button("Try again", action: zoomIn)
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier("editor.zoom.retry")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 28).padding(.vertical, 8)
+        }
+    }
+
+    private func zoomIn() {
+        let source = session.body
+        guard !source.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        writing = false
+        zoomTask?.cancel()
+        zoomState = .loading
+        zoomTask = Task {
+            do {
+                let content = try await analysisService.emotionalZoom(text: source)
+                try Task.checkCancellation()
+                guard session.body == source else { return }
+                zoomState = .result(content)
+            } catch is CancellationError {
+                return
+            } catch {
+                guard session.body == source else { return }
+                if case .unavailable(let message) = analysisService.availability {
+                    zoomState = .unavailable(message)
+                } else if let analysisError = error as? AnalysisError {
+                    zoomState = .failed(analysisError.errorDescription ?? "A closer look isn’t available right now. Try again.")
+                } else {
+                    zoomState = .failed("A closer look isn’t available right now. Try again. Your writing is still here.")
+                }
+            }
+        }
+    }
+}
+
+private enum EmotionalZoomState: Equatable {
+    case idle
+    case loading
+    case result(EmotionalZoomContent)
+    case unavailable(String)
+    case failed(String)
 }
 
 private struct EditRevision: Equatable {

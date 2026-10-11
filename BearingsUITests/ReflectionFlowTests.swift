@@ -44,6 +44,30 @@ final class ReflectionFlowTests: XCTestCase {
         XCTAssertTrue(waitFor(app.staticTexts["reflection.period.unavailable"]).exists)
     }
 
+    func testEmotionalZoomFindsVagueWritingAndAsksAQuestion() {
+        openToday()
+        waitFor(app.buttons["day.newEntry"]).tap()
+        let editor = waitFor(app.textViews["editor.body"])
+        editor.tap()
+        editor.typeText("I feel bad about the thing that happened.")
+
+        let zoom = waitFor(app.buttons["editor.zoom"])
+        XCTAssertTrue(zoom.isEnabled)
+        zoom.tap()
+
+        XCTAssertEqual(waitFor(app.staticTexts["editor.zoom.excerpt"]).label, "“I feel bad”")
+        XCTAssertTrue(app.staticTexts["editor.zoom.explanation"].label.contains("does not yet show"))
+        XCTAssertEqual(app.staticTexts["editor.zoom.question"].label,
+                       "What happened that made this feel difficult?")
+        XCTAssertTrue(app.buttons["editor.zoom.refresh"].exists)
+        app.buttons["editor.zoom.refresh"].tap()
+        XCTAssertEqual(waitFor(app.staticTexts["editor.zoom.question"]).label,
+                       "What happened that made this feel difficult?")
+        attachScreenshot("Emotional Zoom question for vague journal writing")
+        finishEditing()
+        XCTAssertTrue(entryButton().exists)
+    }
+
     func testManualFeelingSurvivesRegenerationAndCanReturnToAISuggestion() throws {
         openToday()
         createEntry("A synthetic memory of a quiet walk by the river.")

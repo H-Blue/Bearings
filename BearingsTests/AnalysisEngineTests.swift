@@ -149,6 +149,36 @@ final class AnalysisEngineTests: XCTestCase {
         XCTAssertThrowsError(try invalid.validate())
     }
 
+    func testEmotionalZoomRequiresGroundedExcerptAndQuestion() throws {
+        let source = "I feel bad about the thing that happened."
+        let valid = EmotionalZoomContent(vagueExcerpt: "I feel bad",
+                                         explanation: "The phrase does not identify the feeling or event.",
+                                         probingQuestion: "What happened, and what feeling fits it most closely?")
+        XCTAssertNoThrow(try valid.validate(source: source))
+        XCTAssertThrowsError(try EmotionalZoomContent(vagueExcerpt: "Words not in the draft",
+                                                       explanation: valid.explanation,
+                                                       probingQuestion: valid.probingQuestion).validate(source: source))
+        XCTAssertThrowsError(try EmotionalZoomContent(vagueExcerpt: " ", explanation: valid.explanation,
+                                                       probingQuestion: valid.probingQuestion).validate(source: source))
+        XCTAssertThrowsError(try EmotionalZoomContent(vagueExcerpt: nil, explanation: " ",
+                                                       probingQuestion: valid.probingQuestion).validate(source: source))
+        XCTAssertThrowsError(try EmotionalZoomContent(vagueExcerpt: nil, explanation: valid.explanation,
+                                                       probingQuestion: "\n").validate(source: source))
+    }
+
+    func testEmotionalZoomProcessesEveryDraftChunkAndReturnsGroundedAmbiguity() async throws {
+        let source = String(repeating: "A specific synthetic detail. ", count: 120) + "I feel bad about the thing."
+        let mock = ZoomMockIntelligence()
+        let engine = JournalAnalysisEngine(intelligence: mock)
+
+        let result = try await engine.emotionalZoom(text: source)
+        let inputs = await mock.inputs
+        XCTAssertGreaterThan(inputs.count, 1)
+        XCTAssertEqual(Array(inputs.joined().utf8), Array(source.utf8))
+        XCTAssertEqual(result.vagueExcerpt, "I feel bad")
+        try result.validate(source: source)
+    }
+
     @MainActor
     func testEngineRejectsMalformedProviderOutput() async throws {
         let entries = try committedSnapshots(["I felt uncertain about a difficult day."])
@@ -249,6 +279,23 @@ final class AnalysisEngineTests: XCTestCase {
             clock = clock.addingTimeInterval(60)
         }
         return try store.snapshots(from: day, through: day)
+    }
+}
+
+private actor ZoomMockIntelligence: JournalIntelligence {
+    private(set) var inputs: [String] = []
+
+    func availability() async -> IntelligenceAvailability { .available }
+    func analyze(_ text: String) async throws -> DailyAnalysisContent { throw AnalysisError.generationFailed }
+    func reflect(_ text: String, kind: ReflectionKind) async throws -> ReflectionContent { throw AnalysisError.generationFailed }
+    func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent {
+        inputs.append(text)
+        let excerpt = text.contains("I feel bad") ? "I feel bad" : nil
+        return EmotionalZoomContent(
+            vagueExcerpt: excerpt,
+            explanation: excerpt == nil ? "This segment is specific." : "The feeling and event are not yet specific.",
+            probingQuestion: "What detail would make this clearer to you?"
+        )
     }
 }
 

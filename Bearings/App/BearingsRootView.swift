@@ -67,7 +67,8 @@ struct BearingsRootView: View {
         .coordinateSpace(name: "timelineRoot")
         .foregroundStyle(BearingsTheme.ink)
         .sheet(item: $editor) { route in
-            JournalEditorView(day: route.day, entry: route.entry, period: route.period, store: store)
+            JournalEditorView(day: route.day, entry: route.entry, period: route.period, store: store,
+                              analysisService: analysisService)
         }
         .safeAreaInset(edge: .bottom) {
             if case .failed(let message)? = analysisService.states["storage"] {
@@ -160,6 +161,20 @@ private struct SyntheticJournalIntelligence: JournalIntelligence {
                                  importantEvents: ["A walk by the river"], emotionalThemes: "Peace and joy appear in the writing.",
                                  relationships: "The writing provides insufficient information about relationships.",
                                  interests: "Walking outdoors appears in the writing.", changes: "The writing moves toward peace.")
+    }
+
+    func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent {
+        guard isAvailable else { throw AnalysisError.generationFailed }
+        let excerpt = text.localizedStandardContains("I feel bad") ? "I feel bad" : nil
+        return EmotionalZoomContent(
+            vagueExcerpt: excerpt,
+            explanation: excerpt == nil
+                ? "This writing is specific enough to follow."
+                : "This phrase does not yet show what felt difficult or what happened.",
+            probingQuestion: excerpt == nil
+                ? "What detail feels most important to remember?"
+                : "What happened that made this feel difficult?"
+        )
     }
 }
 #endif

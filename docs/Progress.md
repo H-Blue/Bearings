@@ -2,6 +2,12 @@
 
 Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, GitHub setup, map opening screen, and centered timeline, October 10–11, 2026.
 
+## Emotional Zoom clarity pass — October 11, 2026
+
+Added a 44-point navy eyeglasses button to the editor header, below Done and above the rule. On demand, the on-device analysis boundary evaluates the visible draft, returns one exact vague excerpt when supported, explains what is difficult to understand and asks one open-ended question below the writing. Its shared navy sextant requests another interpretation. The result is transient, disappears when the draft changes, never rewrites or persists into the journal, and exposes unavailable/retry states. The analysis version is now 2 because the provider schema and instructions changed. This is the first clarity slice of Emotional Zoom; finer feeling choices and persisted accept/edit/reject remain unimplemented.
+
+The generic iOS Simulator build passed. The complete 64-test unit suite passed with zero failures and one expected physical-model skip; one end-to-end UI test also passed and covered the result's sextant refresh. Its screenshot was reviewed and shows the intended icon placement, grounded excerpt and question. Real Apple-model generation for this new schema, physical-device layout, maximum Dynamic Type and Notion synchronization remain unverified. Exact commands and limits are in Testing.md. No publishing or pushing occurred.
+
 ## AI sextant refresh controls — October 11, 2026
 
 Daily, weekly and monthly generated outputs now show a shared 44-point navy sextant control. It requests a fresh on-device interpretation by bypassing the selected valid cache, preserves the prior output through loading/failure and leaves user emotion corrections intact. All 14 analysis-service tests and two synthetic-provider UI flows passed, covering daily, weekly and monthly refresh plus correction preservation; the three output screenshots were reviewed. The complete app unit/UI suites, physical-device model generation and iOS 17 runtime were not rerun. Notion synchronization is pending. No publishing or push was performed.

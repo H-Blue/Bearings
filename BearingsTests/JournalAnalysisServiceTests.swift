@@ -5,6 +5,24 @@ import XCTest
 
 final class JournalAnalysisServiceTests: XCTestCase {
     @MainActor
+    func testEmotionalZoomUsesCurrentTextWithoutPersistingDerivedOutput() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let store = JournalStore(context: container.mainContext)
+        let model = ServiceFixtureIntelligence()
+        let service = JournalAnalysisService(store: store, intelligence: model)
+        let source = "I feel bad about the thing that happened."
+
+        let result = try await service.emotionalZoom(text: source)
+        let prompts = await model.zoomPrompts
+
+        XCTAssertEqual(result.vagueExcerpt, "I feel bad")
+        XCTAssertEqual(prompts, [source])
+        XCTAssertEqual(service.availability, .available)
+        XCTAssertTrue(try store.snapshots(from: JournalDay(key: "2026-10-01")!,
+                                          through: JournalDay(key: "2026-10-01")!).isEmpty)
+    }
+
+    @MainActor
     func testExplicitRefreshBypassesCachesAndPreservesCorrection() async throws {
         let container = try PersistenceController.makeContainer(inMemory: true)
         let store = JournalStore(context: container.mainContext)
@@ -442,6 +460,7 @@ private actor ServiceFixtureIntelligence: JournalIntelligence {
     let available: Bool
     private(set) var analysisCount = 0
     private(set) var reflectionPrompts: [String] = []
+    private(set) var zoomPrompts: [String] = []
     init(delay: Duration = .zero, available: Bool = true) { self.delay = delay; self.available = available }
     func availability() async -> IntelligenceAvailability { available ? .available : .unavailable("Synthetic unavailable model") }
     func analyze(_ text: String) async throws -> DailyAnalysisContent {
@@ -454,6 +473,12 @@ private actor ServiceFixtureIntelligence: JournalIntelligence {
         reflectionPrompts.append(text)
         return ReflectionContent(overview: "A remembered walk", importantEvents: ["Walk"], emotionalThemes: "Peace",
                                  relationships: "Friend", interests: "Walking", changes: "Insufficient information")
+    }
+    func emotionalZoom(_ text: String) async throws -> EmotionalZoomContent {
+        zoomPrompts.append(text)
+        return EmotionalZoomContent(vagueExcerpt: text.contains("I feel bad") ? "I feel bad" : nil,
+                                    explanation: "The phrase is not yet specific.",
+                                    probingQuestion: "What happened, and what felt difficult?")
     }
 }
 
