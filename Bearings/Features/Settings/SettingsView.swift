@@ -40,7 +40,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.ink)
+        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.systemControl)
         .accessibilityIdentifier("settings.screen")
     }
 }

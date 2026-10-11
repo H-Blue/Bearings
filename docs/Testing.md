@@ -2,6 +2,22 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Timeline Settings rope interaction — October 11, 2026
+
+The focused native UI flow passed on the Bearings iPhone 16 Pro simulator running iOS 26.5. It verified that a horizontal timeline swipe neither opens Settings nor reveals the handle; the first upward swipe reveals the rope handle without opening Settings; a second upward pull on the handle opens Settings; dismissing returns to the timeline; the day screen contains no Settings button; and an upward day gesture does not open Settings. Two screenshots were exported and visually reviewed. The handle is legible above the safe-area bottom and the Settings picker value and row indicators render in the requested light gray while navy custom linework and the pen remain unchanged.
+
+An unsigned generic iOS Release build succeeded. Harry's iPhone became unavailable before the signed Debug build and update installation, so this milestone was not installed on the physical phone. The complete unit and UI suites, physical-device gesture behavior, maximum Dynamic Type and live assistive-technology behavior were not repeated.
+
+```sh
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,name=Bearings iPhone 16 Pro,OS=26.5' \
+  -resultBundlePath /private/tmp/BearingsRopeHandleUI-20261011-0616.xcresult \
+  -only-testing:BearingsUITests/JournalFlowTests/testSettingsRequiresTimelineRevealThenRopePull \
+  -parallel-testing-enabled NO -collect-test-diagnostics never
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings -configuration Release \
+  -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
+```
+
 ## Finn and Sophie fictional demo — October 11, 2026
 
 The project was regenerated after adding the demo persistence tests. Three focused seed tests passed on the Bearings iPhone 16 Pro simulator running iOS 26.5. They verified twelve entries across October 4–10, no entry on Sunday October 11, the intended progression from vague to specific writing, a current version-5 Sunday–Saturday reflection fingerprint, a nonstale prepared-demo record, idempotent seeding, and repair of a prepared review invalidated by a newly saved daily analysis without changing journal writing. The complete `BearingsTests` suite then executed 80 tests with zero failures and one expected hosted Foundation Models skip before the repair regression was added; the three-test focused suite passed afterward.

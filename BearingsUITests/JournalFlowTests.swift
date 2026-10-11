@@ -312,29 +312,42 @@ final class JournalFlowTests: XCTestCase {
                        "The month title should hide five seconds after horizontal scrolling ends.")
     }
 
-    func testSettingsButtonAndDownwardGesturePreserveNavigationContext() throws {
+    func testSettingsRequiresTimelineRevealThenRopePull() throws {
         let right = app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.7))
         let left = app.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.7))
         right.press(forDuration: 0.1, thenDragTo: left)
         XCTAssertFalse(app.otherElements["settings.screen"].exists,
                        "A horizontal timeline drag must not open Settings.")
+        let settingsHandle = app.descendants(matching: .any)["timeline.settingsHandle"].firstMatch
+        XCTAssertFalse(settingsHandle.exists,
+                       "A horizontal timeline drag must not reveal the Settings handle.")
+        XCTAssertFalse(app.buttons["timeline.settings"].exists)
 
-        waitFor(app.buttons["timeline.settings"]).tap()
+        let firstSwipeStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.86))
+        let firstSwipeEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55))
+        firstSwipeStart.press(forDuration: 0.1, thenDragTo: firstSwipeEnd)
+        let handle = waitFor(settingsHandle)
+        XCTAssertFalse(app.otherElements["settings.screen"].exists,
+                       "The first upward swipe should only reveal the rope handle.")
+        attachScreenshot(named: "Timeline with revealed Settings rope handle")
+
+        let pullStart = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+        let pullEnd = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: -1.0))
+        pullStart.press(forDuration: 0.1, thenDragTo: pullEnd)
         waitFor(app.otherElements["settings.screen"])
+        attachScreenshot(named: "Settings with light gray native control values")
         waitFor(app.buttons["settings.done"]).tap()
+
         waitFor(app.buttons["timeline.today"]).tap()
         waitFor(app.buttons["day.newEntry"])
-        waitFor(app.buttons["day.settings"]).tap()
-        waitFor(app.otherElements["settings.screen"])
-        waitFor(app.buttons["settings.done"]).tap()
+        XCTAssertFalse(app.buttons["day.settings"].exists)
+        let daySwipeStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85))
+        let daySwipeEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
+        daySwipeStart.press(forDuration: 0.1, thenDragTo: daySwipeEnd)
+        XCTAssertFalse(app.otherElements["settings.screen"].exists,
+                       "Settings must not open from a day view gesture.")
         XCTAssertTrue(waitFor(app.buttons["day.newEntry"]).exists,
-                      "Dismissing Settings must preserve the selected day.")
-
-        app.buttons["day.back"].tap()
-        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
-        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
-        start.press(forDuration: 0.1, thenDragTo: end)
-        waitFor(app.otherElements["settings.screen"])
+                      "The day must remain selected after its vertical gesture.")
     }
 
     func testExplicitSavedLanguageShowsNoContactSafetyRouteAndNeverAutoSends() {

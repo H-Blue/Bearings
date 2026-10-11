@@ -71,7 +71,7 @@ struct BearingsRootView: View {
                 }, onNew: { period in
                     analysisService.cancel()
                     editor = EditorRoute(day: day, entry: nil, period: period)
-                }, onSettings: openSettings)
+                })
                 .transition(reduceMotion ? .opacity : .offset(y: 160).combined(with: .opacity))
                 .zIndex(2)
             }
@@ -79,13 +79,6 @@ struct BearingsRootView: View {
         }
         .coordinateSpace(name: "timelineRoot")
         .foregroundStyle(BearingsTheme.ink)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 24).onEnded { value in
-                guard selectedDay == nil, value.translation.height > 100,
-                      abs(value.translation.height) > abs(value.translation.width) * 1.8 else { return }
-                openSettings()
-            }
-        )
         .sheet(item: $editor, onDismiss: presentPendingSafetyCheckIn) { route in
             JournalEditorView(day: route.day, entry: route.entry, period: route.period, store: store,
                               analysisService: analysisService, onCommittedSave: evaluateCommittedWriting,

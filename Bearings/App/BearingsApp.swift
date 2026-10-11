@@ -7,6 +7,7 @@ struct BearingsApp: App {
         WindowGroup {
             AppEntryView()
                 .preferredColorScheme(.light)
+                .tint(BearingsTheme.systemControl)
         }
     }
 }
@@ -48,7 +49,7 @@ private struct StoreBootstrapView: View {
                 ProgressView("Opening your journal…")
             }
         }
-        .tint(BearingsTheme.ink)
+        .tint(BearingsTheme.systemControl)
         .task { if container == nil { openStore() } }
     }
 

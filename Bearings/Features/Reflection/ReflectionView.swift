@@ -88,7 +88,7 @@ struct ReflectionView: View {
                 }
             }
         }
-        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.ink)
+        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.systemControl)
         .task(id: scenePhase) {
             if scenePhase == .active { await service.reflect(period: period) }
         }

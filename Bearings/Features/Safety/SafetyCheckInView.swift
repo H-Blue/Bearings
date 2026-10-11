@@ -40,7 +40,7 @@ struct SafetyCheckInView: View {
             }
             .navigationDestination(isPresented: $showsSupport) { ProfessionalSupportView() }
         }
-        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.ink)
+        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.systemControl)
         .interactiveDismissDisabled(false)
         .task { startTimer() }
         .onChange(of: session.stage) { _, stage in if stage != .offer { timerTask?.cancel() } }

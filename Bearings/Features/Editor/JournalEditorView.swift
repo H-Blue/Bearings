@@ -141,7 +141,7 @@ struct JournalEditorView: View {
                 }
             } message: { Text("This removes this entry from your journal.") }
         }
-        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.ink)
+        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.systemControl)
         .interactiveDismissDisabled(session.hasUnsavedChanges)
         .task(id: EditRevision(body: session.body, period: session.period, day: session.day)) {
             guard session.hasUnsavedChanges else { return }
@@ -334,7 +334,7 @@ private struct EntryMetadataView: View {
                 }
             }
         }
-        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.ink)
+        .foregroundStyle(BearingsTheme.ink).tint(BearingsTheme.systemControl)
     }
 
     private func timestamp(_ date: Date, zone: String? = nil) -> String {
