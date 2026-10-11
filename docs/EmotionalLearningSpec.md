@@ -8,7 +8,7 @@ Write → name feelings → inspect assumptions → choose one practice → revi
 
 ### Emotional Zoom
 
-Implemented first slice: the current draft can be reviewed on demand without being treated as committed journal data. A navy eyeglasses button below Done and above the editor rule sends the visible draft only to the on-device provider. The transient response appears below the writing, must ground any highlighted phrase as an exact excerpt, and asks one open-ended question. Editing clears the result. Nothing is written back to the journal or stored as a confirmed interpretation.
+Implemented first slice: the current draft can be reviewed on demand without being treated as committed journal data. A navy magnifying-glass button below Done and above the editor rule sends the visible draft only to the on-device provider. The transient response appears below the writing, must ground any highlighted phrase as an exact excerpt, and asks one open-ended question. Editing clears the result. Nothing is written back to the journal or stored as a confirmed interpretation.
 
 Input is saved writing and the user's initial description. Output includes a small set of feeling candidates, a short reviewed distinction, a clarifying question, user-confirmed finer words and an optional contextual sentence. Examples can include hurt, disappointed, lonely, frustrated, anxious, relieved, proud or grateful. Permit multiple/custom/uncertain choices. Do not force every experience into a single label.
 

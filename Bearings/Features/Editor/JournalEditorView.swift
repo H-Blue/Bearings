@@ -40,7 +40,7 @@ struct JournalEditorView: View {
                     }
                     Spacer(minLength: 0)
                     Button(action: zoomIn) {
-                        Image(systemName: "eyeglasses")
+                        Image(systemName: "magnifyingglass")
                             .font(.title3.weight(.medium))
                             .foregroundStyle(BearingsTheme.line)
                             .frame(width: 44, height: 44)

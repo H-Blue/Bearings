@@ -4,7 +4,7 @@ Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 
 
 ## Emotional Zoom clarity pass — October 11, 2026
 
-The editor clarity slice passed an unsigned generic iOS Simulator build. The final complete `BearingsTests` run executed 64 tests with zero failures and one expected physical-device Foundation Models skip in 1.923 seconds. A preceding focused engine/service run executed 30 tests with zero failures in 0.612 seconds. New coverage rejects blank questions/explanations and excerpts not present in the draft, verifies complete long-draft segmentation, exercises the transient service route, confirms no journal record is created by the output, and adds Emotional Zoom to the real-device smoke path. The focused synthetic UI flow passed one test with zero failures in 39.454 seconds: it typed vague writing, used the navy eyeglasses control, asserted the exact excerpt/explanation/question, refreshed through the navy sextant, saved the original entry and captured a screenshot. The screenshot was exported and visually reviewed; the control is below Done and above the rule, and the result and refresh control are legible below the writing.
+The editor clarity slice passed an unsigned generic iOS Simulator build. The final complete `BearingsTests` run executed 64 tests with zero failures and one expected physical-device Foundation Models skip in 1.923 seconds. A preceding focused engine/service run executed 30 tests with zero failures in 0.612 seconds. New coverage rejects blank questions/explanations and excerpts not present in the draft, verifies complete long-draft segmentation, exercises the transient service route, confirms no journal record is created by the output, and adds Emotional Zoom to the real-device smoke path. After the owner replaced the eyeglasses direction with the supplied traditional magnifier reference, the focused synthetic UI flow passed again with zero failures in 32.898 seconds. It typed vague writing, used the navy magnifying-glass control, asserted the exact excerpt/explanation/question, refreshed through the navy sextant, saved the original entry and captured a screenshot. The screenshot was exported and visually reviewed; the clean circular-lens/diagonal-handle symbol is below Done and above the rule, and the result and refresh control are legible below the writing.
 
 ```sh
 xcodebuild build -project Bearings.xcodeproj -scheme Bearings \
@@ -23,7 +23,7 @@ xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
   -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
 xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
   -destination 'platform=iOS Simulator,id=795E69CB-C101-488F-A8B0-CF3ECD77C7EE' \
-  -derivedDataPath build/ZoomUIDerivedData -resultBundlePath build/ZoomUITestFinal.xcresult \
+  -derivedDataPath build/MagnifierUIDerivedData -resultBundlePath build/MagnifierUITest.xcresult \
   -only-testing:BearingsUITests/ReflectionFlowTests/testEmotionalZoomFindsVagueWritingAndAsksAQuestion \
   -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
 ```
