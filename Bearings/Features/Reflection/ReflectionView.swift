@@ -25,8 +25,11 @@ struct ReflectionView: View {
                             ) { Task { await service.regenerate(period: period) } }
                         }
                     }
-                    Text("On-device AI interpretation. You can return to your original writing at any time.")
+                    Text(stored?.content.isPreparedDemo == true
+                         ? "Prepared fictional demo reflection. Refresh to replace it with a new on-device interpretation."
+                         : "On-device AI interpretation. You can return to your original writing at any time.")
                         .font(.footnote).foregroundStyle(BearingsTheme.quietInk)
+                        .accessibilityIdentifier("reflection.provenance")
                     if let stored {
                         if stored.isStale || stored.analysisVersion != JournalAnalysisService.version {
                             Text("Earlier reflection — your writing or feelings have changed.")

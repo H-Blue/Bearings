@@ -86,6 +86,12 @@ The daily reflection presents “Day summary” before an optional “Notable em
 
 ## Privacy and verification limits
 
+### Finn and Sophie fictional demo
+
+The Debug-only `--seed-finn-sophie-demo` launch option activates a separate persistent `BearingsDemos/FinnSophie/FinnSophie.store`; it never replaces the normal `ReCollect/Journal.store`. The fixture contains twelve invented entries dated October 4–10, 2026 and deliberately leaves Sunday, October 11 empty. Its writing progresses from brief, vague notes to a fuller account of Finn's repeated impulse to instruct or correct Sophie when she describes pain.
+
+The fixture also stores one prepared weekly reflection for the completed Sunday–Saturday period. `ReflectionContent.isPreparedDemo` makes the interface label that record as prepared fictional output. The ordinary refresh control bypasses the cache and replaces it through the same on-device generation and isolated-save path as any other reflection. The prepared record uses the current analysis version and exact current fingerprint, so any journal edit makes it stale normally. A later home-screen launch keeps using the separate demo store after activation; `--leave-finn-sophie-demo` returns Debug builds to the normal journal, and `--reset-finn-sophie-demo` resets only the demo directory when paired with the seed option.
+
 The implementation has no network client, cloud AI provider, analytics SDK, CloudKit store or journal export path. Journals, corrections and generated results stay in the local SwiftData store. Provider/framework error payloads and transcripts are neither logged nor shown; unknown errors receive content-free messages. Synthetic UI and unit fixtures contain invented journal writing.
 
 The directory and SQLite store/companions retain native iOS `completeUntilFirstUserAuthentication` protection. This supports use after the first unlock; it is not a claim that the store becomes inaccessible whenever the screen locks. Local persistence is separate from a user's OS-managed device backup: app data can be included in device backups according to system settings. Bearings does not implement cloud sync or send journal content for inference. Backup exclusion, encryption beyond platform protection and synchronization policy require a separate decision.

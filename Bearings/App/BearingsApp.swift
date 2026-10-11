@@ -57,16 +57,30 @@ private struct StoreBootstrapView: View {
             var storeURL: URL?
             #if DEBUG
             let arguments = ProcessInfo.processInfo.arguments
+            if arguments.contains("--seed-finn-sophie-demo") {
+                UserDefaults.standard.set(true, forKey: FinnSophieDemoSeeder.activeDefaultsKey)
+            } else if arguments.contains("--leave-finn-sophie-demo") {
+                UserDefaults.standard.removeObject(forKey: FinnSophieDemoSeeder.activeDefaultsKey)
+            }
             if arguments.contains("--uitesting") {
                 let directory = URL.applicationSupportDirectory.appending(path: "BearingsUITests", directoryHint: .isDirectory)
                 if arguments.contains("--reset-test-store"), FileManager.default.fileExists(atPath: directory.path) {
                     try FileManager.default.removeItem(at: directory)
                 }
                 storeURL = directory.appending(path: "ui-tests.store")
+            } else if UserDefaults.standard.bool(forKey: FinnSophieDemoSeeder.activeDefaultsKey) {
+                let directory = URL.applicationSupportDirectory
+                    .appending(path: "BearingsDemos", directoryHint: .isDirectory)
+                    .appending(path: "FinnSophie", directoryHint: .isDirectory)
+                if arguments.contains("--reset-finn-sophie-demo"), FileManager.default.fileExists(atPath: directory.path) {
+                    try FileManager.default.removeItem(at: directory)
+                }
+                storeURL = directory.appending(path: "FinnSophie.store")
             }
             #endif
             let openedContainer = try PersistenceController.makeContainer(storeURL: storeURL)
             #if DEBUG
+            try FinnSophieDemoSeeder.seedIfRequested(in: openedContainer)
             try ProfessionalCaseStudyDemoSeeder.seedIfRequested(in: openedContainer)
             #endif
             container = openedContainer
@@ -79,6 +93,135 @@ private struct StoreBootstrapView: View {
 }
 
 #if DEBUG
+/// Activates a persistent Debug-only fictional demo store without touching the
+/// owner's ordinary journal. Once activated, normal home-screen launches keep
+/// using the demo store until `--leave-finn-sophie-demo` is supplied.
+@MainActor
+enum FinnSophieDemoSeeder {
+    static let activeDefaultsKey = "BearingsFinnSophieDemoActive"
+
+    struct SeedEntry {
+        let dayKey: String
+        let hour: Int
+        let minute: Int
+        let period: JournalPeriod
+        let body: String
+    }
+
+    static func seedIfRequested(in container: ModelContainer) throws {
+        guard ProcessInfo.processInfo.arguments.contains("--seed-finn-sophie-demo") else { return }
+        try seed(in: container)
+    }
+
+    static func seed(in container: ModelContainer) throws {
+        var seedNow = date(dayKey: "2026-10-04", hour: 9, minute: 10)
+        let store = JournalStore(
+            context: container.mainContext,
+            now: { seedNow },
+            creationTimeZone: { TimeZone(identifier: "America/New_York")! }
+        )
+        guard try store.daysWithEntries().isEmpty else { return }
+
+        for entry in entries {
+            guard let day = JournalDay(key: entry.dayKey) else { continue }
+            seedNow = date(dayKey: entry.dayKey, hour: entry.hour, minute: entry.minute)
+            try store.create(day: day, body: entry.body, period: entry.period)
+        }
+
+        let reviewDay = JournalDay(key: "2026-10-11")!
+        let reviewedWeek = AnalysisPeriod.weekForReview(on: reviewDay)
+        seedNow = date(dayKey: reviewDay.key, hour: 9, minute: 0)
+        let fingerprint = try store.reflectionFingerprint(
+            for: reviewedWeek,
+            version: JournalAnalysisService.version
+        )
+        try store.saveReflection(
+            preparedReflection,
+            for: reviewedWeek,
+            sourceFingerprint: fingerprint,
+            version: JournalAnalysisService.version
+        )
+    }
+
+    private static func date(dayKey: String, hour: Int, minute: Int) -> Date {
+        let components = dayKey.split(separator: "-").compactMap { Int($0) }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/New_York")!
+        return calendar.date(from: DateComponents(
+            timeZone: calendar.timeZone,
+            year: components[0], month: components[1], day: components[2],
+            hour: hour, minute: minute
+        ))!
+    }
+
+    static let preparedReflection = ReflectionContent(
+        overview: "Finn spent the week trying to support Sophie when she talked about painful moments with her friend, her sister, and work. His entries became much clearer: he moved from saying conversations simply felt strange to noticing that he often interrupted, corrected her interpretation, or offered instructions before she had finished. Sophie directly asked to be heard, and she repeatedly became quieter after advice arrived too quickly. Finn's care is consistent, but the way he responds is still leaving part of her experience unheard.",
+        importantEvents: [
+            "Oct 4: Sophie asked Finn to let her finish after he began explaining what she should do about a canceled plan.",
+            "Oct 6: Finn corrected Sophie's interpretation of an argument with her sister, and Sophie said she wanted him to hear why it hurt.",
+            "Oct 8: Sophie asked whether Finn could listen before giving her steps for handling a work problem.",
+            "Oct 10: Finn recognized that his quick solutions come from care and discomfort with feeling helpless, but he still planned to improve the advice rather than first ask what Sophie needed."
+        ],
+        emotionalThemes: "Concern and tenderness are present throughout the week, alongside helplessness, defensiveness, regret, and growing self-awareness. Finn's language becomes more precise even though his response pattern remains unresolved.",
+        relationships: "Finn wants Sophie to feel supported and takes her pain seriously. The tension appears when he treats support as fixing, explaining, or correcting before making room for her experience.",
+        interests: "The writing repeatedly focuses on becoming a kinder and more useful partner during difficult conversations.",
+        changes: "Finn moved from vague discomfort to a coherent description of his intention, his urge to solve problems, and Sophie's response. He has identified the pattern but has not yet tried listening first or asking what kind of support she wants.",
+        weeklyDetails: WeeklyReflectionDetails(
+            workFocus: "Finn was trying to understand why his attempts to help Sophie often ended with her becoming quiet or asking to finish speaking.",
+            progressAndUnfinished: "His reflection became more specific and honest across the week. By Saturday he could connect his advice-giving to care and to his discomfort with feeling helpless. What remains unresolved is the response itself: he is still considering how to give better instructions rather than whether instruction is what Sophie wants in that moment.",
+            whatHelped: "Writing down Sophie's exact words and revisiting several conversations helped Finn see a repeated pattern instead of treating each moment as a separate misunderstanding.",
+            realisticImprovement: "When Sophie shares something painful, listen without instructing or correcting first. Before offering an answer, ask what she needs: for example, whether she wants Finn to listen, help her think it through, or help with something practical.",
+            lessonReadiness: .continueCurrentLesson,
+            readinessEvidence: [
+                "Sophie directly asked Finn to let her finish and later asked him to hear why an experience hurt.",
+                "Finn noticed that Sophie repeatedly became quieter after he offered instructions or corrected her interpretation.",
+                "Finn identified his urge to solve the problem, but he had not yet asked Sophie what kind of response she wanted."
+            ],
+            reflectionQuestion: nil
+        ),
+        isPreparedDemo: true
+    )
+
+    static let entries: [SeedEntry] = [
+        SeedEntry(dayKey: "2026-10-04", hour: 20, minute: 20, period: .evening, body: """
+        Weird talk with Sophie. She was sad. I tried to help. It got quiet.
+        """),
+        SeedEntry(dayKey: "2026-10-05", hour: 8, minute: 15, period: .morning, body: """
+        Still thinking about last night. Sophie was upset because a friend canceled on her. I told her the friend was probably just busy. She said that was not really the point. I meant to make it feel less bad.
+        """),
+        SeedEntry(dayKey: "2026-10-05", hour: 21, minute: 5, period: .evening, body: """
+        I brought Sophie tea after class because she looked tired. She smiled, which was nice. When she started talking about the canceled plan again, I gave her ideas for what to text. She asked if she could finish first. I said of course, but then I explained one more thing. I do not think I handled that well.
+        """),
+        SeedEntry(dayKey: "2026-10-06", hour: 12, minute: 35, period: .midday, body: """
+        Sophie argued with her sister this morning. She said her sister made her feel small. I told her that was probably not what her sister meant and that she should call back when everyone was calmer. Sophie looked hurt and said, "I know you are trying to help. I want you to hear why it hurt." I felt confused because listening without doing anything seems unhelpful.
+        """),
+        SeedEntry(dayKey: "2026-10-06", hour: 22, minute: 10, period: .evening, body: """
+        I keep replaying what Sophie said. I care about her, and when she is hurting I want the hurt to have an answer. Maybe I rush because silence feels like leaving her alone with it. I still think calling her sister calmly would help, but saying that immediately made Sophie defend the fact that she was hurt instead of letting her talk about it.
+        """),
+        SeedEntry(dayKey: "2026-10-07", hour: 9, minute: 0, period: .morning, body: """
+        Sent Sophie a kind message before her meeting and told her I believed in her. She said thank you. That felt simple and good. I did not need to tell her how to prepare because she had not asked. I wonder why that is easier before a problem than when she is already upset.
+        """),
+        SeedEntry(dayKey: "2026-10-07", hour: 20, minute: 45, period: .evening, body: """
+        Her meeting went badly. I started listing the three things she should do tomorrow. Sophie went quiet after the second one. I asked whether I had said something wrong, and she said she did not have energy to be coached tonight. I felt defensive because I had spent time thinking of useful steps, but I also felt sad that my effort made her feel more tired.
+        """),
+        SeedEntry(dayKey: "2026-10-08", hour: 13, minute: 20, period: .midday, body: """
+        Lunch was warm and easy until Sophie mentioned work. I corrected one detail because I thought it changed the situation. She stopped and said, "Can you listen before we turn this into a plan?" I let her finish after that. I noticed how much more there was to the story than the first problem she mentioned, although I still spent the walk home thinking about what she should say to her manager.
+        """),
+        SeedEntry(dayKey: "2026-10-08", hour: 22, minute: 30, period: .evening, body: """
+        I am beginning to see that I answer the first solvable part of Sophie's story. She may still be describing what happened, but I am already sorting it into causes and next steps. In my head that is care. From her side it might feel like I am grading how she handled the day. I do not want that. Maybe I need to wait until I understand the whole problem before giving advice.
+        """),
+        SeedEntry(dayKey: "2026-10-09", hour: 8, minute: 40, period: .morning, body: """
+        I want tonight to go better. If Sophie brings up the meeting, I will try to hear the full timeline before responding. I can ask a clarifying question and avoid telling her that she is overthinking. My goal is to be useful without making her prove that the pain is reasonable.
+        """),
+        SeedEntry(dayKey: "2026-10-09", hour: 21, minute: 50, period: .evening, body: """
+        I waited longer tonight, but as soon as there was a pause I explained what I thought Sophie should do. She sighed and said she wished I would stay with her feelings for a minute instead of moving her past them. That sentence stung because I am not trying to rush her. Still, I can see that my response was aimed at ending the problem, while she was trying to show me what the problem felt like.
+        """),
+        SeedEntry(dayKey: "2026-10-10", hour: 19, minute: 40, period: .evening, body: """
+        This week I kept trying to protect Sophie from pain by explaining it, correcting the part that seemed unfair, or giving her a next step. The intention is loving, but the pattern is clearer now: she starts with an experience, I turn it into a task, and then she becomes quieter or asks to finish. I think feeling helpless makes me reach for instructions because advice proves I am doing something. I want to support her more patiently. My current thought is that I should wait until she finishes, understand the whole situation, and then give gentler advice that fits better. I am not sure what else being helpful would look like yet.
+        """)
+    ]
+}
+
 /// Loads fictional judging material only when an explicit launch argument is
 /// supplied. The argument is intended to be paired with `--uitesting`, which
 /// keeps the demo in the separate UI-test store instead of the personal store.

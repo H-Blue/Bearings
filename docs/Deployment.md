@@ -49,6 +49,8 @@ The iOS 17 deployment target preserves journaling compatibility. Testing on a ne
 
 ## Physical iPhone verification
 
+For the persistent Finn and Sophie fictional demo, launch a signed Debug build once with `--seed-finn-sophie-demo --reset-finn-sophie-demo`. The activation flag and the dedicated demo store survive later home-screen launches. The normal journal remains at its compatibility path and is not deleted or modified. Launch once with `--leave-finn-sophie-demo` to return the Debug build to that normal journal.
+
 For a local development installation, select the connected trusted iPhone in Xcode, verify its Developer Mode and signing access, and use the existing team and bundle identifier. Preserve the installed app and its journal: use an update installation rather than deleting it. Confirm any required device registration/provisioning action before changing account resources.
 
 Use only synthetic writing for model evaluation and debugging. On a compatible iPhone running iOS 26 or later, check runtime availability in the app after Apple Intelligence is enabled and its model is ready. Verify unsupported OS/device states separately. The app should explain unavailability while writing, editing, day reassignment and manual emotion correction continue to work.

@@ -44,6 +44,9 @@ struct ReflectionContent: Codable, Equatable, Sendable {
     var interests: String
     var changes: String
     var weeklyDetails: WeeklyReflectionDetails? = nil
+    /// Prepared fictional reflections are labeled in the interface and may be
+    /// replaced by the ordinary on-device regeneration path.
+    var isPreparedDemo: Bool? = nil
 
     func validate() throws {
         guard !overview.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,

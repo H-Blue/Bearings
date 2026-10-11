@@ -128,6 +128,28 @@ final class ReflectionFlowTests: XCTestCase {
         }
     }
 
+    func testFinnSophieDemoShowsPreparedReviewAndCanRefreshOnDevice() {
+        app.terminate()
+        app.launchArguments = ["--uitesting", "--ai-fixture", "--reduce-motion",
+                               "--reset-test-store", "--seed-finn-sophie-demo"]
+        app.launch()
+        waitFor(app.buttons["timeline.today"], timeout: 12)
+        openToday()
+        XCTAssertFalse(entryButton().exists, "The Sunday review day must not contain a journal entry.")
+
+        reveal(app.buttons["reflection.weekly"])
+        app.buttons["reflection.weekly"].tap()
+        XCTAssertTrue(waitFor(app.staticTexts["reflection.provenance"]).label.contains("Prepared fictional demo"))
+        XCTAssertTrue(waitFor(app.staticTexts["reflection.period.summary"]).label.contains("Finn spent the week"))
+        XCTAssertTrue(app.staticTexts["reflection.weekly.improvement"].label.contains("ask what she needs"))
+
+        let refresh = waitFor(app.buttons["reflection.period.refresh"])
+        refresh.tap()
+        XCTAssertTrue(waitFor(app.staticTexts["reflection.period.summary"], timeout: 20).label.contains("weekly reflection"))
+        XCTAssertTrue(app.staticTexts["reflection.provenance"].label.contains("On-device AI interpretation"))
+        attachScreenshot("Finn and Sophie refreshed weekly reflection")
+    }
+
     func testEmptyPeriodsOfferWritingWithoutGenerationError() {
         openToday()
         reveal(app.staticTexts["reflection.daily.empty"])

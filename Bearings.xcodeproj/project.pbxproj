@@ -127,6 +127,7 @@
 			isa = "PBXGroup";
 			children = (
 				"EC179BF07EB9F71F6EA024BF",
+				"9C28B4AB2223ECFD8990FBBC",
 				"78DBD1A3FAEC42B26134DD92",
 				"B5593EB38BC005CADA852F35",
 				"D4DBAF6A73F15965BE446EA5",
@@ -808,6 +809,12 @@
 			path = "BearingsUITests";
 			sourceTree = "<group>";
 		};
+		9C28B4AB2223ECFD8990FBBC = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "FinnSophieDemoTests.swift";
+			sourceTree = "<group>";
+		};
 		9C3D7281C4F06F3E83AA9B5B = {
 			isa = "PBXBuildFile";
 			fileRef = "8A57FFA75EEE6B6D13D6262B";
@@ -910,6 +917,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				"E5D6BF6117DEFFB8D2F500E2",
+				"BA70EC49305D322E2DE803CC",
 				"FA5D3BB426A572E0CB82AA1E",
 				"11C92CF09A4232870EBB094D",
 				"2D0F9049C8F501EF38D3E115",
@@ -945,6 +953,10 @@
 		B99D6707DD2732CEDF40E77A = {
 			isa = "PBXBuildFile";
 			fileRef = "30130A1EB5C9D02F0540D2EF";
+		};
+		BA70EC49305D322E2DE803CC = {
+			isa = "PBXBuildFile";
+			fileRef = "9C28B4AB2223ECFD8990FBBC";
 		};
 		C1CFB6D7F565C197664D3A17 = {
 			isa = "XCConfigurationList";

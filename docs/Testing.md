@@ -2,6 +2,30 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Finn and Sophie fictional demo — October 11, 2026
+
+The project was regenerated after adding the demo persistence test. The two focused seed tests passed on the Bearings iPhone 16 Pro simulator running iOS 26.5. They verified twelve entries across October 4–10, no entry on Sunday October 11, the intended progression from vague to specific writing, a current version-5 Sunday–Saturday reflection fingerprint, a nonstale prepared-demo record and idempotent seeding. The complete `BearingsTests` suite then executed 80 tests with zero failures and one expected hosted Foundation Models skip.
+
+The focused UI flow passed on the same simulator. It opened the empty Sunday, loaded the prepared weekly reflection, verified its fictional provenance label and listening-first suggestion, used the visible refresh control, and confirmed that the deterministic on-device-provider path replaced the prepared record and its label. The rest of the UI suite was not repeated.
+
+A signed Debug build succeeded for Harry's connected iPhone 16 Pro and was installed as an update; an unsigned generic iOS Release build also succeeded. The phone build was launched with `--seed-finn-sophie-demo --reset-finn-sophie-demo`, then launched again without arguments. A read-only copy of the synthetic demo store confirmed per-day counts of 1, 2, 2, 2, 2, 2 and 1 for October 4–10, zero October 11 entries, and one current nonstale `weekly:2026-10-04:2026-10-10` prepared reflection. The installed preferences confirmed that persistent demo mode remained active. The normal compatibility journal store was not removed or modified. Live Foundation Models regeneration on the phone, iOS 17 runtime behavior and accessibility review remain unverified.
+
+```sh
+python3 Scripts/generate_project.py
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,name=Bearings iPhone 16 Pro,OS=26.5' \
+  -only-testing:BearingsTests/FinnSophieDemoTests
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,name=Bearings iPhone 16 Pro,OS=26.5' \
+  -only-testing:BearingsUITests/ReflectionFlowTests/testFinnSophieDemoShowsPreparedReviewAndCanRefreshOnDevice \
+  -parallel-testing-enabled NO -collect-test-diagnostics never
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,name=Bearings iPhone 16 Pro,OS=26.5' \
+  -only-testing:BearingsTests -parallel-testing-enabled NO -collect-test-diagnostics never
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings -configuration Release \
+  -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
+```
+
 ## Trusted contacts and safety check-in — October 11, 2026
 
 The project was regenerated after adding the trusted-contact, safety-service and settings Swift files. An unsigned generic iOS Simulator Release build succeeded. The complete `BearingsTests` suite then executed 78 tests with zero failures; the single hosted Foundation Models smoke test skipped because it requires supported physical hardware. The new deterministic suites cover explicit self-harm and serious-other-harm fixtures; sadness, anger, loneliness, figurative, historical, quoted, fictional, news and third-person negatives; successful-save gating; evaluator failure after a real committed journal save; no-contact state; recipient and message stages; transport invocation only at final confirmation; contact create/edit/disable/delete/relaunch; real read-only failure/retry; and additive migration from the frozen pre-AI journal schema. Existing persistence failure tests also passed.
