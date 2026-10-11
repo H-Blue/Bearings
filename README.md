@@ -52,6 +52,8 @@ The previously saved and verified [iOS Development handoff](https://app.notion.c
 
 The owner supplied and approved `appIcon.png` for the Bearings app icon. The artwork is preserved without recoloring or redrawing and resized only to 1024 × 1024 for `Bearings/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png`. The root source remains untouched. The original compass/map direction requested `#C8AB89` and `#323575`; those are design targets, not a claim that the supplied image contains exactly two colors.
 
+The latest owner direction sets decorative timeline lines and ticks, day branches, entry dividers and the editor rule to opaque `#323575`. Text and control tint retain black Ink, period/entry markers retain grey, and the paper background is unchanged.
+
 AI, cloud sync, export/backup, and progressive design reveal remain future work. A local read-only snapshot interface exists for later integration; it sends nothing over the network.
 
 Git is configured locally on `codex/bearings-foundation`. To host the project privately on GitHub later, sign in to GitHub and authorize creating/pushing a private repository. Remote publication requires the owner's approval.

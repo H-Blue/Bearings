@@ -1,6 +1,6 @@
 # Bearings Notion synchronization
 
-The Bearings rename and owner-accepted app-icon milestone was synchronized and the saved content fetched for verification on October 10, 2026.
+The owner-directed navy-linework milestone was synchronized and the saved content fetched for verification on October 10, 2026. The preceding Bearings rename and owner-accepted app-icon milestone remains recorded below as verified history.
 
 - Page: [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204).
 - Page ID: `3f5076d4-a2e1-8161-9c8b-ff6109e7ba69`.
@@ -11,6 +11,39 @@ The Bearings rename and owner-accepted app-icon milestone was synchronized and t
 
 ## Current saved scope
 
+The existing iOS Development child contains the complete current Product, Architecture, ReferenceReview, Decisions, Testing and Progress documents as six sections. They record the explicit owner override to opaque sRGB `#323575` for every custom decorative drawing stroke: timeline horizontal axis/ticks, day branches, entry dividers and editor rule. The editor oval is a grey fill with no stroke and remains unchanged. Text and control ink remain black, period/entry marker fills stay grey, paper remains `#C8AB89`, and the accepted app icon is preserved.
+
+The shared `Line` colorset / `BearingsTheme.line` and the application copy of the editor rule implement that color direction. Historical Reconnect Figma facts and original black-stroke reference assets remain evidence. No persistence behavior changed.
+
+The latest milestone passed Debug simulator compilation and two existing UI tests with zero failures in **113.875 seconds**. Three exported editor/day/timeline screenshots were visually reviewed and contain exact `#323575` pixels: **2,898 editor, 3,648 day and 8,226 timeline**. The saved Testing section records exact commands and evidence paths, independent source audit, preserved geometry/colors, and the explicit limits: the full data/editor and accessibility suites, unsigned device Release build, iOS 17 runtime and physical-device appearance were not rerun for this color-only change. Earlier results remain historical evidence.
+
+Tables and source/date references retain native Notion formatting. Local commands, paths and source hashes remain inspectable. Artwork, screenshots, test result files and journal content were not uploaded. Existing task values were not changed for this milestone.
+
+## Current verification evidence
+
+1. The project home was updated to record the explicit owner navy-linework decision, its precedence over historical Figma black strokes, and the unchanged grey editor oval. The saved home was fetched to verify that exact scope.
+2. The existing iOS Development child was fetched before refreshing its six-document body. It had no child pages or databases to affect.
+3. The initial full saved snapshot matched all six local sources after native-format normalization: **64,735 normalized characters**.
+4. After that read-back, the precise pending-sync paragraphs in local ReferenceReview and Progress were changed to the verified result. Their saved counterparts were patched, then the entire page was fetched again. All six final documents matched: **65,090 normalized characters**. The final source hashes are below.
+5. The home was updated from pending synchronization to the completed handoff result, then fetched again. It still contains the same iOS Development child, and the saved child reports the intended Bearings parent path. No new pages were created and no tasks were modified.
+
+Normalization removes structural Markdown/XML formatting and whitespace differences, preserves native mention identity by URL and date identity, accepts self-closing mentions and resolved titles, ignores the Notion presentation query `pvs`, and treats shell fence-language aliases equivalently. This verifies saved content rather than byte-for-byte serialization. Fetch responses did not report truncation or unknown-block indicators; those fields were absent rather than explicitly false. Native Notion verification badges remain separate from these saved-content checks and were not changed.
+
+## Final source hashes
+
+These hashes identify the complete local six-document snapshot verified against the saved linework handoff. Future documentation changes require resynchronization.
+
+| Local source | SHA-256 |
+| --- | --- |
+| `docs/Product.md` | `a596a00ee11628600ce63d1baf1fdc2a36eb1c975710338344a1a506703afd07` |
+| `docs/Architecture.md` | `6ed0ed7ccb5485d2036248cb05202710590019fe132b749ed69f7ecb4b7ebaa5` |
+| `docs/ReferenceReview.md` | `6796f22376e0228cc14e1bf5f6972da68647a3d4a0ce6a05b458827bee5ca778` |
+| `docs/Decisions.md` | `539658a8dfefe6ce9ec6e16502986a4fb782144340ef636ff96a1988df7d932a` |
+| `docs/Testing.md` | `1061c01e2ad053858b46d598a4d8826cfc4bac8a64052efea1d2d45d2e7443dc` |
+| `docs/Progress.md` | `15de02a61dff9ce7fc4d6bf8bf1cd464e4ef8e4ed47191f8e734889e2fec4154` |
+
+## Previously verified rename/icon scope
+
 The existing project home and the existing Steps database/data source now use Bearings. The home records the owner's explicit rename, superseding earlier naming guidance, and the subsequent acceptance of the supplied `appIcon.png`. Its original `#C8AB89` / `#323575` values are recorded as design targets; exact two-color enforcement is not claimed for the accepted artwork.
 
 The existing iOS Development child contains the complete current Product, Architecture, ReferenceReview, Decisions, Testing and Progress documents as six sections. They record the renamed project/scheme/targets/source types, retained bundle and persistent-store compatibility identities, owner-selected resize-only app icon, 24 passing data/editor tests, two passing focused UI tests, passing unsigned Release build, Home Screen icon review, and remaining device/runtime/upgrade limits. Historical commands, source names and earlier test evidence are preserved as history.
@@ -19,7 +52,7 @@ Tables use native Notion blocks; existing Notion sources and the synchronization
 
 Pitch, Initial Brainstorming, Design & Style Guide and both Steps task pages were inspected. They contain no current ReCollect branding to replace. Historical HeartMap/Project Wayfinder ideas remain source evidence. The approved Figma file's actual name remains Reconnect.
 
-## Current verification evidence
+## Previous rename/icon verification evidence
 
 1. The renamed home and database/data source were fetched. Their titles are `Bearings` and `Steps for Project Bearings`; child hierarchy, database schema, views and task identities are preserved.
 2. The home was updated to record the owner's accepted `appIcon.png` artwork and resize-only integration, then fetched to verify that direction and the absence of an exact-palette claim.
@@ -30,9 +63,9 @@ Pitch, Initial Brainstorming, Design & Style Guide and both Steps task pages wer
 
 Normalization removes structural Markdown/XML formatting and whitespace differences, preserves native mention identity by URL and date identity, accepts self-closing mentions and resolved titles, ignores the Notion presentation query `pvs`, and treats shell fence-language aliases equivalently. The comparison verifies saved content rather than byte-for-byte serialization. Fetch responses did not report truncation or unknown-block indicators; those fields were absent rather than explicitly false. Native Notion verification badges remain separate from these saved-content checks and were not changed.
 
-## Final source hashes
+## Previous rename/icon source hashes
 
-These hashes identify the complete local six-document snapshot verified against the saved page. Future documentation changes require resynchronization.
+These hashes identify the complete local six-document snapshot verified for the rename/icon milestone before the pending linework changes. They are historical evidence; current linework hashes are recorded above.
 
 | Local source | SHA-256 |
 | --- | --- |

@@ -3,6 +3,7 @@ import SwiftUI
 enum BearingsTheme {
     static let paper = Color("Paper")
     static let ink = Color("Ink")
+    static let line = Color("Line")
     static let marker = Color("Marker")
     static let quietInk = Color("Ink").opacity(0.65)
     static let transition = Animation.spring(response: 0.55, dampingFraction: 0.88)

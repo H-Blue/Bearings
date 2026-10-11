@@ -37,7 +37,7 @@ struct DayView: View {
                                 .accessibilityLabel(excerpt(entry.body))
                                 .accessibilityHint("Edit \(entry.period.title.lowercased()) entry")
                                 .accessibilityIdentifier("day.entry.\(entry.id.uuidString)")
-                                Divider().overlay(BearingsTheme.ink.opacity(0.25))
+                                Divider().overlay(BearingsTheme.line)
                             }
                         }.padding(.horizontal, 32)
                     }
@@ -69,7 +69,7 @@ struct DayView: View {
                     path.addLine(to: CGPoint(x: 115, y: branch - 75))
                     path.move(to: CGPoint(x: center, y: branch))
                     path.addLine(to: CGPoint(x: geometry.size.width - 115, y: branch - 75))
-                }.stroke(BearingsTheme.ink, lineWidth: 1)
+                }.stroke(BearingsTheme.line, lineWidth: 1)
             }.allowsHitTesting(false).accessibilityHidden(true)
         }
     }

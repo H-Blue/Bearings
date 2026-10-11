@@ -15,6 +15,7 @@ Native iPhone journal built with Swift, SwiftUI, and SwiftData. The user's story
 ## Design
 - Explicit owner decisions → approved Reconnect Figma → Bearings Notion → development brief → implementation judgment.
 - The owner renamed the app and associated materials to Bearings and explicitly selected the supplied `appIcon.png` as its app icon. Preserve that artwork and root source; resize only to 1024 × 1024 for the app asset, without recoloring or redrawing. The original compass/topographic-map request specified `#C8AB89` / `#323575` as design targets; exact two-color enforcement is not claimed.
+- The latest owner instruction sets decorative app linework to opaque `#323575`: timeline horizontal line/ticks, day branches, entry dividers and the editor rule. Use the shared `Line` color / `BearingsTheme.line`; preserve geometry, black Ink text/control tint, grey Marker fills and Paper.
 - Preserve the tactile paper, dark blue, brass, and kerosene-yellow direction. Reference status is recorded in `docs/ReferenceReview.md`.
 - Do not claim provisional UI matches approved Figma. Review actual screens before final styling and animation; escalate consequential design conflicts.
 - Timeline/day navigation must preserve spatial context, work in reverse, and respect Reduce Motion. Use native text editing, safe areas, keyboard behavior, Dynamic Type, and accessible controls.

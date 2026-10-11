@@ -164,8 +164,8 @@ private struct TimelineDayTick: View {
                     .padding(.bottom, major ? 0 : 26)
                 }.frame(height: markerAreaHeight)
                 ZStack {
-                    Rectangle().fill(BearingsTheme.ink).frame(height: 1)
-                    Rectangle().fill(BearingsTheme.ink).frame(width: 1, height: major ? 110 : 56)
+                    Rectangle().fill(BearingsTheme.line).frame(height: 1)
+                    Rectangle().fill(BearingsTheme.line).frame(width: 1, height: major ? 110 : 56)
                 }.frame(height: 110)
                 Text("\(day.day)").font(.caption).monospacedDigit()
                     .fixedSize(horizontal: true, vertical: true)

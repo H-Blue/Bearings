@@ -2,6 +2,28 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Owner-directed navy linework
+
+Verified on October 10, 2026 using Xcode 27.0 and iPhone 17e, iOS 26.5. All custom decorative linework now uses opaque sRGB `#323575`: timeline horizontal line/ticks, day branches, entry dividers and the editor rule. `Line` / `BearingsTheme.line` provides the native drawing color; the SVG rule's stroke uses the same value. Source review confirmed that the rule geometry, line widths, text/control ink, gray marker fills, paper and accepted app icon are preserved.
+
+- Debug simulator compilation and two existing UI tests passed: zero failures, 113.875 seconds. They exercise period reassignment and saved text across relaunch, plus earlier-month entry navigation and reverse context. Evidence: `build/BearingsLineColorUITests.xcresult` and `build/BearingsLineColorUITests.log`.
+- All three exported screenshots were visually reviewed: navy timeline/ticks, day branches and entry divider, and editor rule are visible in `docs/evidence/Linework/`. Original source Figma assets under `docs/design-reference/` retain the historical black strokes; the app rule is the owner-recolored copy.
+- Exact sRGB asset channels and full opacity were inspected. Each original screenshot contains pixels exactly matching RGB `(50, 53, 117)` / `#323575` (editor: 2,898; day: 3,648; timeline: 8,226). The SVG source differs from its earlier version only by the stroke color; independent source audit found no overlooked custom line primitives.
+- No persistence behavior changed, and no new tests were added. The full data/editor and accessibility suites, unsigned device Release build, iOS 17 runtime and physical-device appearance were not rerun for this color-only change; earlier results below remain historical evidence.
+
+Commands actually run:
+
+```sh
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/BearingsTestDerivedData -resultBundlePath build/BearingsLineColorUITests.xcresult \
+  -only-testing:BearingsUITests/JournalFlowTests/testMorningBranchPersistsAndPeriodCanBeChanged \
+  -only-testing:BearingsUITests/JournalFlowTests/testPreviousMonthDayRetainsEntryAndNavigationContext \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcrun xcresulttool export attachments --path build/BearingsLineColorUITests.xcresult \
+  --output-path docs/evidence/Linework --filter '*.png'
+```
+
 ## Bearings rename and owner-selected icon
 
 Verified on October 10, 2026 with the same Xcode version, iOS 17 deployment target and iPhone 17e simulator running iOS 26.5. The owner supplied `appIcon.png` and explicitly selected it. The source remains unchanged; the app copy was resized from 1254 × 1254 to an opaque 1024 × 1024 PNG without recoloring, redrawing or cropping. The accepted image is not claimed to contain only the two hex colors in the original generation brief. Source and asset hashes and generation provenance are in `docs/design-reference/AppIcon.md`.
