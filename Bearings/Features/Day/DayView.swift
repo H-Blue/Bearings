@@ -107,7 +107,13 @@ struct DayView: View {
             VStack(spacing: 10) {
                 Circle().fill(BearingsTheme.marker).frame(width: 80, height: 80)
                     .overlay {
-                        if count > 0 { Text("\(count)").font(.title3).foregroundStyle(BearingsTheme.ink) }
+                        if count == 1 {
+                            Circle()
+                                .fill(BearingsTheme.line)
+                                .frame(width: 13, height: 13)
+                        } else if count > 1 {
+                            Text("\(count)").font(.title3).foregroundStyle(BearingsTheme.ink)
+                        }
                     }
                 Text(period.title).font(.subheadline)
                     .padding(.horizontal, 4)

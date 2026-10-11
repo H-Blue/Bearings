@@ -2,6 +2,12 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Single-entry day marker — October 11, 2026
+
+Verified with Xcode 27.0 on the iPhone 17e simulator running iOS 26.5. An unsigned Debug build for the generic iOS Simulator succeeded. `BearingsUITests/JournalFlowTests/testMorningBranchPersistsAndPeriodCanBeChanged` passed with zero failures in 66.147 seconds, covering creation, explicit save, the retained accessible label “Morning, 1 entry,” process relaunch, period reassignment and a second relaunch. The test's “Morning branch with saved memory” attachment was exported and visually inspected: the single morning entry appears as a centered navy dot inside the grey period circle, with no numeral 1. Source review confirms that counts above one remain numeric and that the dot uses shared `BearingsTheme.line`, whose asset value is opaque `#323575`.
+
+The full unit and UI suites, physical-device behavior and iOS 17 runtime were not rerun for this view-only change. The targeted result bundle is local at `/private/tmp/BearingsSingleEntryDotUITest.xcresult`; build products remain outside the repository.
+
 ## Owner-directed centered timeline
 
 Verified on October 11, 2026 using Xcode 27.0 and iPhone 17e, iOS 26.5. Timeline branding/slogan and both bottom helper messages are removed. A thin fountain-pen outline uses the shared opaque `#323575` token; its accessible “Write today” button retains a 44-point hit target and opens today’s journal. The native horizontal scroll surface extends through the blank bottom thumb area, while date tap targets remain bounded to their cells.

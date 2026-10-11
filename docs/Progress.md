@@ -2,6 +2,10 @@
 
 Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, GitHub setup, map opening screen, and centered timeline, October 10–11, 2026.
 
+## Single-entry day marker — October 11, 2026
+
+The morning, midday and evening circles now show a centered 13-point navy `#323575` dot when that period has exactly one saved entry, replacing the numeral 1. Counts above one remain numeric, and VoiceOver continues to announce the exact entry count. A Debug simulator build and the focused period-save/reassignment/relaunch UI test passed; its saved-entry screenshot was reviewed and shows the centered navy dot. The full test suites, physical device and iOS 17 runtime were not rerun for this view-only change. Notion synchronization is pending. No publishing or push was performed.
+
 ## Implemented
 
 - Existing Git repository preserved; local `codex/recollect-foundation` branch created.
