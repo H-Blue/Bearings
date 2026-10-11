@@ -13,6 +13,7 @@ Native iPhone journal built with Swift, SwiftUI, and SwiftData. The user's story
 - Build with Xcode and run meaningful date/persistence and UI tests when possible. Record exactly what ran and what remains unverified in `docs/Testing.md`.
 
 ## Design
+- The owner-selected right-curving river/ridge map is the full-screen opening artwork. Show Bearings and “Find what’s been lost inside.” at the safe-area top right in navy, for at least two uninterrupted active seconds on a fresh launch. Restart the opening wait if interrupted; do not replay it after completion on an ordinary background return. Initialize the journal after the opening, preserving visible store errors and retry behavior.
 - Explicit owner decisions → approved Reconnect Figma → Bearings Notion → development brief → implementation judgment.
 - The owner renamed the app and associated materials to Bearings and explicitly selected the supplied `appIcon.png` as its app icon. Preserve that artwork and root source; resize only to 1024 × 1024 for the app asset, without recoloring or redrawing. The original compass/topographic-map request specified `#C8AB89` / `#323575` as design targets; exact two-color enforcement is not claimed.
 - The latest owner instruction sets decorative app linework to opaque `#323575`: timeline horizontal line/ticks, day branches, entry dividers and the editor rule. Use the shared `Line` color / `BearingsTheme.line`; preserve geometry, black Ink text/control tint, grey Marker fills and Paper.

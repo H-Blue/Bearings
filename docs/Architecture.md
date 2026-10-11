@@ -1,6 +1,6 @@
 # Bearings architecture
 
-Status: reconciled with implemented source on October 10, 2026. Build, test and visual verification results are maintained separately in `docs/Testing.md` and `docs/Progress.md`.
+Status: reconciled with implemented source on October 11, 2026. Build, test and visual verification results are maintained separately in `docs/Testing.md` and `docs/Progress.md`.
 
 ## Platform and organization
 
@@ -16,6 +16,12 @@ Bearings uses Swift, SwiftUI, SwiftData, and native Apple frameworks, with iOS 1
 | `Bearings/Services` | Local read-only entry snapshots for possible future integrations. |
 
 SwiftUI owns transient screen state. The journal store owns persistent mutations. Keep view drafts separate from managed entries so an unsuccessful save cannot erase the user's current writing.
+
+## Opening sequence
+
+`AppEntryView` owns process-session presentation state. It first shows `OpeningScreenView`, then creates `StoreBootstrapView` after the opening completes. This keeps synchronous store initialization outside the opening interval and preserves the existing loading/error/retry path. Store retries do not replay the opening.
+
+`OpeningScreenView` uses the bundled `OpeningMap` imageset, an edge-to-edge aspect-fill image, and native Dynamic Type text aligned to the safe-area top right. Its scene-phase keyed task waits two seconds only while active. An interruption cancels the task; the next active period starts a full new wait. After completion, ordinary background/foreground transitions retain the journal view. No animated dismissal is added, so Reduce Motion requires no alternate opening animation. Persistence and bundle/store identities are unchanged.
 
 ## Data model
 

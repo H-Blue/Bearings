@@ -22,6 +22,7 @@ For a physical iPhone, select a valid Apple signing team in the app target. Devi
 
 ## Features
 
+- A map opening screen displays Bearings and “Find what’s been lost inside.” for at least two seconds on a fresh launch.
 - Browse dates using the horizontal timeline, month arrows, date chooser and Today shortcut. Dots indicate saved entries.
 - Open a day. Morning is on the left, midday at the top, evening on the right. A circle opens the latest entry for that period, or starts one if the period is empty.
 - **Write** always creates another entry. The editor's time-of-day menu can change its assignment.

@@ -21,6 +21,12 @@
 			isa = "PBXBuildFile";
 			fileRef = "A1F2DCE6A9EC62E6DE949648";
 		};
+		083EFAEBEB4CED2003908429 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "OpeningScreenView.swift";
+			sourceTree = "<group>";
+		};
 		08631B20564E0F13FC15A804 = {
 			isa = "XCBuildConfiguration";
 			buildSettings = {
@@ -47,6 +53,10 @@
 				VALIDATE_PRODUCT = "YES";
 			};
 			name = "Release";
+		};
+		08B5A93D71D954A35AE5F80B = {
+			isa = "PBXBuildFile";
+			fileRef = "083EFAEBEB4CED2003908429";
 		};
 		08E913A4114B94044568E3A2 = {
 			isa = "PBXFileReference";
@@ -281,6 +291,7 @@
 			files = (
 				"73D2B7EF50CBF51EAA8A18BA",
 				"ECB8E55485E8154497152099",
+				"08B5A93D71D954A35AE5F80B",
 				"25D5DBD9682CC019030AFD93",
 				"F817A9F96BBC85F80F3D90F2",
 				"0733FB871440E3D9AAD4F31A",
@@ -747,6 +758,7 @@
 			children = (
 				"66AA908EC2BDC059C3C922B8",
 				"7548B953A83DA2DC50E43C53",
+				"083EFAEBEB4CED2003908429",
 			);
 			path = "App";
 			sourceTree = "<group>";

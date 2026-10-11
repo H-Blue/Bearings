@@ -2,6 +2,29 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Owner-directed map opening screen
+
+Verified on October 11, 2026. `OpeningMap` preserves the owner-selected 1206 × 2622 right-curving river/ridge image byte-for-byte. Bearings and “Find what’s been lost inside.” appear in navy at the safe-area top right. The active-scene task waits two seconds; scene interruptions cancel/restart it, and completed openings do not replay on normal foreground returns. Storage initializes afterward, retaining the existing visible failure/retry path.
+
+- Final Debug simulator compilation and two existing UI tests passed with zero failures in 82.880 seconds on iPhone 17e, iOS 26.5, Xcode 27.0. Tests cover saved writing/edits across process relaunch and forward/reverse Reduce Motion navigation. Evidence: `build/BearingsOpeningScreenFinalUITests.xcresult` and `build/BearingsOpeningScreenFinalUITests.log`. A preceding overlay/preload version also passed; the final conditional opening/storage sequence is the verified final build.
+- Actual iPhone 16 Pro simulator screenshots, iOS 26.5, were reviewed at normal and maximum accessibility text size. The full-bleed map and complete title/slogan are visible, and the journal appears afterward. Evidence: `docs/evidence/OpeningScreen/OpeningDefault.png`, `OpeningMaximumText.png` and `TimelineAfterOpening.png`. The created simulator's text size was restored to `large`.
+- The warm-launch native recording `docs/evidence/OpeningScreen/OpeningTimingWarm.mp4` contains 114 frames with monotonic timestamps. Image comparison located the first fully rendered map frame at 18.441667 seconds and the first timeline frame at 20.568333 seconds: approximately 2.13 seconds of map presentation. The map remains still between encoded frames. Scores and timestamps are in `build/OpeningScreenSetup/WarmNativeFrameScores.json`. This supports the two-second opening floor, not a device frame-rate benchmark. The initial fresh-simulator recording had discontinuous timestamps and was excluded from quantitative timing evidence.
+- The image asset and accepted source share SHA-256 `809925cf983bcfa6b7cd68c467fcb4816718b030df25fab12088642fe47830d3`. Source review confirms unchanged journal models, stores, editor logic, bundle/store identity and app icon. No full unit/accessibility suite or device Release build was rerun for this opening-only change. Physical-device launch timing, iOS 17 runtime and interrupted-opening presentation remain unverified.
+- Backgrounding to Settings and returning to the same app process showed the timeline immediately without replaying the opening. Screenshot: `docs/evidence/OpeningScreen/TimelineAfterBackgroundReturn.png`.
+
+Final test command actually run:
+
+```sh
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/BearingsTestDerivedData -resultBundlePath build/BearingsOpeningScreenFinalUITests.xcresult \
+  -only-testing:BearingsUITests/JournalFlowTests/testEntryPersistsAcrossRelaunchAndCanBeEdited \
+  -only-testing:BearingsUITests/JournalFlowTests/testForwardAndReverseNavigationWithReduceMotion \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+```
+
+The iPhone 16 Pro simulator is `4D6128DA-96C3-4BC3-89C5-EF5975616AC7`. The built Debug app was installed with `simctl install`, launched with the isolated `--uitesting` store, and captured using `simctl io screenshot` and `recordVideo --codec=h264`. `simctl ui content_size` selected maximum accessibility size for review and restored `large`. Native frame inspection used `ffprobe` timestamps and `ffmpeg` decoded frames, compared against the actual map screenshot with Pillow/NumPy; image files were not edited.
+
 ## Public GitHub source setup
 
 Verified on October 10, 2026. The owner requested GitHub setup, selected public visibility, and explicitly excluded hackathon submission. The public repository is [H-Blue/Bearings](https://github.com/H-Blue/Bearings), with `main` as its default branch.

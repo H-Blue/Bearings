@@ -1,6 +1,6 @@
 # Bearings development progress
 
-Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, and GitHub setup, October 10, 2026.
+Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, GitHub setup, and map opening screen, October 10–11, 2026.
 
 ## Implemented
 
@@ -54,6 +54,14 @@ An unsigned Debug simulator build passed from a clean export of the committed so
 The [Hacklanta guide](https://aluminum-soprano-222.notion.site/Hacklanta-2026-Hacker-Guide-3b81ccc4ed5c80f4b717c0ccc4b5df54#c5e8ee29f2bf4d9d954266fce5486f5c) requires public project code and a useful README; its submission checklist accepts clear run instructions as an alternative to a working demo link. GitHub setup covers those repository materials. Submission forms and a demo video remain separate owner work.
 
 This GitHub setup milestone was synchronized to [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69) under the existing Bearings home on October 10, 2026. The saved Decisions, Testing and Progress updates and the complete six-document snapshot were fetched and verified; `docs/NotionSync.md` records the final source hashes. No hackathon submission was made.
+
+## Map opening screen
+
+On October 11, 2026, the owner selected the right-curving river/ridge map for a minimum two-second opening screen, with Bearings at the top right and “Find what’s been lost inside.” beneath it. The accepted 1206 × 2622 artwork is bundled unchanged as `OpeningMap`. Native navy text respects safe areas and Dynamic Type. A scene-phase keyed task waits two uninterrupted active seconds; interrupted waits restart, and completed openings do not replay on ordinary background returns. Store initialization follows the opening and preserves its existing visible error/retry behavior. No persistence behavior, store identity or app icon changed.
+
+Final Debug simulator compilation and both selected existing UI tests passed with zero failures in 82.880 seconds, covering saved edits across process relaunch and forward/reverse Reduce Motion navigation. iPhone 16 Pro screenshots were reviewed at normal and maximum text size. A warm-launch native recording has monotonic frame timestamps and shows approximately 2.13 seconds between the first fully rendered map frame and the first timeline frame. Exact evidence and remaining limits are in Testing.
+
+This opening-screen milestone was synchronized to the existing iOS Development handoff on October 11, 2026. The saved Product, Architecture, Decisions, Testing and Progress additions and status updates were fetched and verified, preserving the previous handoff content. Verification evidence is in `docs/NotionSync.md`. The implementation is local; the GitHub repository remains at the prior owner-authorized setup commit.
 
 ## Next work and boundaries
 

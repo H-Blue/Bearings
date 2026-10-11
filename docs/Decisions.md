@@ -1,6 +1,6 @@
 # Bearings decisions
 
-Status: approved direction and routine decisions reconciled with implemented source, October 10, 2026. Verification results and outstanding limitations are maintained separately in `docs/Testing.md` and `docs/Progress.md`.
+Status: approved direction and routine decisions reconciled with implemented source, October 11, 2026. Verification results and outstanding limitations are maintained separately in `docs/Testing.md` and `docs/Progress.md`.
 
 | Decision | Why | Consequences and alternatives |
 | --- | --- | --- |
@@ -32,3 +32,7 @@ Status: approved direction and routine decisions reconciled with implemented sou
 | Create a public GitHub source repository at `H-Blue/Bearings`. | The owner requested GitHub setup for later Hacklanta submission and explicitly selected public visibility. | Publish the implemented source, icon, tests and documentation with clear run instructions. Preserve existing history and local signing/work files. GitHub setup does not authorize Devpost, Google Form or any other hackathon submission. |
 
 The foundation decisions did not approve external publication. The later owner request explicitly authorizes the public GitHub setup described above. Paid services, app cloud features, gamification and AI capabilities remain outside the approved scope.
+
+## Opening screen decision
+
+The owner explicitly selected the right-curving river/ridge map for a minimum two-second opening screen, with Bearings at the top right and the existing slogan underneath. Bundle the accepted image unchanged, use navy native Dynamic Type text within safe areas, and display it for at least two uninterrupted active seconds on a fresh launch. Scene interruptions restart the wait; ordinary foreground returns after completion do not replay it. Initialize storage after the opening and retain its visible loading/error/retry path. The opening uses no animated dismissal and changes no journal persistence behavior.

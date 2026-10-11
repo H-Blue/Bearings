@@ -5,8 +5,22 @@ import SwiftData
 struct BearingsApp: App {
     var body: some Scene {
         WindowGroup {
-            StoreBootstrapView()
+            AppEntryView()
                 .preferredColorScheme(.light)
+        }
+    }
+}
+
+private struct AppEntryView: View {
+    @State private var showsOpeningScreen = true
+
+    var body: some View {
+        Group {
+            if showsOpeningScreen {
+                OpeningScreenView { showsOpeningScreen = false }
+            } else {
+                StoreBootstrapView()
+            }
         }
     }
 }

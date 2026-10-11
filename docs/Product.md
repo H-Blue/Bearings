@@ -1,6 +1,6 @@
 # Bearings product specification
 
-Status: approved product direction, reconciled with implemented source on October 10, 2026. Build, test and visual verification results are maintained in `docs/Progress.md` and `docs/Testing.md`; implemented source alone does not establish that the MVP has passed its completion criteria.
+Status: approved product direction, reconciled with implemented source on October 11, 2026. Build, test and visual verification results are maintained in `docs/Progress.md` and `docs/Testing.md`; implemented source alone does not establish that the MVP has passed its completion criteria.
 
 ## Purpose
 
@@ -32,6 +32,10 @@ The owner renamed the application and associated materials to **Bearings** on Oc
 The interface uses safe areas, keyboard controls, accessible hit targets, the user's native Dynamic Type preference, and layouts that adapt to phone sizes. Timeline cells grow with the native date-caption scale so enlarged numbers have enough width and height. At accessibility text sizes, the timeline scrolls vertically so enlarged content remains reachable while dates still scroll horizontally. At the largest two accessibility sizes, the editor uses compact date/period metadata and omits the decorative oval to make room for writing; the journal body retains full scalable system text. Saving status and a native Hide keyboard icon share a footer above the keyboard. Day-period labels have paper backing to keep decorative lines clear of the text.
 
 The transition scales the timeline around the tapped date, moves it upward, and introduces the day view from below. Reverse navigation uses the corresponding animation and preserves timeline state, with explicit visual layering throughout the transition. Reduce Motion uses a short fade. Simulator and device evidence for these behaviors is recorded separately.
+
+## Opening experience
+
+The owner selected the portrait topographic map with two mountain ridges and a river bending right near the bottom for the app opening. The artwork fills the screen; Bearings appears at the safe-area top right with “Find what’s been lost inside.” underneath, both in navy. A fresh launch displays the opening for at least two uninterrupted active seconds before opening the journal. Background interruptions restart the wait; a normal return after the opening has completed does not replay it. Text uses native Dynamic Type and the artwork adapts to screen proportions by filling and clipping.
 
 ## Data and privacy
 
