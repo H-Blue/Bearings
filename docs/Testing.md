@@ -304,3 +304,9 @@ Build products, logs and result bundles remain local and ignored. The harmless s
 - File-backed old-schema migration succeeded on simulator and physical hardware with synthetic stores. Updating the owner's real journal was not used as a migration test.
 - Native protection attributes are applied; locked-device, disk-full and abrupt termination timing still require dedicated acceptance testing. In-app corrections and inference never modify original writing.
 - This is a local development installation. App Store Connect/distribution access, archive upload, TestFlight processing and beta distribution have not been performed or verified. They require separate owner authorization.
+
+## Emotional-learning planning document checks — October 11, 2026
+
+The planning-only update adds HacklantaPlan.md, EmotionalLearningSpec.md and PitchResearch.md. Checked the twelve ordered step headings, required feature/demo-case coverage, sibling Markdown links, saved Notion sections/native cross-references and the nine new tasks' unchecked Not started status. Verified the retained AI task stays In progress/unchecked, Weekly Summaries now reflects implemented-but-unverified work, and Demo Video/Submit Project remain incomplete. Notion fetches reported no truncation/unknown-block indicators; those fields were absent rather than explicitly false. Existing home, Pitch and iOS Development content was preserved.
+
+No Xcode build, simulator UI test, physical-device inference or app regression test was run for this documentation-only change. The earlier implementation evidence and modelNotReady limitation remain unchanged. New feature acceptance tests described in EmotionalLearningSpec.md are future work, not executed evidence.

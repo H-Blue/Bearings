@@ -221,3 +221,17 @@ The table hashes exactly the complete documents or explicitly identified source 
 | `docs/Deployment.md` | `1325d35ffd138ccd41a8292e455ebdab940818706c194514a545f7bf04283428` |
 | `docs/Testing.md#local-intelligence` | `de804bf8318ad193620290a32c33e01f935e13cc99aaf5a776f8ef397be0d341` |
 | `docs/Progress.md#approved-local-intelligence` | `f32e27bc59d89c9a52a04554d60aaf8f53e47a175775ab945083d38d74850101` |
+
+## Emotional-learning planning synchronization — October 11, 2026
+
+The owner requested a sequenced plan and durable pitch notes. The existing Bearings home, Pitch, iOS Development and task data-source schema/content were read before writes. New pages use the existing home as parent; existing pages received scoped additions, preserving prior writing and child blocks.
+
+- [Build, test, pitch, submission & practice](https://app.notion.com/p/3f6076d4a2e18159a0d3fdbc683a4cc7): the twelve-step roadmap, deadline, scope priorities, acceptance gates and mapping to retained tasks. Local source: docs/HacklantaPlan.md.
+- [Emotional learning specs & demo stories](https://app.notion.com/p/3f6076d4a2e1815a95c1c5b2ded742e9): proposed interactions/data boundaries, correction semantics, weekly outcome branches, two invented cases and meaningful future tests. Local source: docs/EmotionalLearningSpec.md.
+- Existing [Pitch](https://app.notion.com/p/3f5076d4a2e1807e82dae04a2b69111b): the discussion's statistics, granularity evidence including a null result, Yale/RULER studies, empathy/creativity claim limits, human-support resource caveats and AI explanation. Local source: docs/PitchResearch.md. Earlier pitch brainstorming remains beneath the new material.
+
+Nine new unchecked tasks were created in the existing Steps for Project Bearings data source: steps 01, 03–09 and 12. The existing Integrate AI for basic daily summaries task carries step 02, Demo Video step 10 and Submit Project step 11. Existing Weekly Summaries and UI Improvements were annotated and retained. Weekly Summaries was corrected from Unstarted to In progress/unchecked because implementation exists but real-model acceptance remains pending; no implementation task was marked complete from planning work.
+
+Read-back fetched both new document pages, Pitch, home, all nine new tasks, the five retained task pages and iOS Development: 19 pages total. The checks verified all twelve roadmap steps, both demo cases, source/statistic/claim sections, native cross-links and the preserved earlier Pitch sentence. Each new task retained Not started/unchecked status and its complete acceptance paragraph. A fresh rows query confirmed the nine new tasks, retained tasks and updated Weekly Summaries status with no more rows pending. Home and iOS Development contain the new planning summary and preserve earlier implementation evidence. Fetches did not report truncation/unknown-block fields; absence is not an explicit false indicator. Native verification badges were not changed.
+
+Local filenames in Notion were code-formatted and plan/spec/pitch references use native page mentions. Local Markdown sibling links and content were also checked. This is semantic read-back verification of scoped planning content, not a byte-identical full replacement of prior source snapshots. No app source, real-model run, Xcode test, publication, contact message or hackathon submission was performed. Existing project-file/asset changes were preserved.
