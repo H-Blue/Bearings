@@ -11,7 +11,6 @@ struct TimelineView: View {
     @State private var showsDatePicker = false
     @State private var showsMonthLabel = false
     @State private var monthLabelDismissTask: Task<Void, Never>?
-    @State private var showsSettingsHandle = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .caption) private var dateCaptionAllowance: CGFloat = 20
     @ScaledMetric(relativeTo: .caption2) private var markerCaptionAllowance: CGFloat = 16
@@ -35,26 +34,6 @@ struct TimelineView: View {
         GeometryReader { viewport in
             timelineContent(viewport: viewport)
         }
-        .overlay(alignment: .bottom) {
-            if showsSettingsHandle {
-                SettingsRopeHandle {
-                    showsSettingsHandle = false
-                    onSettings()
-                }
-                .padding(.bottom, 10)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 30).onEnded { value in
-                guard !showsSettingsHandle,
-                      value.translation.height < -80,
-                      abs(value.translation.height) > abs(value.translation.width) * 1.5 else { return }
-                withAnimation(reduceMotion ? nil : .easeOut(duration: 0.24)) {
-                    showsSettingsHandle = true
-                }
-            }
-        )
         .sheet(isPresented: $showsDatePicker) {
             NavigationStack {
                 DatePicker("Choose a day", selection: $pickerDate, displayedComponents: .date)
@@ -76,6 +55,16 @@ struct TimelineView: View {
     private func timelineContent(viewport: GeometryProxy) -> some View {
         VStack(spacing: 0) {
             HStack {
+                Button(action: onSettings) {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 21, weight: .regular))
+                        .foregroundStyle(BearingsTheme.systemControl)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Settings")
+                .accessibilityHint("Open Settings")
+                .accessibilityIdentifier("timeline.settings")
                 Spacer()
                 Button {
                     month = JournalMonth()
@@ -175,11 +164,6 @@ struct TimelineView: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityAction(named: "Reveal Settings handle") {
-            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.24)) {
-                showsSettingsHandle = true
-            }
-        }
         .onDisappear { monthLabelDismissTask?.cancel() }
     }
 
@@ -211,57 +195,6 @@ struct TimelineView: View {
         let today = JournalDay(date: Date())
         let focus = selectedDay?.key ?? (days.contains(today) ? today.key : days.first?.key)
         if let focus { proxy.scrollTo(focus, anchor: .center) }
-    }
-}
-
-private struct SettingsRopeHandle: View {
-    let onPulled: () -> Void
-    @GestureState private var pull: CGFloat = 0
-
-    var body: some View {
-        VStack(spacing: 4) {
-            RopeHandleShape()
-                .stroke(BearingsTheme.systemControl,
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-                .frame(width: 92, height: 18)
-            Text("Pull for settings")
-                .font(.caption2)
-                .foregroundStyle(BearingsTheme.systemControl)
-        }
-        .frame(width: 150, height: 48)
-        .background(BearingsTheme.ink.opacity(0.82), in: Capsule())
-        .contentShape(Capsule())
-        .offset(y: min(0, pull))
-        .gesture(
-            DragGesture(minimumDistance: 12)
-                .updating($pull) { value, state, _ in
-                    state = max(value.translation.height, -72)
-                }
-                .onEnded { value in
-                    if value.translation.height < -55 { onPulled() }
-                }
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Settings handle")
-        .accessibilityHint("Pull upward to open Settings")
-        .accessibilityIdentifier("timeline.settingsHandle")
-        .accessibilityAction(.default, onPulled)
-    }
-}
-
-private struct RopeHandleShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let midY = rect.midY
-        path.move(to: CGPoint(x: rect.minX + 4, y: midY - 3))
-        path.addCurve(to: CGPoint(x: rect.maxX - 4, y: midY - 3),
-                      control1: CGPoint(x: rect.minX + rect.width * 0.3, y: midY + 6),
-                      control2: CGPoint(x: rect.minX + rect.width * 0.7, y: midY - 12))
-        path.move(to: CGPoint(x: rect.minX + 4, y: midY + 3))
-        path.addCurve(to: CGPoint(x: rect.maxX - 4, y: midY + 3),
-                      control1: CGPoint(x: rect.minX + rect.width * 0.3, y: midY - 6),
-                      control2: CGPoint(x: rect.minX + rect.width * 0.7, y: midY + 12))
-        return path
     }
 }
 
