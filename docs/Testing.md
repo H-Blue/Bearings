@@ -1,8 +1,46 @@
-# ReCollect verification
+# Bearings verification
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
-## Results
+## Bearings rename and owner-selected icon
+
+Verified on October 10, 2026 with the same Xcode version, iOS 17 deployment target and iPhone 17e simulator running iOS 26.5. The owner supplied `appIcon.png` and explicitly selected it. The source remains unchanged; the app copy was resized from 1254 × 1254 to an opaque 1024 × 1024 PNG without recoloring, redrawing or cropping. The accepted image is not claimed to contain only the two hex colors in the original generation brief. Source and asset hashes and generation provenance are in `docs/design-reference/AppIcon.md`.
+
+| Check | Actual result |
+| --- | --- |
+| Renamed project syntax and discovery | Passed: `plutil -lint`, Xcode target/scheme discovery and stable project identity checks. |
+| Project generator and local signing preservation | Passed in a temporary copy. Generated project semantics match the renamed working project with AppIcon; original per-configuration signing teams, absent teams, fresh projects and invalid-project failure preservation were checked. `build/BearingsGeneratorValidation.log`. |
+| Debug simulator build and complete data/editor suite | Passed: 24 tests, zero failures, including both real read-only SwiftData failure/retry fixtures. `build/BearingsRenameUnitTests.xcresult`, `build/BearingsRenameUnitTests.log`. |
+| Focused native UI suite | Passed: 2 tests, zero failures, 69.809 seconds. Saved writing and edits survive relaunch; forward/reverse Reduce Motion navigation works. `build/BearingsRenameUITests.xcresult`, `build/BearingsRenameUITests.log`. |
+| Unsigned Release build for generic iOS device | Passed. Built name/display name/executable are Bearings; existing bundle ID is retained; primary icon is AppIcon; compiled `Assets.car` is included. `build/BearingsDeviceRelease.log`. |
+| Installed simulator Home Screen icon | Passed visual review: Bearings label and selected compass/topographic artwork appear, with the circular compass entirely inside the system icon mask. `build/BearingsHomeScreen.png`. |
+| Compatibility source review | JournalStore, date/model types, retrieval boundary and editor-session behavior are unchanged at their renamed paths. Existing production bundle identifier, SwiftData configuration and journal path are retained. |
+
+Commands actually run for this milestone:
+
+```sh
+plutil -lint Bearings.xcodeproj/project.pbxproj
+xcodebuild -list -project Bearings.xcodeproj
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/BearingsTestDerivedData -resultBundlePath build/BearingsRenameUnitTests.xcresult \
+  -only-testing:BearingsTests -parallel-testing-enabled NO \
+  -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/BearingsTestDerivedData -resultBundlePath build/BearingsRenameUITests.xcresult \
+  -only-testing:BearingsUITests/JournalFlowTests/testEntryPersistsAcrossRelaunchAndCanBeEdited \
+  -only-testing:BearingsUITests/JournalFlowTests/testForwardAndReverseNavigationWithReduceMotion \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+xcodebuild build -project Bearings.xcodeproj -scheme Bearings -configuration Release \
+  -destination 'generic/platform=iOS' -derivedDataPath build/BearingsDeviceDerivedData \
+  CODE_SIGNING_ALLOWED=NO
+xcrun simctl io 47707FD0-2CB6-49DC-B509-4B102AF0837C screenshot build/BearingsHomeScreen.png
+```
+
+The full UI/accessibility suite was not rerun for the branding-only change; its earlier results below remain historical evidence. Signed physical-device installation, a real upgrade from the prior binary, an iOS 17 runtime and alternate Home Screen appearances remain unverified. Compatibility is supported by preserved identity and unchanged persistence behavior, rather than a performed upgrade test. No app interface styling or persistence behavior changed in this milestone.
+
+## Earlier foundation results
 
 | Check | Actual result |
 | --- | --- |
@@ -49,7 +87,7 @@ Review also found that three stacked dots on a minor tick need 75 points, and mo
 
 Native recording exposed a brief blank content frame on reverse navigation. Explicit fixed layers (paper 0, timeline 1, day 2) preserve the departing day above the background. The two final navigation tests passed. Review of 88 decoded native frames across two reverse sequences in `docs/evidence/TransitionFinal.mp4` showed the day moving/fading above the returning timeline without a blank content frame. Simulator recordings have variable frame timing; low-rate frame conversion can exaggerate gaps, so these observations use native timestamps. This is layering evidence, not a device frame-rate benchmark.
 
-## Commands and evidence
+## Earlier foundation commands and evidence
 
 ```sh
 python3 Scripts/generate_project.py

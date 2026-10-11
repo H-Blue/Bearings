@@ -1,19 +1,19 @@
-# ReCollect architecture
+# Bearings architecture
 
 Status: reconciled with implemented source on October 10, 2026. Build, test and visual verification results are maintained separately in `docs/Testing.md` and `docs/Progress.md`.
 
 ## Platform and organization
 
-ReCollect uses Swift, SwiftUI, SwiftData, and native Apple frameworks, with iOS 17 as the minimum version because SwiftData is available from that release. No third-party runtime dependencies are needed.
+Bearings uses Swift, SwiftUI, SwiftData, and native Apple frameworks, with iOS 17 as the minimum version because SwiftData is available from that release. No third-party runtime dependencies are needed.
 
 | Folder | Responsibility |
 | --- | --- |
-| `ReCollect/App` | Application launch, dependency creation, root view, persistent-store recovery. |
-| `ReCollect/Models` | Journal entries, explicit journal periods, and calendar-day identity. |
-| `ReCollect/Persistence` | Dedicated SwiftData container and one store responsible for reads and mutations. |
-| `ReCollect/Features` | Timeline, day view, journal editor, and navigation state. |
-| `ReCollect/Design` | Shared palette, typography, reusable drawing, and interface components. |
-| `ReCollect/Services` | Local read-only entry snapshots for possible future integrations. |
+| `Bearings/App` | Application launch, dependency creation, root view, persistent-store recovery. |
+| `Bearings/Models` | Journal entries, explicit journal periods, and calendar-day identity. |
+| `Bearings/Persistence` | Dedicated SwiftData container and one store responsible for reads and mutations. |
+| `Bearings/Features` | Timeline, day view, journal editor, and navigation state. |
+| `Bearings/Design` | Shared palette, typography, reusable drawing, and interface components. |
+| `Bearings/Services` | Local read-only entry snapshots for possible future integrations. |
 
 SwiftUI owns transient screen state. The journal store owns persistent mutations. Keep view drafts separate from managed entries so an unsuccessful save cannot erase the user's current writing.
 
@@ -36,7 +36,7 @@ SwiftUI owns transient screen state. The journal store owns persistent mutations
 
 ## Persistence and saving
 
-The SwiftData container uses a dedicated store in the application's Application Support directory. CloudKit is disabled. The directory, main store, and existing SQLite companion files use iOS `completeUntilFirstUserAuthentication` protection. This allows normal use after the first device unlock while retaining the operating system's data-at-rest protection.
+The SwiftData container uses a dedicated store in the application's Application Support directory. The Bearings rename preserves the existing bundle identifier, SwiftData configuration name `ReCollect`, and `ReCollect/Journal.store` path so existing installations continue to open their saved journal. Public app/project/scheme/target names and brand-specific Swift types use Bearings; storage identifiers remain compatibility values. CloudKit is disabled. The directory, main store, and existing SQLite companion files use iOS `completeUntilFirstUserAuthentication` protection. This allows normal use after the first device unlock while retaining the operating system's data-at-rest protection.
 
 Application launch does not fall back to an in-memory store after a disk-store failure. Instead it presents the failure and a retry path. A root query fetch error also displays an explicit loading error with retry instead of appearing as an empty journal. In-memory configuration is reserved for isolated tests.
 
@@ -44,7 +44,7 @@ Application launch does not fall back to an in-memory store after a disk-store f
 
 On a transaction save failure, the store rolls back that isolated context and lets the failed transaction be discarded while `JournalEditorSession` retains its independent draft. There is no native undo manager in this implementation. The store increments its revision only after successful commits. This isolation was chosen because failure fixtures exposed registered-model/cache behavior that rollback in the interface's shared context did not reliably restore.
 
-`JournalStore.entries(for:)`, `daysWithEntries()` and `snapshots(from:through:)` fetch with `includePendingChanges = false`. `ReCollectRootView` initializes its `@Query` with an ascending creation-time descriptor that also excludes pending changes, then passes date-filtered committed entries to the day and timeline views. A missing UUID during update or deletion throws `JournalStoreError.entryNotFound` instead of creating a replacement entry.
+`JournalStore.entries(for:)`, `daysWithEntries()` and `snapshots(from:through:)` fetch with `includePendingChanges = false`. `BearingsRootView` initializes its `@Query` with an ascending creation-time descriptor that also excludes pending changes, then passes date-filtered committed entries to the day and timeline views. A missing UUID during update or deletion throws `JournalStoreError.entryNotFound` instead of creating a replacement entry.
 
 The editor requests saving 350 milliseconds after the most recent body or period edit using a cancellable SwiftUI task. Done, a transition out of the active scene, and editor disappearance also request saving. `JournalEditorSession.SaveState` is empty, unsaved, saving, saved or failed. Done only dismisses after a successful save, and interactive dismissal is disabled while edits remain unsaved. A visible retry action retains the draft when saving fails. A new empty or whitespace-only draft is not inserted. An existing entry can be edited to an empty body; deletion remains a separate deliberate operation.
 
@@ -60,11 +60,13 @@ Every day in the browsed month shares the same marker-area height, selected from
 
 The day view draws a black branching stem and three grey period circles. Period labels have a paper-colored backing that keeps decorative lines clear of the text. Each circle opens the latest matching entry by creation order, or a new editor if none exists. Write always starts another draft. The list below the branches permits opening every saved entry, including earlier entries for the same period. Blank saved entries display “Untitled entry.”
 
-`ReCollectRootView` stores the tapped date's normalized viewport anchor. Opening a day scales the timeline to 1.8 around that anchor, moves it upward 180 points and fades it out; the day enters from 160 points below and fades in. Returning reverses the state change with `Animation.spring(response: 0.55, dampingFraction: 0.88)`. Reduce Motion removes the scale and offsets and uses `easeInOut(duration: 0.18)`. There is no matched-geometry effect, avoiding overlapping hidden source views. Explicit root layer ordering keeps paper at z-index 0, timeline at 1 and day at 2 so the day remains visible during the reverse transition. Animation and responsive geometry evidence is recorded in the testing log.
+`BearingsRootView` stores the tapped date's normalized viewport anchor. Opening a day scales the timeline to 1.8 around that anchor, moves it upward 180 points and fades it out; the day enters from 160 points below and fades in. Returning reverses the state change with `Animation.spring(response: 0.55, dampingFraction: 0.88)`. Reduce Motion removes the scale and offsets and uses `easeInOut(duration: 0.18)`. There is no matched-geometry effect, avoiding overlapping hidden source views. Explicit root layer ordering keeps paper at z-index 0, timeline at 1 and day at 2 so the day remains visible during the reverse transition. Animation and responsive geometry evidence is recorded in the testing log.
 
 The writing interface uses Apple's `TextEditor` and system font, as approved by the owner. The editor sheet includes the day, editable period, Done and confirmed deletion. Saving status shares a footer in the normal layout with a native Hide keyboard icon while the editor is focused; its hit target is at least 44 × 44 points. The footer stays in the sheet's layout above the keyboard.
 
-The oval and thin rule use the actual Figma `EditorCircle.svg` and `EditorRule.svg` imagesets with vector representation preserved. At Dynamic Type accessibility4 and accessibility5, the editor uses a compact header: it omits the decorative oval and uses scalable native caption styles for the date and period metadata. Journal text retains the full scalable title3 style. `ReCollectTheme` uses asset colors Paper (`#C8AB89`), Ink (`#000000`) and Marker (`#D9D9D9`); the application requests a light appearance to retain the approved palette.
+The oval and thin rule use the actual Figma `EditorCircle.svg` and `EditorRule.svg` imagesets with vector representation preserved. At Dynamic Type accessibility4 and accessibility5, the editor uses a compact header: it omits the decorative oval and uses scalable native caption styles for the date and period metadata. Journal text retains the full scalable title3 style. `BearingsTheme` uses asset colors Paper (`#C8AB89`), Ink (`#000000`) and Marker (`#D9D9D9`); the application requests a light appearance to retain the approved palette.
+
+The app icon uses the owner-supplied and explicitly accepted `appIcon.png`, preserved without recoloring or redrawing and resized only to 1024 × 1024 for `Bearings/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png`. The root source remains untouched. The original compass/topographic-map request specified `#C8AB89` / `#323575` design targets; exact two-color enforcement is not claimed for the accepted artwork. This asset does not alter the interface's Paper, Ink and Marker tokens.
 
 ## Future integration boundary
 
@@ -72,4 +74,4 @@ The oval and thin rule use the actual Figma `EditorCircle.svg` and `EditorRule.s
 
 ## Verification and documentation
 
-Validate calendar identity, period persistence, create/update/delete behavior, blank draft semantics, failure handling, disk persistence across container recreation, navigation, keyboard use, and normal/Reduce Motion transitions. The exact commands, results, and remaining limitations belong in `docs/Testing.md`. Milestone progress belongs in `docs/Progress.md`; significant choices are recorded in `docs/Decisions.md`. These documents must be synchronized to the existing ReCollect Notion hierarchy and the saved Notion content fetched for verification.
+Validate calendar identity, period persistence, create/update/delete behavior, blank draft semantics, failure handling, disk persistence across container recreation, navigation, keyboard use, and normal/Reduce Motion transitions. The exact commands, results, and remaining limitations belong in `docs/Testing.md`. Milestone progress belongs in `docs/Progress.md`; significant choices are recorded in `docs/Decisions.md`. These documents must be synchronized to the existing Bearings Notion hierarchy and the saved Notion content fetched for verification.

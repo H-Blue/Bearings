@@ -1,15 +1,15 @@
-# ReCollect reference review
+# Bearings reference review
 
-Reviewed on October 10, 2026 through the connected Notion integration and the Reconnect Figma file. The Notion review is limited to the ReCollect project home and the three references supplied by the product owner. Unrelated ancestor projects were not read.
+Reviewed on October 10, 2026 through the connected Notion integration and the Reconnect Figma file. The original Notion review is limited to the project home then associated with ReCollect and the three references supplied by the product owner. Unrelated ancestor projects were not read.
 
 ## Access and read status
 
 | Reference | Verified read result | Source facts |
 | --- | --- | --- |
-| [Project home: Reco](https://app.notion.com/p/3f5076d4a2e18039877ed1727adbcb42) | Successfully fetched page content | Tagline: “Find what’s been lost inside.” Links to Pitch, Initial Brainstorming, Design & Style Guide, and Steps for Project ReCollect. Last edited reported as October 10, 2026, 21:26:21 UTC. |
+| [Project home: Reco — title at original review](https://app.notion.com/p/3f5076d4a2e18039877ed1727adbcb42) | Successfully fetched page content | Tagline: “Find what’s been lost inside.” Links to Pitch, Initial Brainstorming, Design & Style Guide, and Steps for Project ReCollect at the time of review. Last edited reported as October 10, 2026, 21:26:21 UTC. |
 | [Design & Style Guide](https://app.notion.com/p/3f5076d4a2e1803485f0cfc95d63f856) | Successfully fetched page content | Materials, palette names, angular/hand drawn direction, file naming convention, and progressive design reveal idea. Last edited reported as October 10, 2026, 19:51:00 UTC. |
 | [Initial Brainstorming](https://app.notion.com/p/3f5076d4a2e180bfbd7dd67f7ec77adb) | Successfully fetched page content | Daily stories, meaningful life moments, emotional awareness, local storage and future AI ideas. Last edited reported as October 10, 2026, 17:10:20 UTC. |
-| [Steps for Project ReCollect](https://app.notion.com/p/3f5076d4a2e180ed841bd463c948dd36) | Successfully fetched database schema and queried its data source | Properties are `Name` (title) and `Checkbox` (checkbox). WIP filters unchecked rows; Finished filters checked rows. Query returned zero rows with `has_more: false`. |
+| [Steps for Project ReCollect — title at original review](https://app.notion.com/p/3f5076d4a2e180ed841bd463c948dd36) | Successfully fetched database schema and queried its data source | Properties are `Name` (title) and `Checkbox` (checkbox). WIP filters unchecked rows; Finished filters checked rows. Query returned zero rows with `has_more: false`. |
 
 The three fetched pages report native Notion verification state `unverified`. This is source metadata, not a fetch failure. The responses did not report truncation or unknown-block indicators; those fields were absent. No task completion claims can be inferred from the empty Steps database. The linked Pitch page was not read in this review.
 
@@ -24,8 +24,8 @@ The three fetched pages report native Notion verification state `unverified`. Th
 
 The supplied v0.3 brief explicitly authorizes a native Swift/SwiftUI/SwiftData iPhone foundation with timeline, day view, journal creation/editing/deletion, reliable local saving, and a timeline-to-day transition. The fetched Notion material contains no more detailed screen or interaction specifications.
 
-- **Naming:** Notion home is titled `Reco`; brainstorming includes `New Name HeartMap`; the explicit current application name is `ReCollect`. Use ReCollect for the application and do not rename existing Notion pages based on this review.
-- **File convention:** The style guide says folders use `pw_purpose` and code files use `pw_`, referring to Project Wayfinder. This older convention is not aligned with the current ReCollect naming. Record any chosen repository convention as an implementation decision rather than claiming it was established in Figma.
+- **Naming:** At the original review, the Notion home was titled `Reco` and brainstorming included `New Name HeartMap`; the initial application brief used `ReCollect`. The owner subsequently explicitly renamed the app and all associated materials to **Bearings** on October 10, 2026. Current application, repository and Notion material should use Bearings. Preserve historical source titles in this evidence record and the approved Figma file's actual name, Reconnect.
+- **File convention:** The style guide says folders use `pw_purpose` and code files use `pw_`, referring to Project Wayfinder. This older convention is not aligned with the current Bearings naming. Record any chosen repository convention as an implementation decision rather than claiming it was established in Figma.
 - **Progressive design reveal:** The style guide describes an app that becomes deeper and more complex with use. The explicit brief defers this concept; preserve flexibility without adding progression or achievements to the MVP.
 - **Brainstorm features:** Daily triggers, working through texts, AI-selected art, stream of consciousness and the 12345 method are ideas, not approved initial functionality. The brief defers AI and excludes elaborate prompts and scope expansion.
 
@@ -43,6 +43,8 @@ Reference SVGs are saved under `docs/design-reference/`. Implemented timeline an
 
 ## Resolved owner decisions
 
+- The current application and associated materials are named **Bearings**, superseding the initial ReCollect brief.
+- The original icon request specified a flush, edge-to-edge background in `#C8AB89`, thin `#323575` linework, a fully visible circular compass and simplified topographic contours extending beyond the borders. The owner subsequently supplied and explicitly approved `appIcon.png` as the app icon. Preserve the accepted artwork without recoloring or redrawing, resize only to 1024 × 1024 for `Bearings/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png`, and leave the root source untouched. The original colors are requested design targets; exact two-color enforcement is not claimed for the accepted image. This owner decision does not change the inspected interface tokens.
 - The left circle means **morning**, the top circle means **midday**, and the right circle means **evening**. These are explicit journal periods, not decoration or a gamification system.
 - The owner approved Apple's system font in place of Figma's Inter. Use the system text editor and accessible text scaling while preserving the inspected composition and palette.
 - The implemented system text styles follow native Dynamic Type settings. Timeline cell width and cell/viewport height expand with the date-caption scale. The month also uses a shared marker-area height that grows for three dots or a remaining-count label, preserving aligned ticks. The 44 × 235 baseline applies at normal text size with at most two entries per day. The timeline adds vertical scrolling at accessibility sizes while retaining horizontal date browsing; these are data and accessibility adaptations of the inspected composition, with visual verification recorded separately.
@@ -54,4 +56,6 @@ Figma inspection is complete for these three frames, and the implementation desc
 
 ## Documentation synchronization
 
-This file records reference research and owner clarifications only. No Notion page or database was changed during this review. Implementation progress, technical architecture, decisions, verification results, and any differences between approved Figma designs and the implemented interface must be saved and verified in the ReCollect Notion hierarchy as implementation milestones are completed.
+This file records reference research and owner clarifications only. No Notion page or database was changed during this review. Implementation progress, technical architecture, decisions, verification results, and any differences between approved Figma designs and the implemented interface must be saved and verified in the Bearings Notion hierarchy as implementation milestones are completed.
+
+The Bearings rename and owner-accepted app-icon milestone was synchronized to [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69) and the saved content fetched for verification on October 10, 2026. See `docs/NotionSync.md` for the final verified scope and source hashes.

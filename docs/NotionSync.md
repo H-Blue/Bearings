@@ -1,17 +1,62 @@
-# ReCollect Notion synchronization
+# Bearings Notion synchronization
 
-Synchronized and fetched for verification on October 10, 2026.
+The Bearings rename and owner-accepted app-icon milestone was synchronized and the saved content fetched for verification on October 10, 2026.
 
 - Page: [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204).
 - Page ID: `3f5076d4-a2e1-8161-9c8b-ff6109e7ba69`.
-- Parent: [Reco — existing ReCollect project home](https://app.notion.com/p/3f5076d4a2e18039877ed1727adbcb42).
+- Parent: [Bearings — existing project home](https://app.notion.com/p/3f5076d4a2e18039877ed1727adbcb42).
 - Parent ID: `3f5076d4-a2e1-8039-877e-d1727adbcb42`.
+- Steps database: [Steps for Project Bearings](https://app.notion.com/p/3f5076d4a2e180ed841bd463c948dd36).
+- Steps data source ID: `3f5076d4-a2e1-80f3-938b-000b81e7b3f8`.
 
-## Saved scope
+## Current saved scope
+
+The existing project home and the existing Steps database/data source now use Bearings. The home records the owner's explicit rename, superseding earlier naming guidance, and the subsequent acceptance of the supplied `appIcon.png`. Its original `#C8AB89` / `#323575` values are recorded as design targets; exact two-color enforcement is not claimed for the accepted artwork.
+
+The existing iOS Development child contains the complete current Product, Architecture, ReferenceReview, Decisions, Testing and Progress documents as six sections. They record the renamed project/scheme/targets/source types, retained bundle and persistent-store compatibility identities, owner-selected resize-only app icon, 24 passing data/editor tests, two passing focused UI tests, passing unsigned Release build, Home Screen icon review, and remaining device/runtime/upgrade limits. Historical commands, source names and earlier test evidence are preserved as history.
+
+Tables use native Notion blocks; existing Notion sources and the synchronization page use native mentions; dates use native date mentions. Historical source titles are preserved as adjacent text alongside their native references. Local command examples, paths and SHA-256 values remain inspectable text. Artwork, test evidence files and journal content were not uploaded.
+
+Pitch, Initial Brainstorming, Design & Style Guide and both Steps task pages were inspected. They contain no current ReCollect branding to replace. Historical HeartMap/Project Wayfinder ideas remain source evidence. The approved Figma file's actual name remains Reconnect.
+
+## Current verification evidence
+
+1. The renamed home and database/data source were fetched. Their titles are `Bearings` and `Steps for Project Bearings`; child hierarchy, database schema, views and task identities are preserved.
+2. The home was updated to record the owner's accepted `appIcon.png` artwork and resize-only integration, then fetched to verify that direction and the absence of an exact-palette claim.
+3. The complete six-document snapshot was saved in the existing iOS Development child. An initial full read-back matched all six sources after native-format normalization: **58,582 normalized characters**.
+4. The precise pending-sync paragraphs in local ReferenceReview and Progress were changed to the verified synchronization result. The corresponding saved paragraphs were patched, then the entire page was fetched again. All six final documents matched: **58,939 normalized characters**. Their final local hashes are below.
+5. The parent was fetched again and contains the same iOS Development child. The child reports the intended Bearings parent path. No new Notion pages were created during this milestone.
+6. The existing [Generate Icon](https://app.notion.com/p/3f6076d4a2e1805a9dbee59a46e6913b) task now contains owner-selection, integration, source/asset hash and validation evidence, and its `Checkbox` value was fetched as `__YES__`. The [future AI task](https://app.notion.com/p/3f6076d4a2e180c2b779e1b6de5e3407) was fetched unchanged as `__NO__`.
+
+Normalization removes structural Markdown/XML formatting and whitespace differences, preserves native mention identity by URL and date identity, accepts self-closing mentions and resolved titles, ignores the Notion presentation query `pvs`, and treats shell fence-language aliases equivalently. The comparison verifies saved content rather than byte-for-byte serialization. Fetch responses did not report truncation or unknown-block indicators; those fields were absent rather than explicitly false. Native Notion verification badges remain separate from these saved-content checks and were not changed.
+
+## Final source hashes
+
+These hashes identify the complete local six-document snapshot verified against the saved page. Future documentation changes require resynchronization.
+
+| Local source | SHA-256 |
+| --- | --- |
+| `docs/Product.md` | `d1767ed3b5f14934a625c6e427a2d53ea1059760e0633a98f7ed1ada2f69a7a8` |
+| `docs/Architecture.md` | `41342c02b530cee14030579d9622e97614e2c03490220cb49e1a76ce6008045b` |
+| `docs/ReferenceReview.md` | `fd117a93388e0d5319c3b1aa9e1929cab8137f94764003a1345a7405950cc944` |
+| `docs/Decisions.md` | `61d34fb540a4de3ecdda3ddcc83a855d733f8e4b631f390aec6fad04bf631f35` |
+| `docs/Testing.md` | `2f6a3167f1e080789cd1bc12c506987a359e96346e52b1851a3f4f2f2c2cc784` |
+| `docs/Progress.md` | `0e69543186fbe4dcbe8cc86044a7ca20ca12992076a71d2eace1a0ecb775556b` |
+
+## Icon evidence
+
+The supplied source is 1254 × 1254 and opaque; the integrated universal iOS AppIcon is 1024 × 1024 and opaque. The original artwork is preserved without recoloring, redrawing or cropping.
+
+| Local file | SHA-256 |
+| --- | --- |
+| `appIcon.png` | `9a7923a68d4c3dee2196582f19af69cd6fdf263249120260b7c0a28c658b0206` |
+| `Bearings/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png` | `5e6bba6a243141ebbd037cc3996e6bcf9704604a4a2398b27a78ff89e6af5eaf` |
+
+## Earlier foundation saved scope
 
 One child page contains the complete Product, Architecture, ReferenceReview, Decisions, Testing and Progress documents as six sections. Existing Notion design, brainstorming, Pitch and Steps content was preserved. Tables use native Notion table blocks; existing Notion sources and the synchronization page use native mentions; dates use native date mentions. Local command examples and test evidence paths remain inspectable text. No local evidence files or journal data were uploaded.
 
-## Verification evidence
+## Earlier foundation verification evidence
 
 1. Before creation, the project home was fetched and a scoped `iOS Development` search found no matching technical child.
 2. The create operation returned the page ID and URL recorded above.
@@ -23,9 +68,9 @@ Normalization removes structural Markdown/XML formatting and whitespace differen
 
 The saved Testing section includes the final 24-test data/editor suite, eight core UI workflows, focused accessibility/keyboard/navigation/date/overflow-marker results, final unsigned Release result, and documented physical-device/runtime limits. Progress accurately records the implemented foundation, owner decisions and future scope.
 
-## Final source hashes
+## Earlier foundation source hashes
 
-These hashes identify the local six-document snapshot verified against the saved page. Future documentation changes require resynchronization.
+These hashes identify the earlier local six-document snapshot verified against the saved page before the Bearings rename. They are retained as historical evidence; the current verified snapshot is identified by the final source hashes above.
 
 | Local source | SHA-256 |
 | --- | --- |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the dependency-free ReCollect Xcode project and shared scheme.
+"""Generate the dependency-free Bearings Xcode project and shared scheme.
 
 Run from any directory. Source membership is explicit and refreshed on each run;
 stable SHA-256 object identifiers keep project diffs focused and reproducible.
@@ -11,16 +11,19 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PROJECT = ROOT / "ReCollect.xcodeproj"
+PROJECT = ROOT / "Bearings.xcodeproj"
 OBJECTS: dict[str, dict] = {}
 
 
 def identifier(key: str) -> str:
-    return hashlib.sha256(("ReCollect:" + key).encode()).hexdigest()[:24].upper()
+    # Retain object identities from the original project through the brand rename.
+    legacy_key = key.replace("Bearings", "ReCollect")
+    return hashlib.sha256(("ReCollect:" + legacy_key).encode()).hexdigest()[:24].upper()
 
 
 def add(key: str, isa: str, **attributes) -> str:
@@ -85,6 +88,30 @@ def phase(target: str, kind: str, files: list[str]) -> str:
                files=files, runOnlyForDeploymentPostprocessing=0)
 
 
+def existing_development_teams() -> dict[str, str]:
+    """Preserve the owner's app signing team separately for each configuration."""
+    project_file = PROJECT / "project.pbxproj"
+    if not project_file.exists():
+        return {}
+    # plutil reads either Xcode's OpenStep format or the generated format.
+    # Parsing failures stop generation before an existing project is replaced.
+    result = subprocess.run(
+        ["plutil", "-convert", "json", "-o", "-", "--", str(project_file)],
+        check=True, capture_output=True, text=True
+    )
+    objects = json.loads(result.stdout)["objects"]
+    for target in objects.values():
+        if target.get("isa") != "PBXNativeTarget" or target.get("name") not in {"Bearings", "ReCollect"}:
+            continue
+        configurations = objects[target["buildConfigurationList"]]["buildConfigurations"]
+        return {
+            objects[configuration]["name"]: objects[configuration]["buildSettings"]["DEVELOPMENT_TEAM"]
+            for configuration in configurations
+            if "DEVELOPMENT_TEAM" in objects[configuration]["buildSettings"]
+        }
+    return {}
+
+
 def target_settings(name: str) -> dict:
     settings = {
         "CODE_SIGN_STYLE": "Automatic",
@@ -92,7 +119,8 @@ def target_settings(name: str) -> dict:
         "GENERATE_INFOPLIST_FILE": "YES",
         "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
         "MARKETING_VERSION": "0.1.0",
-        "PRODUCT_BUNDLE_IDENTIFIER": f"com.harryhutchins.recollectdemo.{name}",
+        # Keep the installed app identity so existing local journals stay available.
+        "PRODUCT_BUNDLE_IDENTIFIER": f"com.harryhutchins.recollectdemo.{name.replace('Bearings', 'ReCollect')}",
         "PRODUCT_NAME": "$(TARGET_NAME)",
         "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
         "SUPPORTS_MACCATALYST": "NO",
@@ -100,10 +128,10 @@ def target_settings(name: str) -> dict:
         "SWIFT_VERSION": "5.0",
         "TARGETED_DEVICE_FAMILY": "1",
     }
-    if name == "ReCollect":
+    if name == "Bearings":
         settings.update({
             "ENABLE_PREVIEWS": "YES",
-            "INFOPLIST_KEY_CFBundleDisplayName": "ReCollect",
+            "INFOPLIST_KEY_CFBundleDisplayName": "Bearings",
             "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES",
             "INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents": "YES",
             "INFOPLIST_KEY_UILaunchScreen_Generation": "YES",
@@ -111,43 +139,49 @@ def target_settings(name: str) -> dict:
             "LD_RUNPATH_SEARCH_PATHS": ["$(inherited)", "@executable_path/Frameworks"],
             "SWIFT_EMIT_LOC_STRINGS": "YES",
         })
-        if (ROOT / "ReCollect/Resources/Assets.xcassets/AppIcon.appiconset").exists():
+        if (ROOT / "Bearings/Resources/Assets.xcassets/AppIcon.appiconset").exists():
             settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
     else:
         settings["LD_RUNPATH_SEARCH_PATHS"] = ["$(inherited)", "@executable_path/Frameworks", "@loader_path/Frameworks"]
-        if name == "ReCollectTests":
+        if name == "BearingsTests":
             settings["BUNDLE_LOADER"] = "$(TEST_HOST)"
-            settings["TEST_HOST"] = "$(BUILT_PRODUCTS_DIR)/ReCollect.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ReCollect"
+            settings["TEST_HOST"] = "$(BUILT_PRODUCTS_DIR)/Bearings.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bearings"
         else:
-            settings["TEST_TARGET_NAME"] = "ReCollect"
+            settings["TEST_TARGET_NAME"] = "Bearings"
     return settings
 
 
 def build_project() -> dict[str, str]:
+    development_teams = existing_development_teams()
     project_id = identifier("project")
-    names = ["ReCollect", "ReCollectTests", "ReCollectUITests"]
+    names = ["Bearings", "BearingsTests", "BearingsUITests"]
     target_ids = {name: identifier(f"target:{name}") for name in names}
     groups = []
     products = []
     for name in names:
         group, sources, resources = source_group(ROOT / name)
         groups.append(group)
-        is_app = name == "ReCollect"
+        is_app = name == "Bearings"
         product = add(f"product:{name}", "PBXFileReference", explicitFileType="wrapper.application" if is_app else "wrapper.cfbundle",
                       includeInIndex=0, path=f"{name}.{'app' if is_app else 'xctest'}", sourceTree="BUILT_PRODUCTS_DIR")
         products.append(product)
         settings = target_settings(name)
-        configs = configuration_list(name, {"Debug": dict(settings), "Release": dict(settings)})
+        configurations = {"Debug": dict(settings), "Release": dict(settings)}
+        if is_app:
+            for configuration, team in development_teams.items():
+                if configuration in configurations:
+                    configurations[configuration]["DEVELOPMENT_TEAM"] = team
+        configs = configuration_list(name, configurations)
         dependencies = []
         if not is_app:
-            proxy = add(f"proxy:{name}:ReCollect", "PBXContainerItemProxy", containerPortal=project_id,
-                        proxyType=1, remoteGlobalIDString=target_ids["ReCollect"], remoteInfo="ReCollect")
-            dependencies.append(add(f"dependency:{name}:ReCollect", "PBXTargetDependency", target=target_ids["ReCollect"], targetProxy=proxy))
+            proxy = add(f"proxy:{name}:Bearings", "PBXContainerItemProxy", containerPortal=project_id,
+                        proxyType=1, remoteGlobalIDString=target_ids["Bearings"], remoteInfo="Bearings")
+            dependencies.append(add(f"dependency:{name}:Bearings", "PBXTargetDependency", target=target_ids["Bearings"], targetProxy=proxy))
         add(f"target:{name}", "PBXNativeTarget", buildConfigurationList=configs,
             buildPhases=[phase(name, "Sources", sources), phase(name, "Frameworks", []), phase(name, "Resources", resources)],
             buildRules=[], dependencies=dependencies, name=name, productName=name, productReference=product,
             productType="com.apple.product-type.application" if is_app else
-                        ("com.apple.product-type.bundle.unit-test" if name == "ReCollectTests" else "com.apple.product-type.bundle.ui-testing"))
+                        ("com.apple.product-type.bundle.unit-test" if name == "BearingsTests" else "com.apple.product-type.bundle.ui-testing"))
 
     products_group = add("group:Products", "PBXGroup", children=products, name="Products", sourceTree="<group>")
     main_group = add("group:main", "PBXGroup", children=[*groups, products_group], sourceTree="<group>")
@@ -177,7 +211,7 @@ def build_project() -> dict[str, str]:
     release = {**common, "DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym", "SWIFT_COMPILATION_MODE": "wholemodule",
                "SWIFT_OPTIMIZATION_LEVEL": "-O", "VALIDATE_PRODUCT": "YES"}
     project_configs = configuration_list("project", {"Debug": debug, "Release": release})
-    attributes = {target_ids[name]: {"CreatedOnToolsVersion": "16.0", **({"TestTargetID": target_ids["ReCollect"]} if name != "ReCollect" else {})}
+    attributes = {target_ids[name]: {"CreatedOnToolsVersion": "16.0", **({"TestTargetID": target_ids["Bearings"]} if name != "Bearings" else {})}
                   for name in names}
     add("project", "PBXProject", attributes={"BuildIndependentTargetsInParallel": "YES", "LastUpgradeCheck": "1600", "TargetAttributes": attributes},
         buildConfigurationList=project_configs, compatibilityVersion="Xcode 14.0", developmentRegion="en",
@@ -192,8 +226,8 @@ def build_project() -> dict[str, str]:
 
 def buildable(parent, name: str, target_ids: dict[str, str]) -> None:
     ET.SubElement(parent, "BuildableReference", BuildableIdentifier="primary", BlueprintIdentifier=target_ids[name],
-                  BuildableName=f"{name}.{'app' if name == 'ReCollect' else 'xctest'}", BlueprintName=name,
-                  ReferencedContainer="container:ReCollect.xcodeproj")
+                  BuildableName=f"{name}.{'app' if name == 'Bearings' else 'xctest'}", BlueprintName=name,
+                  ReferencedContainer="container:Bearings.xcodeproj")
 
 
 def write_scheme(target_ids: dict[str, str]) -> None:
@@ -201,7 +235,7 @@ def write_scheme(target_ids: dict[str, str]) -> None:
     action = ET.SubElement(scheme, "BuildAction", parallelizeBuildables="YES", buildImplicitDependencies="YES")
     entries = ET.SubElement(action, "BuildActionEntries")
     for name in target_ids:
-        is_app = name == "ReCollect"
+        is_app = name == "Bearings"
         entry = ET.SubElement(entries, "BuildActionEntry", buildForTesting="YES", buildForRunning="YES" if is_app else "NO",
                               buildForProfiling="YES" if is_app else "NO", buildForArchiving="YES" if is_app else "NO",
                               buildForAnalyzing="YES")
@@ -209,23 +243,23 @@ def write_scheme(target_ids: dict[str, str]) -> None:
     action = ET.SubElement(scheme, "TestAction", buildConfiguration="Debug", selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB",
                            selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB", shouldUseLaunchSchemeArgsEnv="YES")
     testables = ET.SubElement(action, "Testables")
-    for name in ["ReCollectTests", "ReCollectUITests"]:
+    for name in ["BearingsTests", "BearingsUITests"]:
         testable = ET.SubElement(testables, "TestableReference", skipped="NO", parallelizable="NO")
         buildable(testable, name, target_ids)
-    buildable(ET.SubElement(action, "MacroExpansion"), "ReCollect", target_ids)
+    buildable(ET.SubElement(action, "MacroExpansion"), "Bearings", target_ids)
     action = ET.SubElement(scheme, "LaunchAction", buildConfiguration="Debug", selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB",
                            selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB", launchStyle="0", useCustomWorkingDirectory="NO",
                            ignoresPersistentStateOnLaunch="NO", debugDocumentVersioning="YES", debugServiceExtension="internal", allowLocationSimulation="YES")
-    buildable(ET.SubElement(action, "BuildableProductRunnable", runnableDebuggingMode="0"), "ReCollect", target_ids)
+    buildable(ET.SubElement(action, "BuildableProductRunnable", runnableDebuggingMode="0"), "Bearings", target_ids)
     action = ET.SubElement(scheme, "ProfileAction", buildConfiguration="Release", shouldUseLaunchSchemeArgsEnv="YES",
                            savedToolIdentifier="", useCustomWorkingDirectory="NO", debugDocumentVersioning="YES")
-    buildable(ET.SubElement(action, "BuildableProductRunnable", runnableDebuggingMode="0"), "ReCollect", target_ids)
+    buildable(ET.SubElement(action, "BuildableProductRunnable", runnableDebuggingMode="0"), "Bearings", target_ids)
     ET.SubElement(scheme, "AnalyzeAction", buildConfiguration="Debug")
     ET.SubElement(scheme, "ArchiveAction", buildConfiguration="Release", revealArchiveInOrganizer="YES")
     ET.indent(scheme, space="   ")
     scheme_directory = PROJECT / "xcshareddata/xcschemes"
     scheme_directory.mkdir(parents=True, exist_ok=True)
-    ET.ElementTree(scheme).write(scheme_directory / "ReCollect.xcscheme", encoding="UTF-8", xml_declaration=True)
+    ET.ElementTree(scheme).write(scheme_directory / "Bearings.xcscheme", encoding="UTF-8", xml_declaration=True)
     workspace = PROJECT / "project.xcworkspace"
     workspace.mkdir(parents=True, exist_ok=True)
     (workspace / "contents.xcworkspacedata").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<Workspace version="1.0">\n   <FileRef location="self:"></FileRef>\n</Workspace>\n')
@@ -233,4 +267,4 @@ def write_scheme(target_ids: dict[str, str]) -> None:
 
 if __name__ == "__main__":
     write_scheme(build_project())
-    print("Generated ReCollect.xcodeproj with shared ReCollect scheme (app, unit tests, UI tests).")
+    print("Generated Bearings.xcodeproj with shared Bearings scheme (app, unit tests, UI tests).")

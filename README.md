@@ -1,14 +1,14 @@
-# ReCollect
+# Bearings
 
 A native, private iPhone journal. Move along your timeline, open a day, and write in morning, midday, or evening. Your writing stays in local SwiftData storage.
 
 ## Run the app
 
-1. Open `ReCollect.xcodeproj` in Xcode.
-2. Choose the **ReCollect** scheme and an **iPhone simulator** at the top of the window.
+1. Open `Bearings.xcodeproj` in Xcode.
+2. Choose the **Bearings** scheme and an **iPhone simulator** at the top of the window.
 3. Press **⌘R**. No developer-account configuration is needed for the simulator.
 
-Xcode is already installed on the development Mac. The app supports iOS 17 and later and uses Apple's frameworks without external packages. Running on a physical iPhone additionally requires selecting your Apple signing team in the app target; no signing identity is committed here.
+Xcode is already installed on the development Mac. The app supports iOS 17 and later and uses Apple's frameworks without external packages. Running on a physical iPhone requires a valid Apple signing team in the app target. The existing team configuration is retained; no signing certificate is committed here.
 
 ## Writing
 
@@ -20,7 +20,7 @@ Xcode is already installed on the development Mac. The app supports iOS 17 and l
 
 ## Project map
 
-`ReCollect/` contains the app, models, storage, screens, design tokens, and local retrieval boundary. `ReCollectTests/` verifies data and editor behavior; `ReCollectUITests/` exercises the app through native controls. `docs/` records the product, references, architecture, decisions, progress, and exact verification results. `AGENTS.md` guides future development.
+`Bearings/` contains the app, models, storage, screens, design tokens, and local retrieval boundary. `BearingsTests/` verifies data and editor behavior; `BearingsUITests/` exercises the app through native controls. `docs/` records the product, references, architecture, decisions, progress, and exact verification results. `AGENTS.md` guides future development.
 
 Source membership in the Xcode project is explicit. After adding/removing Swift files or supported resources, run:
 
@@ -28,14 +28,14 @@ Source membership in the Xcode project is explicit. After adding/removing Swift 
 python3 Scripts/generate_project.py
 ```
 
-The script requires only Python's standard library and generates a deterministic shared project/scheme.
+The script uses Python's standard library and macOS `plutil`, preserves existing app signing teams, and generates a deterministic shared project/scheme.
 
 ## Tests
 
 Use **⌘U** in Xcode to run tests on the selected simulator. For a command-line run:
 
 ```sh
-xcodebuild test -project ReCollect.xcodeproj -scheme ReCollect \
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
   -destination 'platform=iOS Simulator,name=iPhone 18 Pro' \
   -derivedDataPath build/DerivedData -parallel-testing-enabled NO \
   -collect-test-diagnostics never \
@@ -46,10 +46,12 @@ Use an available simulator name on your Mac. UI tests use a separate disk-backed
 
 ## References and future work
 
-The approved visual reference is [Reconnect in Figma](https://www.figma.com/design/dfQAU1BufaXau1fi2bWc5M/Reconnect?node-id=0-1). [ReCollect in Notion](https://app.notion.com/p/3f5076d4a2e18039877ed1727adbcb42) is the product/documentation home. The prototype's circles and writing font were clarified by the owner; necessary date controls, labels, and entry lists are documented adaptations. Personal example writing from Figma is not bundled in the app.
+The approved visual reference is [Reconnect in Figma](https://www.figma.com/design/dfQAU1BufaXau1fi2bWc5M/Reconnect?node-id=0-1). [Bearings in Notion](https://app.notion.com/p/3f5076d4a2e18039877ed1727adbcb42) is the product/documentation home. The prototype's circles and writing font were clarified by the owner; necessary date controls, labels, and entry lists are documented adaptations. Personal example writing from Figma is not bundled in the app.
 
-The saved and verified [iOS Development handoff](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204) contains the product, architecture, reference review, decisions, testing and milestone progress. `docs/NotionSync.md` records synchronization evidence.
+The previously saved and verified [iOS Development handoff](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204) contains the product, architecture, reference review, decisions, testing and milestone progress. `docs/NotionSync.md` records synchronization evidence, including the current Bearings milestone status.
 
-AI, cloud sync, export/backup, progressive design reveal, and final brand artwork remain future work. A local read-only snapshot interface exists for later integration; it sends nothing over the network.
+The owner supplied and approved `appIcon.png` for the Bearings app icon. The artwork is preserved without recoloring or redrawing and resized only to 1024 × 1024 for `Bearings/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png`. The root source remains untouched. The original compass/map direction requested `#C8AB89` and `#323575`; those are design targets, not a claim that the supplied image contains exactly two colors.
 
-Git is configured locally on `codex/recollect-foundation`. To host the project privately on GitHub later, sign in to GitHub and authorize creating/pushing a private repository. Remote publication requires the owner's approval.
+AI, cloud sync, export/backup, and progressive design reveal remain future work. A local read-only snapshot interface exists for later integration; it sends nothing over the network.
+
+Git is configured locally on `codex/bearings-foundation`. To host the project privately on GitHub later, sign in to GitHub and authorize creating/pushing a private repository. Remote publication requires the owner's approval.
