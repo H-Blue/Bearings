@@ -51,6 +51,9 @@ struct DayView: View {
                         Color.clear.preference(key: DayScrollTopKey.self,
                                                value: geometry.frame(in: .named("dayScroll")).minY)
                     }.frame(height: 0)
+                    if AnalysisPeriod.isWeekStart(day) {
+                        SundayWeeklyReviewCard(day: day, service: analysisService)
+                    }
                     dayBranches
                     if entries.isEmpty {
                         Text("A place for this day.\nChoose morning, midday, or evening to begin.")

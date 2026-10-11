@@ -305,6 +305,7 @@
 			children = (
 				"ED0BED743B553258E77CEAC9",
 				"AF49DDB5E07E497BD56A6CE9",
+				"4B5827A7CDE44BCF7AD96604",
 			);
 			path = "Reflection";
 			sourceTree = "<group>";
@@ -396,6 +397,7 @@
 				"457EA0C7A68E603E2AB563FB",
 				"78AC6145569630996C82E624",
 				"483C27699A1C51A9221AA64A",
+				"9E5B495FF4E11EBC60D10F59",
 				"D9F691EA6B06395EA32FB459",
 				"282F6515D2822E8938D0927E",
 				"128F10DC65C949B0BE2047D0",
@@ -474,6 +476,12 @@
 			isa = "PBXFileReference";
 			lastKnownFileType = "sourcecode.swift";
 			path = "PersistenceController.swift";
+			sourceTree = "<group>";
+		};
+		4B5827A7CDE44BCF7AD96604 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "sourcecode.swift";
+			path = "SundayWeeklyReviewCard.swift";
 			sourceTree = "<group>";
 		};
 		4B78B504B837D178C85A8A8A = {
@@ -818,6 +826,10 @@
 		9C3D7281C4F06F3E83AA9B5B = {
 			isa = "PBXBuildFile";
 			fileRef = "8A57FFA75EEE6B6D13D6262B";
+		};
+		9E5B495FF4E11EBC60D10F59 = {
+			isa = "PBXBuildFile";
+			fileRef = "4B5827A7CDE44BCF7AD96604";
 		};
 		9E69F682DAD7CD00551B7B94 = {
 			isa = "PBXFileReference";

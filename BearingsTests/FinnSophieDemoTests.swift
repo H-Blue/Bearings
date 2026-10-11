@@ -47,4 +47,38 @@ final class FinnSophieDemoTests: XCTestCase {
 
         XCTAssertEqual(try store.snapshots(from: firstDay, through: reviewDay).count, 12)
     }
+
+    @MainActor
+    func testPreparedReviewRepairsAfterDailyAnalysisWithoutReplacingWriting() throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        try FinnSophieDemoSeeder.seed(in: container)
+        let store = JournalStore(context: container.mainContext)
+        let analyzedDay = try XCTUnwrap(JournalDay(key: "2026-10-08"))
+        let reviewDay = try XCTUnwrap(JournalDay(key: "2026-10-11"))
+        let period = AnalysisPeriod.weekForReview(on: reviewDay)
+        let snapshots = try store.snapshots(from: analyzedDay, through: analyzedDay)
+        let daily = DailyAnalysisContent(
+            summary: "Finn tried to support Sophie and noticed that advice arrived before listening.",
+            primaryEmotion: .love,
+            secondaryEmotion: .sadness,
+            importantEvents: ["Sophie asked Finn to listen before making a plan."],
+            emotionalTrajectory: "Care and concern became more specific."
+        )
+        try store.saveDailyAnalysis(
+            daily,
+            for: analyzedDay,
+            sourceFingerprint: AnalysisFingerprint.entries(snapshots, version: JournalAnalysisService.version),
+            version: JournalAnalysisService.version
+        )
+        XCTAssertTrue(try XCTUnwrap(store.reflection(for: period)).isStale)
+
+        try FinnSophieDemoSeeder.repairPreparedReflectionIfNeeded(in: container)
+
+        let repaired = try XCTUnwrap(store.reflection(for: period))
+        XCTAssertFalse(repaired.isStale)
+        XCTAssertEqual(repaired.content.isPreparedDemo, true)
+        XCTAssertEqual(repaired.sourceFingerprint,
+                       try store.reflectionFingerprint(for: period, version: JournalAnalysisService.version))
+        XCTAssertEqual(try store.snapshots(from: period.firstDay, through: period.lastDay).count, 12)
+    }
 }

@@ -136,9 +136,10 @@ final class ReflectionFlowTests: XCTestCase {
         waitFor(app.buttons["timeline.today"], timeout: 12)
         openToday()
         XCTAssertFalse(entryButton().exists, "The Sunday review day must not contain a journal entry.")
-
-        reveal(app.buttons["reflection.weekly"])
-        app.buttons["reflection.weekly"].tap()
+        XCTAssertTrue(waitFor(app.staticTexts["reflection.sunday.provenance"]).label.contains("Prepared fictional demo"))
+        XCTAssertTrue(waitFor(app.staticTexts["reflection.sunday.summary"]).label.contains("Finn spent the week"))
+        XCTAssertTrue(app.staticTexts["reflection.sunday.improvement"].label.contains("ask what she needs"))
+        waitFor(app.buttons["reflection.sunday.open"]).tap()
         XCTAssertTrue(waitFor(app.staticTexts["reflection.provenance"]).label.contains("Prepared fictional demo"))
         XCTAssertTrue(waitFor(app.staticTexts["reflection.period.summary"]).label.contains("Finn spent the week"))
         XCTAssertTrue(app.staticTexts["reflection.weekly.improvement"].label.contains("ask what she needs"))

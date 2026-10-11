@@ -62,13 +62,14 @@ private struct StoreBootstrapView: View {
             } else if arguments.contains("--leave-finn-sophie-demo") {
                 UserDefaults.standard.removeObject(forKey: FinnSophieDemoSeeder.activeDefaultsKey)
             }
+            let finnSophieDemoActive = UserDefaults.standard.bool(forKey: FinnSophieDemoSeeder.activeDefaultsKey)
             if arguments.contains("--uitesting") {
                 let directory = URL.applicationSupportDirectory.appending(path: "BearingsUITests", directoryHint: .isDirectory)
                 if arguments.contains("--reset-test-store"), FileManager.default.fileExists(atPath: directory.path) {
                     try FileManager.default.removeItem(at: directory)
                 }
                 storeURL = directory.appending(path: "ui-tests.store")
-            } else if UserDefaults.standard.bool(forKey: FinnSophieDemoSeeder.activeDefaultsKey) {
+            } else if finnSophieDemoActive {
                 let directory = URL.applicationSupportDirectory
                     .appending(path: "BearingsDemos", directoryHint: .isDirectory)
                     .appending(path: "FinnSophie", directoryHint: .isDirectory)
@@ -81,6 +82,9 @@ private struct StoreBootstrapView: View {
             let openedContainer = try PersistenceController.makeContainer(storeURL: storeURL)
             #if DEBUG
             try FinnSophieDemoSeeder.seedIfRequested(in: openedContainer)
+            if finnSophieDemoActive {
+                try FinnSophieDemoSeeder.repairPreparedReflectionIfNeeded(in: openedContainer)
+            }
             try ProfessionalCaseStudyDemoSeeder.seedIfRequested(in: openedContainer)
             #endif
             container = openedContainer
@@ -135,6 +139,31 @@ enum FinnSophieDemoSeeder {
             for: reviewedWeek,
             version: JournalAnalysisService.version
         )
+        try store.saveReflection(
+            preparedReflection,
+            for: reviewedWeek,
+            sourceFingerprint: fingerprint,
+            version: JournalAnalysisService.version
+        )
+    }
+
+    /// Daily analysis records are legitimate fingerprint inputs and therefore
+    /// make an older prepared fixture stale. Keep the authored demo available
+    /// against those current local inputs, while never replacing a reflection
+    /// that the writer refreshed through the real on-device model.
+    static func repairPreparedReflectionIfNeeded(in container: ModelContainer) throws {
+        let store = JournalStore(context: container.mainContext)
+        let reviewDay = JournalDay(key: "2026-10-11")!
+        let reviewedWeek = AnalysisPeriod.weekForReview(on: reviewDay)
+        guard let existing = try store.reflection(for: reviewedWeek),
+              existing.content.isPreparedDemo == true else { return }
+        let fingerprint = try store.reflectionFingerprint(
+            for: reviewedWeek,
+            version: JournalAnalysisService.version
+        )
+        guard existing.isStale
+                || existing.analysisVersion != JournalAnalysisService.version
+                || existing.sourceFingerprint != fingerprint else { return }
         try store.saveReflection(
             preparedReflection,
             for: reviewedWeek,
