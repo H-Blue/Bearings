@@ -114,11 +114,11 @@ struct AppleJournalIntelligence: JournalIntelligence {
             task: "Review this journal draft for language that is vague or difficult to understand. If present, copy one short exact excerpt verbatim, explain tentatively what information is unclear, and ask one open-ended probing question that helps the writer clarify their own experience. If the writing is already specific, use nil for the excerpt, say that clearly, and ask one optional deepening question. Do not infer another person's intent, diagnose, rewrite the journal, or answer the question for the writer.",
             generating: GeneratedEmotionalZoom.self
         )
-        let trimmedExcerpt = result.vagueExcerpt?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let content = EmotionalZoomContent(
-            vagueExcerpt: trimmedExcerpt?.isEmpty == false ? trimmedExcerpt : nil,
-            explanation: result.explanation.trimmingCharacters(in: .whitespacesAndNewlines),
-            probingQuestion: result.probingQuestion.trimmingCharacters(in: .whitespacesAndNewlines)
+        let content = EmotionalZoomContent.groundedModelOutput(
+            vagueExcerpt: result.vagueExcerpt,
+            explanation: result.explanation,
+            probingQuestion: result.probingQuestion,
+            source: text
         )
         try content.validate(source: text)
         return content

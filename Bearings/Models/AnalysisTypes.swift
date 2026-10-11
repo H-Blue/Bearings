@@ -193,6 +193,37 @@ struct EmotionalZoomContent: Equatable, Sendable {
     var explanation: String
     var probingQuestion: String
 
+    /// Foundation Models can occasionally paraphrase an excerpt even when its
+    /// guide asks for a verbatim copy. Never present that text as a quote. The
+    /// excerpt is optional, so discard an ungrounded value and preserve the
+    /// rest of the response. Empty required fields receive neutral prompts so
+    /// a structurally sparse model response does not turn into a dead end.
+    static func groundedModelOutput(
+        vagueExcerpt: String?,
+        explanation: String,
+        probingQuestion: String,
+        source: String
+    ) -> EmotionalZoomContent {
+        let candidate = vagueExcerpt?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let groundedExcerpt = candidate.flatMap { value in
+            !value.isEmpty && source.contains(value) ? value : nil
+        }
+        let trimmedExplanation = explanation.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedQuestion = probingQuestion.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return EmotionalZoomContent(
+            vagueExcerpt: groundedExcerpt,
+            explanation: trimmedExplanation.isEmpty
+                ? (groundedExcerpt == nil
+                    ? "No exact passage was highlighted from this writing."
+                    : "This passage may be clearer with one more concrete detail.")
+                : trimmedExplanation,
+            probingQuestion: trimmedQuestion.isEmpty
+                ? "What detail feels most important to explore further?"
+                : trimmedQuestion
+        )
+    }
+
     func validate(source: String) throws {
         let excerpt = vagueExcerpt?.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !explanation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,

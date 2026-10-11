@@ -179,6 +179,49 @@ final class AnalysisEngineTests: XCTestCase {
                                                        probingQuestion: "\n").validate(source: source))
     }
 
+    func testEmotionalZoomDropsParaphrasedExcerptWithoutDiscardingUsefulResponse() throws {
+        let source = "I want to hear the full timeline before responding."
+        let content = EmotionalZoomContent.groundedModelOutput(
+            vagueExcerpt: "I want to hear everything before I respond.",
+            explanation: "The writer names a concrete plan and could consider what listening looks like in the moment.",
+            probingQuestion: "How will you know that you heard the full timeline?",
+            source: source
+        )
+
+        XCTAssertNil(content.vagueExcerpt)
+        XCTAssertEqual(content.explanation, "The writer names a concrete plan and could consider what listening looks like in the moment.")
+        XCTAssertEqual(content.probingQuestion, "How will you know that you heard the full timeline?")
+        XCTAssertNoThrow(try content.validate(source: source))
+    }
+
+    func testEmotionalZoomRepairsEmptyRequiredFieldsWithNeutralPrompts() throws {
+        let source = "I want to hear the full timeline before responding."
+        let content = EmotionalZoomContent.groundedModelOutput(
+            vagueExcerpt: nil,
+            explanation: " \n",
+            probingQuestion: "\t",
+            source: source
+        )
+
+        XCTAssertNil(content.vagueExcerpt)
+        XCTAssertEqual(content.explanation, "No exact passage was highlighted from this writing.")
+        XCTAssertEqual(content.probingQuestion, "What detail feels most important to explore further?")
+        XCTAssertNoThrow(try content.validate(source: source))
+    }
+
+    func testEmotionalZoomPreservesExactGroundedExcerpt() throws {
+        let source = "I feel bad about the thing that happened."
+        let content = EmotionalZoomContent.groundedModelOutput(
+            vagueExcerpt: "  I feel bad  ",
+            explanation: "The feeling and event are not yet specific.",
+            probingQuestion: "What happened, and what feeling fits it most closely?",
+            source: source
+        )
+
+        XCTAssertEqual(content.vagueExcerpt, "I feel bad")
+        XCTAssertNoThrow(try content.validate(source: source))
+    }
+
     func testEmotionalZoomProcessesEveryDraftChunkAndReturnsGroundedAmbiguity() async throws {
         let source = String(repeating: "A specific synthetic detail. ", count: 120) + "I feel bad about the thing."
         let mock = ZoomMockIntelligence()
