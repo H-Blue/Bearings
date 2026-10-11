@@ -2,6 +2,41 @@
 
 Run on October 10, 2026 using Xcode 27.0 (27A266a), Swift 6.4 compiler in Swift 5 language mode, and the iOS 27 SDK. The deployment target is iOS 17.
 
+## Owner-directed centered timeline
+
+Verified on October 11, 2026 using Xcode 27.0 and iPhone 17e, iOS 26.5. Timeline branding/slogan and both bottom helper messages are removed. A thin fountain-pen outline uses the shared opaque `#323575` token; its accessible “Write today” button retains a 44-point hit target and opens today’s journal. The native horizontal scroll surface extends through the blank bottom thumb area, while date tap targets remain bounded to their cells.
+
+- Debug simulator compilation and three normal-text UI tests passed with zero failures in 86.300 seconds: bottom thumb scrolling in both directions and preserved scroll position after Back, earlier-month writing/markers/navigation, and forward/reverse Reduce Motion navigation. Evidence: `build/BearingsTimelineRefresh.xcresult` and `.log`.
+- Three maximum-text UI tests passed with zero failures in 88.948 seconds: bottom thumb scrolling/reverse context, visible/tappable calendar dates before and after Back, and four-entry marker counts with disk relaunch. Evidence: `build/BearingsTimelineRefreshMaximumText.xcresult` and `.log`. Both reviewed marker screenshots show the full `+1`, three dots and complete two-digit dates. Both simulators’ text sizes were restored to `large`.
+- iPhone 16 Pro screenshots at normal and maximum text size were reviewed at `docs/evidence/TimelineRefresh/TimelineDefault.png` and `TimelineMaximumText.png`. Both images have a full-width navy axis at pixel row 1352 of 2622, centered in the safe-area viewport. On the compact iPhone at maximum text with four-entry markers, the minimum clearance below the controls places the axis slightly lower so the count and all dates fit. UI-test attachments are exported under `docs/evidence/TimelineRefresh/NormalAttachments/` and `MaximumTextAttachments/`.
+- Source review confirms unchanged opening screen, app icon, journal models, persistence and compatibility identities. The full unit suite, full UI suite, device Release build, iOS 17 runtime and physical-device thumb interaction were not rerun for this view-only change. Historical passing results remain below.
+
+The normal run used:
+
+```sh
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/BearingsTestDerivedData \
+  -resultBundlePath build/BearingsTimelineRefresh.xcresult \
+  -only-testing:BearingsUITests/JournalFlowTests/testTimelineCanBeScrolledFromTheBottomAndRetainsPosition \
+  -only-testing:BearingsUITests/JournalFlowTests/testPreviousMonthDayRetainsEntryAndNavigationContext \
+  -only-testing:BearingsUITests/JournalFlowTests/testForwardAndReverseNavigationWithReduceMotion \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+```
+
+The maximum-text run first set `xcrun simctl ui 47707FD0-2CB6-49DC-B509-4B102AF0837C content_size accessibility-extra-extra-extra-large`, then used:
+
+```sh
+xcodebuild test -project Bearings.xcodeproj -scheme Bearings \
+  -destination 'platform=iOS Simulator,id=47707FD0-2CB6-49DC-B509-4B102AF0837C' \
+  -derivedDataPath build/BearingsTestDerivedData \
+  -resultBundlePath build/BearingsTimelineRefreshMaximumText.xcresult \
+  -only-testing:BearingsUITests/JournalFlowTests/testTimelineCanBeScrolledFromTheBottomAndRetainsPosition \
+  -only-testing:BearingsUITests/JournalFlowTests/testTimelineDateCellRemainsReachableWithLargeText \
+  -only-testing:BearingsUITests/JournalFlowTests/testMultipleEntriesRemainOnTheSameDay \
+  -parallel-testing-enabled NO -collect-test-diagnostics never CODE_SIGNING_ALLOWED=NO
+```
+
 ## Owner-directed map opening screen
 
 Verified on October 11, 2026. `OpeningMap` preserves the owner-selected 1206 × 2622 right-curving river/ridge image byte-for-byte. Bearings and “Find what’s been lost inside.” appear in navy at the safe-area top right. The active-scene task waits two seconds; scene interruptions cancel/restart it, and completed openings do not replay on normal foreground returns. Storage initializes afterward, retaining the existing visible failure/retry path.

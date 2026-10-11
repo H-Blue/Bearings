@@ -1,6 +1,6 @@
 # Bearings Notion synchronization
 
-The owner-directed map opening-screen milestone was synchronized and fetched for verification on October 11, 2026. The preceding public GitHub setup, linework, rename/icon and foundation snapshots remain verified history below. The opening-screen implementation is local; the public repository remains at the prior setup milestone. No hackathon submission has been made.
+The owner-directed centered-timeline milestone was synchronized and fetched for verification on October 11, 2026. The preceding opening-screen, public GitHub setup, linework, rename/icon and foundation snapshots remain verified history below. The timeline and opening-screen implementations are local; the public repository remains at the prior authorized setup milestone. No hackathon submission has been made.
 
 - Page: [iOS Development](https://app.notion.com/p/3f5076d4a2e181619c8bff6109e7ba69?pvs=204).
 - Page ID: `3f5076d4-a2e1-8161-9c8b-ff6109e7ba69`.
@@ -10,22 +10,46 @@ The owner-directed map opening-screen milestone was synchronized and fetched for
 - Steps data source ID: `3f5076d4-a2e1-80f3-938b-000b81e7b3f8`.
 - Source repository: [H-Blue/Bearings](https://github.com/H-Blue/Bearings), public, default branch `main`.
 
-## Current opening-screen saved scope
+## Current centered-timeline saved scope
+
+Source-derived targeted edits updated Product, Architecture, Decisions, Testing and Progress in the existing iOS Development handoff. They record removed timeline branding/helper text, centered safe-area axis with clearance for large controls/markers, native bottom thumb scrolling, the `#323575` fountain-pen shortcut, actual-axis transition anchor, six passing UI test executions, reviewed normal/maximum-size screenshots, and explicit device/runtime/test limits. The unchanged opening experience, storage, historical evidence, native tables, page hierarchy and ReferenceReview section were preserved. The existing home records the same owner direction and the local implementation/public-source distinction. No new pages, task changes or file uploads were performed.
+
+## Current centered-timeline verification evidence
+
+1. Home and handoff were fetched before targeted edits; each exact source-derived edit uniquely matched its intended target.
+2. The first complete handoff read-back matched the expected previous native content plus targeted edits after normalization: **78,788 normalized characters**.
+3. The Progress synchronization sentence was changed from pending to verified, and its saved counterpart patched. A final complete handoff fetch matched the exact expected content: **79,085 normalized characters**.
+4. The home was fetched after its owner-decision addition and matched the expected preserved content plus that addition: **4,553 normalized characters**. Its same iOS Development child remains present.
+
+Normalization removes escaped Markdown punctuation and whitespace differences, treats shell `sh`/`bash` fence labels equivalently, and compares native page mentions by URL. This checks complete saved native content against exact expected edits, rather than claiming byte-for-byte Markdown serialization. Native verification badges were not changed. No journal files, images or test evidence were uploaded.
+
+## Current centered-timeline source hashes
+
+| Local source | SHA-256 |
+| --- | --- |
+| `docs/Product.md` | `f224a1a5d818e113ea2f82357137e84de86f17cb0953d178c5e67ba115070578` |
+| `docs/Architecture.md` | `fb074dfecd5ce939adf59b5a2209601135e76c6b7a807d47d8f8b7bc6da47041` |
+| `docs/ReferenceReview.md` | `6796f22376e0228cc14e1bf5f6972da68647a3d4a0ce6a05b458827bee5ca778` |
+| `docs/Decisions.md` | `9b27c5e413636348a9d122969166ac366fc08effb08d136e16f5ae815aa4c321` |
+| `docs/Testing.md` | `b8c5c853e55e5d1804fd1863488b44e72fad1fa40c3450f817710a740bbd3b94` |
+| `docs/Progress.md` | `a294c3f5c8d8639cbc4b04bc32f33861b793bff038b3eadfdc617338b178f80f` |
+
+## Previous opening-screen saved scope
 
 Targeted changes added the Product opening experience, Architecture opening sequence, Decisions opening-screen decision, Testing verification, and Progress milestone to the existing six-document iOS Development handoff. Product/Architecture/Decisions status dates and the handoff introduction/progress milestone range were updated. Historical tables, tests, source facts and the unchanged ReferenceReview section were preserved. The existing home records the owner direction, same handoff child, local implementation/public-source distinction, and no-submission boundary. No new pages, task changes or file uploads were performed.
 
 The saved scope records the unchanged right-curving map asset, navy safe-area title/slogan with Dynamic Type, two uninterrupted active seconds with cancellation/restart on interruption, no replay after a completed opening, conditional storage initialization with visible existing error recovery, final two-test success, normal/maximum-size simulator screenshots, approximately 2.13-second native timing evidence, and physical-device/runtime/interrupt limits.
 
-## Current opening-screen verification evidence
+## Previous opening-screen verification evidence
 
 1. Home and handoff were fetched before targeted edits. Native Notion formatting and the existing child hierarchy were preserved.
 2. The first full handoff read-back matched the expected original content plus the source-derived additions/status changes after normalization: **71,405 normalized characters**.
 3. Local Progress was changed from pending synchronization to the completed result. Its saved counterpart, milestone range and handoff introduction were updated, then the entire handoff fetched again. The final saved content matched all expected targeted changes while preserving unrelated content: **71722 normalized characters**.
 4. The existing home opening decision and unchanged iOS Development child were fetched and verified. No assets, screenshots, build evidence or journal files were uploaded to Notion.
 
-Normalization removes escaped Markdown punctuation and whitespace differences, treats shell `sh`/`bash` fence labels equivalently, and compares native page references by URL. These checks compare the complete saved handoff with the exact expected edits to its prior verified native content; no new full Markdown conversion was performed. The current local six-document sources used for those updates are identified below. Fetch responses did not report truncation or unknown-block indicators; absent fields are not explicit false values. Native verification badges were not changed.
+Normalization removes escaped Markdown punctuation and whitespace differences, treats shell `sh`/`bash` fence labels equivalently, and compares native page references by URL. These checks compare the complete saved handoff with the exact expected edits to its prior verified native content; no new full Markdown conversion was performed. The opening-screen local six-document sources used for those updates are identified below. Fetch responses did not report truncation or unknown-block indicators; absent fields are not explicit false values. Native verification badges were not changed.
 
-## Current opening-screen source hashes
+## Previous opening-screen source hashes
 
 | Local source | SHA-256 |
 | --- | --- |

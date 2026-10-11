@@ -267,6 +267,31 @@ final class JournalFlowTests: XCTestCase {
         attachScreenshot(named: "Timeline after returning to the selected date")
     }
 
+    func testTimelineCanBeScrolledFromTheBottomAndRetainsPosition() throws {
+        let today = try timelineTodayDateButton()
+        waitFor(today)
+        XCTAssertFalse(app.staticTexts["Bearings"].exists)
+        XCTAssertFalse(app.staticTexts["Find what’s been lost inside."].exists)
+        XCTAssertFalse(app.staticTexts["Your story begins with a day."].exists)
+        XCTAssertEqual(app.buttons["timeline.today"].label, "Write today")
+        let initialX = today.frame.midX
+        let right = app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.88))
+        let left = app.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.88))
+        right.press(forDuration: 0.1, thenDragTo: left)
+        XCTAssertLessThan(today.frame.midX, initialX - 40,
+                          "A thumb swipe near the bottom must move the timeline.")
+        left.press(forDuration: 0.1, thenDragTo: right)
+        XCTAssertTrue(today.isHittable, "A reverse bottom swipe should reveal today's date again.")
+        let returnedX = today.frame.midX
+        attachScreenshot(named: "Centered timeline after bottom thumb swipes")
+        today.tap()
+        waitFor(app.buttons["day.newEntry"])
+        waitFor(app.buttons["day.back"]).tap()
+        waitFor(today)
+        XCTAssertEqual(today.frame.midX, returnedX, accuracy: 2,
+                       "Returning from a day must retain the scrolled timeline position.")
+    }
+
     private func timelineTodayDateButton() throws -> XCUIElement {
         // Match the app's local Gregorian date identity. These tests assume a
         // run does not cross local midnight or a time-zone change.

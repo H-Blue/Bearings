@@ -7,7 +7,6 @@ struct TimelineView: View {
     @State private var month = JournalMonth()
     @State private var pickerDate = Date()
     @State private var showsDatePicker = false
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric(relativeTo: .caption) private var dateCaptionAllowance: CGFloat = 20
     @ScaledMetric(relativeTo: .caption2) private var markerCaptionAllowance: CGFloat = 16
 
@@ -28,15 +27,7 @@ struct TimelineView: View {
 
     var body: some View {
         GeometryReader { viewport in
-            if dynamicTypeSize.isAccessibilitySize {
-                ScrollView(.vertical) {
-                    timelineContent(viewport: viewport)
-                        .frame(minHeight: viewport.size.height)
-                }
-                .scrollIndicators(.hidden)
-            } else {
-                timelineContent(viewport: viewport)
-            }
+            timelineContent(viewport: viewport)
         }
         .sheet(isPresented: $showsDatePicker) {
             NavigationStack {
@@ -58,18 +49,21 @@ struct TimelineView: View {
 
     private func timelineContent(viewport: GeometryProxy) -> some View {
         VStack(spacing: 0) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Bearings").font(.largeTitle.weight(.medium))
-                    Text("Find what’s been lost inside.").font(.subheadline).foregroundStyle(BearingsTheme.quietInk)
-                }
-                Spacer(minLength: 10)
-                Button("Today") {
+            HStack {
+                Spacer()
+                Button {
                     month = JournalMonth()
                     onSelect(JournalDay(date: Date()), .center)
+                } label: {
+                    FountainPenIcon()
+                        .stroke(BearingsTheme.line, style: StrokeStyle(lineWidth: 1.4, lineCap: .round, lineJoin: .round))
+                        .frame(width: 28, height: 28)
+                        .rotationEffect(.degrees(40))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
-                .font(.body)
-                .frame(minHeight: 44)
+                .accessibilityLabel("Write today")
+                .accessibilityHint("Open today's journal")
                 .accessibilityIdentifier("timeline.today")
             }
             .padding(.horizontal, 24).padding(.top, 24)
@@ -90,38 +84,43 @@ struct TimelineView: View {
                     .accessibilityLabel("Next month").accessibilityIdentifier("timeline.nextMonth")
             }
             .padding(.horizontal, 20).padding(.top, 24)
-            Spacer(minLength: 24)
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal) {
-                    HStack(alignment: .top, spacing: 0) {
-                        ForEach(days) { day in
-                            GeometryReader { tick in
-                                TimelineDayTick(day: day, count: counts[day.key, default: 0],
-                                                cellWidth: dayCellWidth,
-                                                markerAreaHeight: markerAreaHeight,
-                                                onSelect: {
-                                    let frame = tick.frame(in: .named("timelineRoot"))
-                                    onSelect(day, UnitPoint(
-                                        x: min(max(frame.midX / viewport.size.width, 0), 1),
-                                        y: min(max((frame.minY + 80) / viewport.size.height, 0), 1)
-                                    ))
-                                })
+            GeometryReader { scrollArea in
+                // Center the horizontal axis in the safe-area viewport, while
+                // keeping the native scroll surface reachable near the bottom.
+                let headerHeight = viewport.size.height - scrollArea.size.height
+                let axisOffset = markerAreaHeight + 10 + 55
+                let topInset = max(24, viewport.size.height / 2 - headerHeight - axisOffset)
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal) {
+                        HStack(alignment: .top, spacing: 0) {
+                            ForEach(days) { day in
+                                GeometryReader { tick in
+                                    TimelineDayTick(day: day, count: counts[day.key, default: 0],
+                                                    cellWidth: dayCellWidth,
+                                                    markerAreaHeight: markerAreaHeight,
+                                                    onSelect: {
+                                        let frame = tick.frame(in: .named("timelineRoot"))
+                                        onSelect(day, UnitPoint(
+                                            x: min(max(frame.midX / viewport.size.width, 0), 1),
+                                            y: min(max((frame.minY + axisOffset) / viewport.size.height, 0), 1)
+                                        ))
+                                    })
+                                }
+                                .frame(width: dayCellWidth, height: dayCellHeight)
+                                .id(day.key)
                             }
-                            .frame(width: dayCellWidth, height: dayCellHeight)
-                            .id(day.key)
                         }
+                        .padding(.horizontal, 24)
+                        .padding(.top, topInset)
+                        .frame(minHeight: scrollArea.size.height, alignment: .top)
+                        .contentShape(Rectangle())
                     }
-                    .padding(.horizontal, 24)
+                    .scrollIndicators(.hidden)
+                    .accessibilityIdentifier("timeline.scroll")
+                    .onAppear { scrollToFocus(proxy) }
+                    .onChange(of: month) { _, _ in scrollToFocus(proxy) }
                 }
-                .scrollIndicators(.hidden)
-                .frame(height: dayCellHeight)
-                .onAppear { scrollToFocus(proxy) }
-                .onChange(of: month) { _, _ in scrollToFocus(proxy) }
             }
-            Spacer(minLength: 24)
-            Text(entries.isEmpty ? "Your story begins with a day." : "Choose a day to return to your story.")
-                .font(.subheadline).foregroundStyle(BearingsTheme.quietInk)
-                .multilineTextAlignment(.center).padding(.horizontal, 24).padding(.bottom, 28)
         }
         .buttonStyle(.plain)
     }
@@ -176,5 +175,34 @@ private struct TimelineDayTick: View {
         .accessibilityLabel("\(day.longLabel), \(count) \(count == 1 ? "entry" : "entries")")
         .accessibilityHint("Open this day")
         .accessibilityIdentifier("timeline.openDay.\(day.key)")
+    }
+}
+
+/// A small fountain pen: capped barrel, shoulders, split nib and breather hole.
+private struct FountainPenIcon: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+            CGPoint(x: rect.minX + x * rect.width / 28, y: rect.minY + y * rect.height / 28)
+        }
+        path.move(to: point(11, 3))
+        path.addQuadCurve(to: point(17, 3), control: point(14, 0))
+        path.addLine(to: point(17, 16))
+        path.addLine(to: point(19, 20))
+        path.addLine(to: point(14, 27))
+        path.addLine(to: point(9, 20))
+        path.addLine(to: point(11, 16))
+        path.closeSubpath()
+        path.move(to: point(11, 7))
+        path.addLine(to: point(17, 7))
+        path.move(to: point(11, 16))
+        path.addLine(to: point(17, 16))
+        path.move(to: point(14, 22))
+        path.addLine(to: point(14, 27))
+        path.addEllipse(in: CGRect(x: point(13, 20).x, y: point(13, 20).y,
+                                  width: rect.width / 14, height: rect.height / 14))
+        path.move(to: point(19, 4))
+        path.addLine(to: point(19, 11))
+        return path
     }
 }

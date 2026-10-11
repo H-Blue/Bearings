@@ -1,6 +1,6 @@
 # Bearings development progress
 
-Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, GitHub setup, and map opening screen, October 10–11, 2026.
+Milestones: native journaling foundation, owner-directed Bearings rename/app icon, blue app linework, GitHub setup, map opening screen, and centered timeline, October 10–11, 2026.
 
 ## Implemented
 
@@ -13,7 +13,7 @@ Milestones: native journaling foundation, owner-directed Bearings rename/app ico
 - Morning-left/midday-top/evening-right day branches, latest-period access, full entry list and additional-entry creation.
 - Native editor with approved system font, period selection, long text, debounce/lifecycle/Done saving, explicit errors and retries, deletion confirmation and protection against deleted-entry resurrection.
 - Native selected-date zoom/upward transition with reverse movement; true fade when Reduce Motion is enabled.
-- Native Dynamic Type with scalable date cells and entry markers, vertical timeline scrolling, readable period labels, a keyboard/save footer, and compact metadata at the largest text sizes.
+- Native Dynamic Type with scalable date cells and entry markers, a full-height horizontal timeline scroll surface, readable period labels, a keyboard/save footer, and compact metadata at the largest text sizes.
 
 ## Reference and owner decisions
 
@@ -62,6 +62,12 @@ On October 11, 2026, the owner selected the right-curving river/ridge map for a 
 Final Debug simulator compilation and both selected existing UI tests passed with zero failures in 82.880 seconds, covering saved edits across process relaunch and forward/reverse Reduce Motion navigation. iPhone 16 Pro screenshots were reviewed at normal and maximum text size. A warm-launch native recording has monotonic frame timestamps and shows approximately 2.13 seconds between the first fully rendered map frame and the first timeline frame. Exact evidence and remaining limits are in Testing.
 
 This opening-screen milestone was synchronized to the existing iOS Development handoff on October 11, 2026. The saved Product, Architecture, Decisions, Testing and Progress additions and status updates were fetched and verified, preserving the previous handoff content. Verification evidence is in `docs/NotionSync.md`. The implementation is local; the GitHub repository remains at the prior owner-authorized setup commit.
+
+## Centered timeline and pen shortcut
+
+On October 11, 2026, the owner requested removal of the timeline branding/slogan and bottom helper text, a centered horizontal axis, scrolling with a thumb near the bottom, and a small navy ink pen in place of the Today label. The native horizontal scroll surface now fills the area below the controls. The pen is a thin SwiftUI fountain-pen outline in `#323575`, with an accessible 44-point button that opens today’s journal. Date cells, entry markers, month navigation and the native date chooser remain available; the selected-date transition now anchors at the actual timeline axis. Opening-screen branding and journal storage are unchanged.
+
+Debug simulator compilation and all six selected UI test executions passed with zero failures: three at normal text size and three at the maximum accessibility size. They cover bottom swipes in both directions, preserved horizontal position after Back, earlier-month navigation/writing, Reduce Motion, large calendar dates, and four-entry markers with disk relaunch. iPhone 16 Pro and compact iPhone screenshots were reviewed; complete dates and remaining counts are visible. Exact evidence and device/runtime limits are in Testing. This timeline milestone was synchronized to the existing iOS Development handoff on October 11, 2026; saved source-derived updates and the unchanged parent hierarchy were fetched and verified. Evidence is recorded in `docs/NotionSync.md`. The implementation is local; the public GitHub source remains at the prior authorized setup milestone.
 
 ## Next work and boundaries
 

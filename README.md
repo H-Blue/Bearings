@@ -23,7 +23,7 @@ For a physical iPhone, select a valid Apple signing team in the app target. Devi
 ## Features
 
 - A map opening screen displays Bearings and “Find what’s been lost inside.” for at least two seconds on a fresh launch.
-- Browse dates using the horizontal timeline, month arrows, date chooser and Today shortcut. Dots indicate saved entries.
+- Browse dates on the centered timeline, including thumb swipes near the bottom. Month arrows and the date chooser reach other dates; a navy fountain-pen icon opens today’s journal. Dots indicate saved entries.
 - Open a day. Morning is on the left, midday at the top, evening on the right. A circle opens the latest entry for that period, or starts one if the period is empty.
 - **Write** always creates another entry. The editor's time-of-day menu can change its assignment.
 - Changes save after a short pause and on **Done** or app backgrounding. **Saved** confirms a successful local save. Failed saves retain the editor draft with a retry action.
@@ -44,10 +44,12 @@ Project regeneration requires Python 3 and macOS `plutil`. The script preserves 
 
 ## Tests
 
-Recorded verification on October 10, 2026:
+Recorded verification on October 10–11, 2026:
 
+- The centered timeline passed six selected UI test executions at normal and maximum text sizes, covering bottom thumb swipes, reverse context, month navigation, Reduce Motion and four-entry markers after reopening.
+- The map opening passed two selected UI tests; normal/maximum-size screenshots and a native recording verified its presentation and two-second floor.
 - A clean export of the committed app passed an unsigned Debug simulator build; the public GitHub source was also cloned without credentials.
-- The latest line-color change passed a Debug simulator build and two existing UI tests covering saved writing, period changes and reverse date navigation. Three screenshots were reviewed.
+- The line-color change passed a Debug simulator build and two existing UI tests covering saved writing, period changes and reverse date navigation. Three screenshots were reviewed.
 - The preceding rename/icon milestone passed all 24 data/editor tests, two focused UI tests and an unsigned generic iOS Release build.
 - Earlier foundation runs passed eight core UI tests and focused keyboard, accessibility, persistence and animation checks. The complete suite and device Release build were not rerun for the final color-only change.
 
@@ -73,7 +75,7 @@ The previously saved and verified [iOS Development handoff](https://app.notion.c
 
 Development was assisted by OpenAI Codex. The compass/topographic app-icon concept was created with the built-in image generator, then selected and supplied by the owner for integration. The accepted artwork was resized only to 1024 × 1024; its colors and texture were preserved. [Icon provenance](docs/design-reference/AppIcon.md) records the source, prompt and asset hashes.
 
-The latest owner direction sets decorative timeline lines and ticks, day branches, entry dividers and the editor rule to opaque `#323575`. Text and control tint retain black Ink, period/entry markers retain grey, and the paper background is unchanged.
+The owner direction sets decorative timeline lines and ticks, day branches, entry dividers and the editor rule to opaque `#323575`. The timeline’s fountain-pen shortcut uses the same navy. Other text and control tint retain black Ink, period/entry markers retain grey, and the paper background is unchanged. Timeline branding and helper text have been removed; the separate opening retains its title and slogan.
 
 AI, cloud sync, export/backup, and progressive design reveal remain future work. A local read-only snapshot interface exists for later integration; it sends nothing over the network.
 
