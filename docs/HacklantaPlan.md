@@ -38,7 +38,7 @@ Start with the person's own words. Offer a few precise feeling candidates, short
 
 ### 05 — Implement a weekly lesson and follow-up
 
-Retain the implemented weekly summary as context, then add one educational lesson from a small reviewed library. Begin with the two examples in the spec. At the first opening in a new Monday–Sunday civil week, review the prior selected practice using explicit user feedback: helped, partly helped, not useful, not tried, or unknown. Celebrate effort and learning; provide simpler practice or another approach without blaming the user. Missing writing does not mean failure.
+Retain the implemented weekly summary as context, then add one educational lesson from a small reviewed library. Begin with the two examples in the spec. At the first opening in a new Sunday–Saturday civil week, review the prior selected practice using explicit user feedback: helped, partly helped, not useful, not tried, or unknown. Celebrate effort and learning; provide simpler practice or another approach without blaming the user. Missing writing does not mean failure.
 
 **Done when:** success, partial progress, no benefit, not tried and missing-prior-week paths work; completed lesson history survives regeneration and relaunch. Keep weekly summaries and adaptive lessons as separate concepts and tasks.
 

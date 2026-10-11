@@ -124,7 +124,7 @@ final class JournalAnalysisServiceTests: XCTestCase {
         XCTAssertNil(try store.dailyAnalysis(for: outside))
         let clipped = month.clippedWeeks.first!
         XCTAssertEqual(clipped.firstDay.key, "2026-10-01")
-        XCTAssertEqual(clipped.lastDay.key, "2026-10-04")
+        XCTAssertEqual(clipped.lastDay.key, "2026-10-03")
         XCTAssertNotNil(try store.reflection(for: clipped))
     }
 
@@ -155,8 +155,14 @@ final class JournalAnalysisServiceTests: XCTestCase {
             XCTAssertLessThanOrEqual(week.days.count, 7)
         }
         let week = AnalysisPeriod.week(containing: JournalDay(key: "2026-10-01")!)
-        XCTAssertEqual(week.firstDay.key, "2026-09-28")
-        XCTAssertEqual(week.lastDay.key, "2026-10-04")
+        XCTAssertEqual(week.firstDay.key, "2026-09-27")
+        XCTAssertEqual(week.lastDay.key, "2026-10-03")
+
+        let sunday = JournalDay(key: "2026-10-11")!
+        XCTAssertTrue(AnalysisPeriod.isWeekStart(sunday))
+        let review = AnalysisPeriod.weekForReview(on: sunday)
+        XCTAssertEqual(review.firstDay.key, "2026-10-04")
+        XCTAssertEqual(review.lastDay.key, "2026-10-10")
     }
 
     @MainActor

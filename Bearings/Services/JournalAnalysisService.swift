@@ -10,7 +10,7 @@ enum AnalysisState: Equatable {
 @MainActor
 @Observable
 final class JournalAnalysisService {
-    static let version = 2
+    static let version = 3
     private(set) var availability: IntelligenceAvailability = .unavailable("Checking on-device reflections…")
     private(set) var daily: [String: StoredDailyAnalysis] = [:]
     private(set) var reflections: [String: StoredReflection] = [:]

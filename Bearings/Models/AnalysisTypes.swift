@@ -53,7 +53,7 @@ struct EmotionalZoomContent: Equatable, Sendable {
 
 enum ReflectionKind: String, Codable, Sendable { case weekly, monthly }
 
-/// Monday–Sunday weeks and calendar months, calculated in UTC civil space.
+/// Sunday–Saturday weeks and calendar months, calculated in UTC civil space.
 /// A clipped week retains only the requested month's days.
 struct AnalysisPeriod: Hashable, Sendable {
     let kind: ReflectionKind
@@ -64,7 +64,7 @@ struct AnalysisPeriod: Hashable, Sendable {
     static func week(containing day: JournalDay) -> AnalysisPeriod {
         let calendar = civilCalendar
         let date = day.date(calendar: calendar)!
-        let offset = (calendar.component(.weekday, from: date) + 5) % 7
+        let offset = calendar.component(.weekday, from: date) - 1
         let start = calendar.date(byAdding: .day, value: -offset, to: date)!
         let end = calendar.date(byAdding: .day, value: 6, to: start)!
         let minimum = JournalDay(key: "0001-01-01")!.date(calendar: calendar)!
@@ -72,6 +72,22 @@ struct AnalysisPeriod: Hashable, Sendable {
         return AnalysisPeriod(kind: .weekly,
                               firstDay: JournalDay(date: max(start, minimum), calendar: calendar),
                               lastDay: JournalDay(date: min(end, maximum), calendar: calendar))
+    }
+
+    /// On the first day of a new week, the weekly review covers the completed
+    /// Sunday–Saturday period. During the rest of a week it covers that week.
+    static func weekForReview(on day: JournalDay) -> AnalysisPeriod {
+        let current = week(containing: day)
+        guard current.firstDay == day,
+              let date = day.date(calendar: civilCalendar),
+              let previousDate = civilCalendar.date(byAdding: .day, value: -1, to: date),
+              previousDate >= JournalDay(key: "0001-01-01")!.date(calendar: civilCalendar)!
+        else { return current }
+        return week(containing: JournalDay(date: previousDate, calendar: civilCalendar))
+    }
+
+    static func isWeekStart(_ day: JournalDay) -> Bool {
+        week(containing: day).firstDay == day
     }
 
     static func month(containing day: JournalDay) -> AnalysisPeriod {

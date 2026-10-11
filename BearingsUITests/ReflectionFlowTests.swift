@@ -37,7 +37,12 @@ final class ReflectionFlowTests: XCTestCase {
         XCTAssertTrue(entryButton().exists, "AI unavailability must preserve the original writing.")
         reveal(app.buttons["reflection.weekly"])
         app.buttons["reflection.weekly"].tap()
-        XCTAssertTrue(waitFor(app.staticTexts["reflection.period.unavailable"]).exists)
+        if Calendar.current.component(.weekday, from: Date()) == 1 {
+            XCTAssertTrue(waitFor(app.staticTexts["reflection.period.empty"]).exists,
+                          "A Sunday review must use the completed prior week.")
+        } else {
+            XCTAssertTrue(waitFor(app.staticTexts["reflection.period.unavailable"]).exists)
+        }
         app.buttons["reflection.done"].tap()
         reveal(app.buttons["reflection.monthly"])
         app.buttons["reflection.monthly"].tap()
@@ -98,8 +103,12 @@ final class ReflectionFlowTests: XCTestCase {
     }
 
     func testWeeklyAndMonthlyReflectionsUseSyntheticLocalProvider() {
+        app.terminate()
+        app.launchArguments = ["--uitesting", "--ai-fixture", "--reduce-motion",
+                               "--reset-test-store", "--seed-professional-case-study"]
+        app.launch()
+        waitFor(app.buttons["timeline.today"], timeout: 12)
         openToday()
-        createEntry("A synthetic memory of a quiet walk by the river.")
         for kind in ["weekly", "monthly"] {
             reveal(app.buttons["reflection.\(kind)"])
             app.buttons["reflection.\(kind)"].tap()

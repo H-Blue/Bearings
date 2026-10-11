@@ -383,6 +383,14 @@ No Xcode build, simulator/device test, JSON-to-SwiftData import, phone-store wri
 
 - Built the current `Bearings` Debug scheme for the connected physical iPhone 16 Pro (iOS deployment target 17.0) with `xcodebuild`; build succeeded.
 - Installed the signed app and launched it with `--uitesting --reset-test-store --seed-professional-case-study --reduce-motion`. This selected and reset only `Library/Application Support/BearingsUITests/ui-tests.store`; the normal compatibility store was not selected or read.
-- After the owner requested that writing end yesterday, rebuilt, reinstalled and reset only the demo store with the revised fixture. After the two-second opening completed, copied the separate demo-store files back from the device and inspected only structural metadata. `ZJOURNALENTRY` contained exactly 14 rows with civil-day bounds `2026-09-28` through `2026-10-10`: two October 10 entries and no October 11 entry.
+- After the owner selected Sunday as the first day of the week, rebuilt, reinstalled and reset only the demo store with the revised fixture. After the two-second opening completed, copied the separate demo-store files back from the device and inspected only structural metadata. `ZJOURNALENTRY` contained exactly 14 rows on 14 distinct civil days from `2026-09-27` through `2026-10-10`, with no October 11 entry.
 - Relaunched without `--reset-test-store`, copied the demo store again and confirmed it still contained 14 rows with the same day bounds. This verifies the empty-store guard prevented duplicate seeding.
 - The launch used the real Apple intelligence provider because neither synthetic-provider argument was supplied. No model generation was requested or semantically reviewed in this check. The installed UI was not visually audited, and iOS 17 execution remains unverified.
+
+### Sunday week-boundary verification
+
+- Ran the complete `BearingsTests` target in the iPhone 16 Pro simulator: 64 tests executed, 63 passed, the real-model device test skipped, and 0 failures. This includes real file-backed migration and read-only save-failure fixtures.
+- Unit assertions verify that October 1 belongs to September 27–October 3, October 11 begins a new week, and its review period is October 4–10. Monthly clipping now ends the first October segment on Saturday, October 3.
+- Built and launched the Debug app in the simulator with the synthetic demo fixture. Visual inspection confirmed the long timeline tick falls on Sunday, October 11; neighboring days use short ticks.
+- Ran the two affected reflection UI tests with the deterministic provider: 2 passed and 0 failed. They verify Sunday prior-week routing, the empty prior-week unavailable case, weekly generation from the seeded October 4–10 fixture, monthly generation and refresh.
+- Built, signed, installed and launched the revised Debug app on the connected physical iPhone 16 Pro. The isolated device demo store contains the revised 14-day fixture. Real Foundation Models generation, the proposed lesson feature, and physical-device pixel inspection remain unverified.

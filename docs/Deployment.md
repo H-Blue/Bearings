@@ -58,7 +58,7 @@ Device acceptance should cover:
 - Launch artwork timing and interrupted-opening recovery; existing-store initialization and retry.
 - Existing journal continuity after update, timestamp/creation-zone display and backdated or moved entries.
 - Daily interpretation with primary/secondary emotions, extracted moments and trajectory; correction persistence after regeneration.
-- Monday–Sunday weeks and month-clipped inputs for a boundary-crossing week.
+- Sunday–Saturday weeks, Sunday prior-week review and month-clipped inputs for a boundary-crossing week.
 - Long multilingual/Unicode writing, cancellation while editing/backgrounding, failed generation and retry without lost writing.
 - Offline generation on an available model, foreground resumption, keyboard/large text/Reduce Motion and accessible emotion descriptions.
 - Native data protection behavior and a review of realistic model latency, energy and semantic output quality.

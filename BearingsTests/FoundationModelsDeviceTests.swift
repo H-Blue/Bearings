@@ -54,8 +54,8 @@ final class FoundationModelsDeviceTests: XCTestCase {
         XCTAssertEqual(try store.emotionOverrides(from: day, through: day)[day.key], .peace)
 
         let week = AnalysisPeriod.week(containing: day)
-        XCTAssertEqual(week.firstDay.key, "2026-10-05")
-        XCTAssertEqual(week.lastDay.key, "2026-10-11")
+        XCTAssertEqual(week.firstDay.key, "2026-10-11")
+        XCTAssertEqual(week.lastDay.key, "2026-10-17")
         await service.reflect(period: week)
         XCTAssertEqual(service.states[week.key], .idle)
         let weekly = try XCTUnwrap(store.reflection(for: week))

@@ -14,6 +14,8 @@ struct DailyReflectionSection: View {
     private var displayedEmotion: JournalEmotion? {
         chosenEmotion ?? (isCurrent ? analysis?.content.primaryEmotion : nil)
     }
+    private var weeklyPeriod: AnalysisPeriod { .weekForReview(on: day) }
+    private var weeklyTitle: String { AnalysisPeriod.isWeekStart(day) ? "Last week" : "This week" }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -61,8 +63,8 @@ struct DailyReflectionSection: View {
                 dailyStatus
             }
             HStack {
-                Button { reflection = ReflectionRoute(period: .week(containing: day)) } label: {
-                    Label("This week", systemImage: "book.closed")
+                Button { reflection = ReflectionRoute(period: weeklyPeriod) } label: {
+                    Label(weeklyTitle, systemImage: "book.closed")
                         .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                 }.accessibilityIdentifier("reflection.weekly")
             }

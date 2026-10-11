@@ -145,7 +145,7 @@ private struct TimelineDayTick: View {
     let cellWidth: CGFloat
     let markerAreaHeight: CGFloat
     let onSelect: () -> Void
-    private var major: Bool { (day.day - 1) % 7 == 0 }
+    private var major: Bool { AnalysisPeriod.isWeekStart(day) }
 
     var body: some View {
         Button(action: onSelect) {

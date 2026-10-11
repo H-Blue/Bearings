@@ -28,7 +28,7 @@ Acceptance: corrections survive relaunch/regeneration; a journal edit, move or d
 
 ### Weekly lessons and outcome review
 
-Use a small reviewed lesson library with stable lesson IDs/versions. AI selects or connects a lesson to confirmed context; it does not invent clinical advice. At the first opening in a new Gregorian Monday–Sunday week, present a prior-week review and a short new/continued lesson. This avoids requiring a guaranteed background scheduler or adding notification infrastructure.
+Use a small reviewed lesson library with stable lesson IDs/versions. AI selects or connects a lesson to confirmed context; it does not invent clinical advice. At the first opening in a new Gregorian Sunday–Saturday week, present the completed prior-week review and a short new/continued lesson. This avoids requiring a guaranteed background scheduler or adding notification infrastructure.
 
 Store one chosen practice and an explicit outcome: helped, partly helped, not useful, not tried, or unknown. Ask what happened rather than inferring success from tone or missing writing. If the writer reports success, acknowledge their effort and ask what made it work. With partial progress, simplify the practice. With no benefit, offer another reviewed approach or human support. Not tried is an opportunity to reduce the burden; unknown stays unknown.
 
@@ -93,7 +93,7 @@ Alternative review branches: partly helped → refine the request; not useful �
 - Old-store migration and actual repeated save failures/retry; existing tests stay intact.
 - Confirmed feelings/assumptions/lesson histories survive relaunch and regeneration.
 - Source changes, queued/in-flight cancellation and stale-output rejection.
-- Monday–Sunday identity, boundary-crossing weeks/month clipping and time-zone travel.
+- Sunday–Saturday identity, Sunday prior-week review, boundary-crossing weeks/month clipping and time-zone travel.
 - Mixed/uncertain/manual feelings, sparse context, unsupported locale/device and unavailable model.
 - Separate demo data/reset; cancellation of message composer; no automatic disclosure.
 - Native UI with keyboard, large text, accessible names and Reduce Motion.
