@@ -2,6 +2,8 @@
 
 Prepared October 11, 2026. These notes preserve the discussion separately from implementation steps. The pitch should use one need statistic, one grounded story and one concise AI explanation. Evidence informs the design; it does not establish Bearings' efficacy or imply endorsement by Yale.
 
+The expanded [ResearchEvidence.md](ResearchEvidence.md) contains 37 source cards with study designs, findings, limitations, feature implications, pitch claims and a future evaluation path. It includes adult online/workplace training, labeling, journaling, self-distancing, breathing, positive memories, goal review, empathy, human outreach, privacy and contrary evidence. Start with its six-source shortlist.
+
 ## Main message
 
 Bearings is designed to help people put precise words to experiences, learn emotional concepts, inspect possible patterns and choose a useful next step. The story is central: vague feeling → specific feeling/context → correct an assumption → clear communication → later review.
